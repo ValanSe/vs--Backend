@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.Map;
 import java.util.Optional;
 
 @Slf4j
@@ -25,12 +26,19 @@ public class AuthController {
     private final JwtUtil jwtUtil;
 
 
-    @PostMapping("token/checkToken")
-    public ResponseEntity<StatusResponseDto> check(@RequestHeader("Authorization") final String accessToken) {
+    @PostMapping("token/check/expiration")
+    public ResponseEntity<StatusResponseDto> check1(@RequestHeader("Authorization") final String accessToken) {
+
+        long remainingExpirationTimeInMinutes = jwtUtil.getRemainingExpirationTimeInMinutes(accessToken);
+        return ResponseEntity.ok(StatusResponseDto.success(remainingExpirationTimeInMinutes));
+    }
 
 
+    @PostMapping("token/check/allClaimsFromToken")
+    public ResponseEntity<StatusResponseDto> check2(@RequestHeader("Authorization") final String accessToken) {
 
-        return ResponseEntity.ok(StatusResponseDto.addStatus(200));
+        Map<String, Object> allClaimsFromToken = jwtUtil.getAllClaimsFromToken(accessToken);
+        return ResponseEntity.ok(StatusResponseDto.success(allClaimsFromToken));
     }
 
     @PostMapping("token/logout")
@@ -38,7 +46,7 @@ public class AuthController {
 
         // 엑세스 토큰으로 현재 Redis 정보 삭제
         refreshTokenService.removeRefreshToken(accessToken);
-        return ResponseEntity.ok(StatusResponseDto.addStatus(200));
+        return ResponseEntity.ok(StatusResponseDto.success());
     }
 
     @PostMapping("/token/refresh")
@@ -57,7 +65,7 @@ public class AuthController {
             refreshToken.updateAccessToken(newAccessToken);
             refreshTokenRepository.save(refreshToken);
             // 새로운 액세스 토큰을 반환해준다.
-            return ResponseEntity.ok(TokenResponseStatus.addStatus(200, newAccessToken));
+            return ResponseEntity.ok(TokenResponseStatus.success(newAccessToken));
         }
 
         // 리프레쉬 토큰이 존재하지 않거나 유효하지 않은 토큰이라면 빈 토큰을 보냄
