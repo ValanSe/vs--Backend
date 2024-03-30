@@ -6,6 +6,7 @@ import com.valanse.valanse.repository.redis.RefreshTokenRepository;
 import com.valanse.valanse.service.jwt.RefreshToken;
 import com.valanse.valanse.service.jwt.RefreshTokenService;
 import com.valanse.valanse.util.JwtUtil;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -51,14 +52,11 @@ public class AuthController {
 
     @PostMapping("/token/refresh")
     public ResponseEntity<TokenResponseStatus> refresh(@RequestHeader("Authorization") final String accessToken) {
-
-        // 액세스 토큰으로 Refresh 토큰 객체를 조회
-        Optional<RefreshToken> refreshTokenOptional = refreshTokenRepository.findByAccessToken(accessToken);
+        RefreshToken refreshToken = refreshTokenRepository.findByAccessToken(accessToken)
+                .orElseThrow(EntityNotFoundException::new);
 
         // RefreshToken이 존재하고 유효하다면 실행
-        if (refreshTokenOptional.isPresent() && jwtUtil.verifyToken(refreshTokenOptional.get().getRefreshToken())) {
-            // RefreshToken 객체를 꺼내온다.
-            RefreshToken refreshToken = refreshTokenOptional.get();
+        if (jwtUtil.verifyToken(refreshToken.getRefreshToken())) {
             // 권한과 아이디를 추출해 새로운 액세스토큰을 만든다.
             String newAccessToken = jwtUtil.generateAccessToken(refreshToken.getUserIdx(), jwtUtil.getRole(refreshToken.getRefreshToken()));
             // 액세스 토큰의 값을 수정해준다.

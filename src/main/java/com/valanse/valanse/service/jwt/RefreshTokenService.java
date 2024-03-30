@@ -11,16 +11,16 @@ public class RefreshTokenService {
 
     private final RefreshTokenRepository refreshTokenRepository;
 
-
     //Redis 작업
     @Transactional
-    public void saveTokenInfo(Integer userIdx, String refreshToken, String accessToken) {
-        refreshTokenRepository.save(new RefreshToken(userIdx, refreshToken, accessToken));
+    public void saveTokenInfo(Integer userIdx, String accessToken, String refreshToken) {
+        refreshTokenRepository.save(new RefreshToken(userIdx, accessToken, refreshToken));
     }
 
     @Transactional
     public void removeRefreshToken(String accessToken) {
-        RefreshToken refreshToken = refreshTokenRepository.findByAccessToken(accessToken).orElseThrow(IllegalArgumentException::new);
+        RefreshToken refreshToken = refreshTokenRepository.findByAccessToken(accessToken)
+                .orElseThrow(IllegalArgumentException::new);
         refreshTokenRepository.delete(refreshToken);
     }
 }

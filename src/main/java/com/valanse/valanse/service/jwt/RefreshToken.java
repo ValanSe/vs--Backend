@@ -16,6 +16,7 @@ public class RefreshToken implements Serializable {
     @Id
     private Integer userIdx;
 
+
     @Indexed
     private String accessToken;
 
@@ -25,3 +26,5 @@ public class RefreshToken implements Serializable {
         this.accessToken = accessToken;
     }
 }
+
+

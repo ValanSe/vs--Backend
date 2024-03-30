@@ -50,6 +50,7 @@ public class CustomOauthSuccessHandler extends SimpleUrlAuthenticationSuccessHan
 
             GeneratedToken generatedToken = jwtUtil.generateToken(user.getUserId(), user.getRole());
             log.info("accessToken = {}", generatedToken.getAccessToken());
+            log.info("refreshToken = {}", generatedToken.getRefreshToken());
 
             httpServletResponse.setHeader("Authorization", "Bearer " + generatedToken.getAccessToken());
 
