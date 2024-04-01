@@ -1,5 +1,6 @@
 package com.valanse.valanse.service.QuestionService;
 
+import com.valanse.valanse.entity.ClientResponse;
 import com.valanse.valanse.entity.Question;
 import com.valanse.valanse.entity.Category;
 
@@ -12,4 +13,6 @@ public interface QuestionService {
     Question getQuestionById(Integer questionId); // 질문 조회
     List<Question> getAllQuestions(); // 모든 질문 조회
     List<Question> getQuestionsByCategory(Category category); // 특정 카테고리의 질문 조회
+    List<Question> provideQuestionToClient(); // 클라이언트에게 질문 제공
+    void saveClientResponse(ClientResponse clientResponse); // 클라이언트의 답변을 데이터베이스에 저장
 }
