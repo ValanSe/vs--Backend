@@ -24,6 +24,6 @@ public class Question {
     private String descriptionA; // 선택지 A 설명
     private String descriptionB; // 선택지 B 설명
     private LocalDateTime createdAt; // 문제 생성 시간
-    @OneToMany(mappedBy = "question")
+    @OneToMany
     private List<CategoryQuestion> categoryQuestions;
 }
