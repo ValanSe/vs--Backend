@@ -1,5 +1,5 @@
 package com.valanse.valanse.entity;
-import com.valanse.valanse.entity.Question;
+import com.valanse.valanse.entity.CategoryQuestion;
 
 import jakarta.persistence.*;
 import lombok.Data;
@@ -18,5 +18,6 @@ public class Category {
     private Integer categoryId;
     private String name;
     private String description;
-    private List<Question> questions;
+    @OneToMany(mappedBy = "category")
+    private List<CategoryQuestion> categoryQuestions;
 }
