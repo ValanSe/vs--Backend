@@ -15,10 +15,8 @@ public class CategoryQuestion {
     private Integer categoryQuestionId;
 
     @ManyToOne
-    @JoinColumn(name = "category_id")
     private Category category;
 
     @ManyToOne
-    @JoinColumn(name = "question_id")
     private Question question;
 }
