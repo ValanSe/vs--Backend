@@ -1,12 +1,9 @@
 package com.valanse.valanse.entity;
-import com.valanse.valanse.entity.CategoryQuestion;
 
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;
-
-import java.util.List;
 
 @Entity
 @Data
