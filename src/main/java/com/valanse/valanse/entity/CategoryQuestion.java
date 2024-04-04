@@ -1,4 +1,6 @@
 package com.valanse.valanse.entity;
+import com.valanse.valanse.entity.Category;
+import com.valanse.valanse.entity.Question;
 
 import jakarta.persistence.*;
 import lombok.Data;
@@ -10,13 +12,9 @@ import lombok.AllArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class CategoryQuestion {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer categoryQuestionId;
-
-    @ManyToOne
+    //@Id
+    //@GeneratedValue(strategy = GenerationType.IDENTITY)
+    //private Integer categoryQuestionId;
     private Category category;
-
-    @ManyToOne
     private Question question;
 }

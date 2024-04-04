@@ -4,6 +4,9 @@ import com.valanse.valanse.dto.ClientResponseDto;
 import com.valanse.valanse.entity.Question;
 import com.valanse.valanse.entity.Category;
 
+import org.springframework.data.domain.Example;
+import org.springframework.data.domain.Sort;
+
 import java.util.List;
 import java.util.Optional;
 

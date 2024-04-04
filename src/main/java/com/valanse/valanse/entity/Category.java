@@ -18,6 +18,4 @@ public class Category {
     private Integer categoryId;
     private String name;
     private String description;
-    @OneToMany
-    private List<CategoryQuestion> categoryQuestions;
 }
