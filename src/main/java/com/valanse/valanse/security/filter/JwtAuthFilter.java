@@ -1,10 +1,9 @@
-package com.valanse.valanse.service.jwt;
+package com.valanse.valanse.security.filter;
 
 import com.valanse.valanse.dto.SecurityUserDto;
 import com.valanse.valanse.entity.User;
-import com.valanse.valanse.exception.JwtException;
 import com.valanse.valanse.repository.jpa.UserRepository;
-import com.valanse.valanse.util.JwtUtil;
+import com.valanse.valanse.security.util.JwtUtil;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;

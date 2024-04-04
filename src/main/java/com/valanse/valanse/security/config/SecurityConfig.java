@@ -1,10 +1,10 @@
-package com.valanse.valanse.config;
+package com.valanse.valanse.security.config;
 
-import com.valanse.valanse.filter.CustomOauthFailureHandler;
-import com.valanse.valanse.filter.CustomOauthSuccessHandler;
-import com.valanse.valanse.filter.JwtExceptionFilter;
-import com.valanse.valanse.service.OAuth2UserService.CustomOAuth2UserService;
-import com.valanse.valanse.service.jwt.JwtAuthFilter;
+import com.valanse.valanse.security.handler.CustomOauthFailureHandler;
+import com.valanse.valanse.security.handler.CustomOauthSuccessHandler;
+import com.valanse.valanse.security.filter.JwtExceptionFilter;
+import com.valanse.valanse.security.service.CustomOAuth2UserService;
+import com.valanse.valanse.security.filter.JwtAuthFilter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;

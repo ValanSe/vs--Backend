@@ -1,4 +1,4 @@
-package com.valanse.valanse.config;
+package com.valanse.valanse.repository.redis.config;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;

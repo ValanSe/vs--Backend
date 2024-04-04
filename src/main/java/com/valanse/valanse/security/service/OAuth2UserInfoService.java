@@ -1,4 +1,4 @@
-package com.valanse.valanse.service.OAuth2UserService;
+package com.valanse.valanse.security.service;
 
 import org.springframework.security.oauth2.core.user.OAuth2User;
 
