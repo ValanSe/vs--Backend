@@ -1,12 +1,12 @@
-package com.valanse.valanse.filter;
+package com.valanse.valanse.security.handler;
 
 import com.valanse.valanse.entity.User;
 import com.valanse.valanse.repository.jpa.GoogleUserRepository;
 import com.valanse.valanse.repository.jpa.KakaoUserRepository;
 import com.valanse.valanse.repository.jpa.NaverUserRepository;
 import com.valanse.valanse.repository.jpa.UserRepository;
-import com.valanse.valanse.service.jwt.GeneratedToken;
-import com.valanse.valanse.util.JwtUtil;
+import com.valanse.valanse.security.dto.GeneratedToken;
+import com.valanse.valanse.security.util.JwtUtil;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;

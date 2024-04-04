@@ -2,10 +2,10 @@ package com.valanse.valanse.controller;
 
 import com.valanse.valanse.dto.StatusResponseDto;
 import com.valanse.valanse.dto.response.TokenResponseStatus;
-import com.valanse.valanse.repository.redis.RefreshTokenRepository;
-import com.valanse.valanse.service.jwt.RefreshToken;
-import com.valanse.valanse.service.jwt.RefreshTokenService;
-import com.valanse.valanse.util.JwtUtil;
+import com.valanse.valanse.repository.redis.repository.RefreshTokenRepository;
+import com.valanse.valanse.security.dto.RefreshToken;
+import com.valanse.valanse.repository.redis.jwt.RefreshTokenService;
+import com.valanse.valanse.security.util.JwtUtil;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -15,7 +15,6 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.Map;
-import java.util.Optional;
 
 @Slf4j
 @RestController

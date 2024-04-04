@@ -1,4 +1,4 @@
-package com.valanse.valanse.exception;
+package com.valanse.valanse.security.filter;
 
 public class JwtException extends RuntimeException {
 

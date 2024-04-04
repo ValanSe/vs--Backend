@@ -1,4 +1,4 @@
-package com.valanse.valanse.filter;
+package com.valanse.valanse.security.handler;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;

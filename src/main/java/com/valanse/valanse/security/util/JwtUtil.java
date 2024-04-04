@@ -1,7 +1,7 @@
-package com.valanse.valanse.util;
+package com.valanse.valanse.security.util;
 
-import com.valanse.valanse.service.jwt.GeneratedToken;
-import com.valanse.valanse.service.jwt.RefreshTokenService;
+import com.valanse.valanse.security.dto.GeneratedToken;
+import com.valanse.valanse.repository.redis.jwt.RefreshTokenService;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jws;
 import io.jsonwebtoken.Jwts;

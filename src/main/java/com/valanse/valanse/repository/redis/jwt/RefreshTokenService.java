@@ -1,6 +1,7 @@
-package com.valanse.valanse.service.jwt;
+package com.valanse.valanse.repository.redis.jwt;
 
-import com.valanse.valanse.repository.redis.RefreshTokenRepository;
+import com.valanse.valanse.repository.redis.repository.RefreshTokenRepository;
+import com.valanse.valanse.security.dto.RefreshToken;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

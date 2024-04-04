@@ -1,4 +1,4 @@
-package com.valanse.valanse.service.OAuth2UserService;
+package com.valanse.valanse.security.service;
 
 import com.valanse.valanse.entity.NaverUser;
 import com.valanse.valanse.entity.User;
@@ -27,11 +27,8 @@ public class NaverOAuth2UserInfoService implements OAuth2UserInfoService {
         try {
 
             if (isUserRegistered(oAuth2User)) {
-                // 로그인 처리 (jwt)
             } else {
                 registerUser(oAuth2User, oauthProvider);
-                // 로그인 처리 (jwt)
-
             }
         } catch (Exception e) {
             throw new CustomOAuth2AuthenticationException("An error occurred processing OAuth2User", e);

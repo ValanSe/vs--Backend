@@ -1,4 +1,4 @@
-package com.valanse.valanse.service.OAuth2UserService;
+package com.valanse.valanse.security.service;
 
 
 import com.valanse.valanse.entity.KakaoUser;
@@ -30,8 +30,6 @@ public class KakaoOAuth2UserInfoService implements OAuth2UserInfoService {
 
             } else {
                 registerUser(oAuth2User, oauthProvider);
-                // 로그인 처리 (jwt)
-
             }
 
         } catch (Exception e) {

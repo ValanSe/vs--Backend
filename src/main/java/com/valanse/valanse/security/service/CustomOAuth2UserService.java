@@ -1,4 +1,4 @@
-package com.valanse.valanse.service.OAuth2UserService;
+package com.valanse.valanse.security.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

@@ -1,4 +1,4 @@
-package com.valanse.valanse.service.jwt;
+package com.valanse.valanse.security.dto;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;

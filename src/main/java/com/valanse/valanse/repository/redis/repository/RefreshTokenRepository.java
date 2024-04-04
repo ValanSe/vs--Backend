@@ -1,7 +1,6 @@
-package com.valanse.valanse.repository.redis;
+package com.valanse.valanse.repository.redis.repository;
 
-import com.valanse.valanse.service.jwt.RefreshToken;
-import org.springframework.data.redis.repository.configuration.EnableRedisRepositories;
+import com.valanse.valanse.security.dto.RefreshToken;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 

@@ -1,8 +1,8 @@
-package com.valanse.valanse.filter;
+package com.valanse.valanse.security.filter;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.valanse.valanse.dto.StatusResponseDto;
-import com.valanse.valanse.exception.JwtException;
+import com.valanse.valanse.security.filter.JwtException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;

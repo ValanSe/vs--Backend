@@ -1,4 +1,4 @@
-package com.valanse.valanse.filter;
+package com.valanse.valanse.exception;
 
 import com.valanse.valanse.dto.response.ErrorResponse;
 import com.valanse.valanse.exception.CustomOAuth2AuthenticationException;
