@@ -1,9 +1,5 @@
-package com.valanse.valanse.entity;
+package com.valanse.valanse.dto;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -11,10 +7,7 @@ import java.time.LocalDateTime;
 
 @Data
 @NoArgsConstructor
-@Entity
-public class UserAnswer {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+public class UserAnswerDto {
     private Integer answerId; // 답변 식별자
     private Integer userId; // 답변한 사용자 식별자
     private Integer quizId; // 답변한 퀴즈 식별자
