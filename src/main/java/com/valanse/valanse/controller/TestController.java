@@ -15,4 +15,9 @@ public class TestController {
     public String failureTest() {
         return "failure";
     }
+
+    @GetMapping("/test")
+    public String realTset() {
+        return "test";
+    }
 }

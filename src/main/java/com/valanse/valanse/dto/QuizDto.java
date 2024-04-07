@@ -7,7 +7,7 @@ import java.time.LocalDateTime;
 
 
 @Builder
-public class BalanceQuizDto {
+public class QuizDto {
     private Integer quizId; // 문제 식별자
     private Integer authorUserId; // 문제를 등록한 사용자 식별자
     private String content; // 문제 내용
