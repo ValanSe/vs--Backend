@@ -1,11 +1,14 @@
 package com.valanse.valanse.dto;
 
 
-import lombok.Builder;
+import lombok.*;
 
 import java.time.LocalDateTime;
 
-
+@Getter
+@ToString
+@NoArgsConstructor
+@AllArgsConstructor
 @Builder
 public class QuizDto {
     private Integer quizId; // 문제 식별자
