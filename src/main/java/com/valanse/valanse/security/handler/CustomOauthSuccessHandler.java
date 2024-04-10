@@ -48,6 +48,7 @@ public class CustomOauthSuccessHandler extends SimpleUrlAuthenticationSuccessHan
             // 프로바이더별 사용자 정보 처리
             User user = processUserInformation(registrationId, oAuth2User);
 
+            // JWT 토큰을 생성하고 HTTP 응답 헤더에 포함시켜 클라이언트에 전달
             GeneratedToken generatedToken = jwtUtil.generateToken(user.getUserId(), user.getRole());
             log.info("accessToken = {}", generatedToken.getAccessToken());
             log.info("refreshToken = {}", generatedToken.getRefreshToken());
@@ -60,22 +61,24 @@ public class CustomOauthSuccessHandler extends SimpleUrlAuthenticationSuccessHan
         }
     }
 
+    // OAuth2 사용자의 속성을 가져옴
     private User processUserInformation(String registrationId, OAuth2User oAuth2User) {
         Map<String, Object> attributes = oAuth2User.getAttributes();
         String id; // 사용자 고유 식별 값
 
+        // 등록된 제공자별로 사용자 고유 식별 값 추출
         switch (registrationId) {
             case "google":
-                id = (String) attributes.get("sub");
-                return findUserByProviderId(googleUserRepository, id, registrationId);
+                id = (String) attributes.get("sub"); // 서브 식별자 추출
+                return findUserByProviderId(googleUserRepository, id, registrationId); // 사용자 정보를 데이터베이스에서 찾음
 
             case "naver":
-                Map<String, Object> response = (Map<String, Object>) attributes.get("response");
+                Map<String, Object> response = (Map<String, Object>) attributes.get("response"); // 제공자의 사용자 정보를 포함한 응답에서 ID 추출
                 id = (String) response.get("id");
                 return findUserByProviderId(naverUserRepository, id, registrationId);
 
             case "kakao":
-                id = attributes.get("id").toString();
+                id = attributes.get("id").toString(); // kakao 제공자의 ID 추출
                 return findUserByProviderId(kakaoUserRepository, id, registrationId);
 
             default:
@@ -83,6 +86,7 @@ public class CustomOauthSuccessHandler extends SimpleUrlAuthenticationSuccessHan
         }
     }
 
+    // 제공된 Repository에서 특정 ID를 사용하여 사용자를 검색
     private <T> User findUserByProviderId(JpaRepository<T, String> repository, String id, String registrationId) {
         T providerUser = repository.findById(id).orElseThrow(() -> new EntityNotFoundException("User not found in OauthProviderUserRepository" + " : " + registrationId + " -> " + id));
 

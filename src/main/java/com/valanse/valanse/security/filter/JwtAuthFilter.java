@@ -24,17 +24,18 @@ import java.util.List;
 @RequiredArgsConstructor
 @Slf4j
 @Component
-public class JwtAuthFilter extends OncePerRequestFilter {
+public class JwtAuthFilter extends OncePerRequestFilter { // 한 번 요청당 한 번만 실행
 
     private final JwtUtil jwtUtil;
     private final UserRepository userRepository;
 
     @Override
     protected boolean shouldNotFilter(HttpServletRequest httpServletRequest) {
-        return httpServletRequest.getRequestURI().contains("token/");
+        return httpServletRequest.getRequestURI().contains("token/"); // /token/으로 시작하는 URI 패턴에 필터 적용하지 않음
     }
 
 
+    // 요청 헤더에서 JWT 토큰을 가져와 검증하고 유효한 경우 해당 토큰을 사용하여 사용자 정보 추출하여 SecurityContextHolder에 인증 객체 등록
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         // request Header에서 AccessToken을 가져온다.
@@ -54,10 +55,10 @@ public class JwtAuthFilter extends OncePerRequestFilter {
         // AccessToken의 값이 있고, 유효한 경우에 진행한다.
         if (jwtUtil.verifyToken(accessToken)) {
 
-            User user = userRepository.findById(jwtUtil.getIdx(accessToken))
+            User user = userRepository.findById(jwtUtil.getIdx(accessToken)) // 토큰에서 사용자의 식별자를 추출하고 데이터베이스에서 해당 사용자 정보를 조회
                     .orElseThrow(IllegalStateException::new);
 
-            // SecurityContext에 등록할 User 객체를 만들어준다.
+            // 조회된 사용자 정보를 기반으로 SecurityContext에 등록할 User 객체를 만들어준다.
             SecurityUserDto securityUserDto = SecurityUserDto.builder()
                     .userIdx(user.getUserId())
                     .role(user.getRole())
@@ -71,7 +72,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
         filterChain.doFilter(request, response);
     }
 
-
+    // SecurityUserDto를 사용하여 Authentication 객체 생성; 이 객체는 사용자 정보와 권한 정보 포함
     public Authentication getAuthentication(SecurityUserDto securityUserDto) {
         return new UsernamePasswordAuthenticationToken(securityUserDto, "", List.of(new SimpleGrantedAuthority(securityUserDto.getRole())));
     }
