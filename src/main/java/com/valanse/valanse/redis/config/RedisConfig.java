@@ -1,4 +1,4 @@
-package com.valanse.valanse.repository.redis.config;
+package com.valanse.valanse.redis.config;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -21,8 +21,8 @@ public class RedisConfig {
     @Value("${spring.data.redis.port}")
     private int port;
 
-    @Value("${spring..data.redis.password}")
-    private String password;
+    private final String testPassword = "test";
+
 
 
     @Bean
@@ -30,7 +30,7 @@ public class RedisConfig {
         RedisStandaloneConfiguration redisStandaloneConfiguration = new RedisStandaloneConfiguration();
         redisStandaloneConfiguration.setHostName(host);
         redisStandaloneConfiguration.setPort(port);
-        redisStandaloneConfiguration.setPassword(password);
+        redisStandaloneConfiguration.setPassword(testPassword);
         return new LettuceConnectionFactory(redisStandaloneConfiguration);
     }
 

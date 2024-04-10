@@ -2,9 +2,9 @@ package com.valanse.valanse.controller;
 
 import com.valanse.valanse.dto.StatusResponseDto;
 import com.valanse.valanse.dto.response.TokenResponseStatus;
-import com.valanse.valanse.repository.redis.repository.RefreshTokenRepository;
+import com.valanse.valanse.redis.repository.RefreshTokenRepository;
 import com.valanse.valanse.security.dto.RefreshToken;
-import com.valanse.valanse.repository.redis.jwt.RefreshTokenService;
+import com.valanse.valanse.redis.jwt.RefreshTokenService;
 import com.valanse.valanse.security.util.JwtUtil;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
