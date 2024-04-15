@@ -7,8 +7,8 @@ import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
 
-@Repository
 @EnableRedisRepositories
+@Repository
 public interface RefreshTokenRepository extends CrudRepository<RefreshToken, Integer> {
 
     Optional<RefreshToken> findByAccessToken(String accessToken);

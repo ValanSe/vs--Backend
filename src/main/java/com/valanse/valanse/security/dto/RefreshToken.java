@@ -2,6 +2,7 @@ package com.valanse.valanse.security.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+
 import org.springframework.data.annotation.Id;
 import org.springframework.data.redis.core.RedisHash;
 import org.springframework.data.redis.core.index.Indexed;
