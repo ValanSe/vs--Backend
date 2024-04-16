@@ -12,7 +12,7 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 import java.util.Random;
 
-@Service
+@Service("balanceProblemQuizService")
 @RequiredArgsConstructor
 @Slf4j
 public class QuizServiceImpl implements QuizService {
