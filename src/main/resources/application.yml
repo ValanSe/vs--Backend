@@ -1,12 +1,12 @@
-#server:
-#  port: 8443
-#  ssl:
-#    key-store: keystore.p12
-#    key-store-password: stay3492
-#    keyStoreType: PKCS12
-#    keyAlias: stay
-#
-#frontend:
+##server:
+##  port: 8443
+##  ssl:
+##    key-store: keystore.p12
+##    key-store-password: stay3492
+##    keyStoreType: PKCS12
+##    keyAlias: stay
+##
+##frontend:
 #  url: http://localhost:3000
 
 spring:
