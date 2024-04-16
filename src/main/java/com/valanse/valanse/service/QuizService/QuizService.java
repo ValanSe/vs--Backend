@@ -9,12 +9,12 @@ import java.util.List;
 import java.util.Optional;
 
 public interface QuizService {
-    void addQuiz(QuizDto quiz); // 퀴즈 등록
-    void updateQuiz(QuizDto quiz); // 퀴즈 업데이트
-    void deleteQuiz(Integer quizId); // 퀴즈 삭제
-    Optional<Quiz> findQuizById(Integer quizId); // 퀴즈 조회
-    List<Quiz> findAllQuiz(); // 모든 퀴즈 조회
-    List<Quiz> findQuizByCategory(Category category); // 특정 카테고리의 퀴즈 조회
+    List<Quiz> findUserPreferences(Integer userId, int preference); // 사용자가 선호도 준 퀴즈 조회
+    Optional<Integer> findQuizPreferenceSum(Integer quizId); // 퀴즈의 선호도 합 조회
+    Optional<Integer> findRecentActivity(Quiz quiz); // 퀴즈의 최근 활동(댓글 수, 조회수 등) 조회
+    List<Quiz> sortQuizByCreatedAt(); // 생성 시간에 따른 퀴즈 정렬
+    List<Quiz> sortQuizByPreference(); // 선호도에 따른 퀴즈 정렬
+    List<Quiz> searchQuiz(String keyword); // 퀴즈 검색
     List<QuizDto> provideQuizToClient(); // 클라이언트에게 퀴즈 제공
-    void saveClientResponse(UserAnswerDto userAnswer); // 클라이언트의 답변을 데이터베이스에 저장
+    void saveUserAnswer(UserAnswerDto userAnswer); // 클라이언트의 답변을 데이터베이스에 저장
 }

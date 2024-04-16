@@ -32,7 +32,7 @@ public class SecurityConfig {
 
 
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
+    public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception { // 보안 구성 설정; 요청이 서버로 들어오면 필터 체인을 통해 요청이 처리됨
 
         httpSecurity
                 .csrf(AbstractHttpConfigurer::disable) // csrf 비활성화 -> cookie 를 사용하지 않으면 꺼도 된다. (cookie 를 사용할 경우 httpOnly(XSS 방어), sameSite(CSRF 방어)로 방어해야 한다.)
@@ -40,26 +40,27 @@ public class SecurityConfig {
 //                .httpBasic(AbstractHttpConfigurer::disable) // 기본 인증 로그인 비활성화
 //                .formLogin(AbstractHttpConfigurer::disable) // 기본 login form 비활성화
 //                .logout(AbstractHttpConfigurer::disable) // 기본 logout 비활성화
-                .sessionManagement(sessionManagement ->
+                .sessionManagement(sessionManagement -> // 세션 관리 정책 설정
                         sessionManagement.sessionCreationPolicy(SessionCreationPolicy.STATELESS)) // 세션 사용하지 않음
 
                 // request 인증, 인가 설정
                 .authorizeHttpRequests(request ->
                         request
                                 .requestMatchers("/token/**", "/login", "/failure").permitAll()
-                                .anyRequest().authenticated()
+                                .anyRequest().authenticated() // /token/**, /login, /failure 경로에 대한 요청 외 인증 요구
                 )
 
+                // OAuth2 로그인 설정
                 .oauth2Login(oauth2 ->
                         oauth2
-                                .userInfoEndpoint(userInfoEndpointConfig ->
-                                        userInfoEndpointConfig.userService(customOAuth2UserService))
+                                .userInfoEndpoint(userInfoEndpointConfig -> // 사용자 정보 엔드포인트 설정; 엔드포인트: OAuth2 로그인 시 사용자의 프로필 정보를 가져오는 역할
+                                        userInfoEndpointConfig.userService(customOAuth2UserService)) // userService를 통한 사용자 서비스 구성
                                 .failureHandler(customOauthFailureHandler)
-                                .successHandler(customOauthSuccessHandler)
+                                .successHandler(customOauthSuccessHandler) // 로그인 성공 및 실패 핸들러
                 );
 
 
-        // JWT 인증 필터를 UsernamePasswordAuthenticationFilter 앞에 추가한다.
+        // JWT 인증 필터를 UsernamePasswordAuthenticationFilter 앞에 추가한다. JWT 인증 필터가 인증 요청 처리
         return httpSecurity
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)
                 .addFilterBefore(jwtExceptionFilter, JwtAuthFilter.class)
