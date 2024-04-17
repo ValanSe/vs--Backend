@@ -1,4 +1,4 @@
-package com.valanse.valanse.repository.jpa;
+package com.valanse.valanse.repository;
 import com.valanse.valanse.entity.Category;
 import org.springframework.data.jpa.repository.JpaRepository;
 

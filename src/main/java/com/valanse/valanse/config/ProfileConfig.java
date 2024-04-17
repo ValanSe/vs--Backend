@@ -1,6 +1,6 @@
 package com.valanse.valanse.config;
 
-import com.valanse.valanse.repository.jpa.QuizRepository;
+import com.valanse.valanse.repository.QuizRepository;
 import com.valanse.valanse.service.BalanceProblemService.QuizService;
 import com.valanse.valanse.service.BalanceProblemService.QuizServiceImpl;
 import org.springframework.context.annotation.Bean;

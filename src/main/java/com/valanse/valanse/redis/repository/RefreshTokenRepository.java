@@ -1,13 +1,11 @@
 package com.valanse.valanse.redis.repository;
 
-import com.valanse.valanse.security.dto.RefreshToken;
-import org.springframework.data.redis.repository.configuration.EnableRedisRepositories;
+import com.valanse.valanse.redis.entity.RefreshToken;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
 
-@EnableRedisRepositories
 @Repository
 public interface RefreshTokenRepository extends CrudRepository<RefreshToken, Integer> {
 

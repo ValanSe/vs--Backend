@@ -1,10 +1,10 @@
 package com.valanse.valanse.security.config;
 
+import com.valanse.valanse.security.filter.JwtAuthFilter;
+import com.valanse.valanse.security.filter.JwtExceptionFilter;
 import com.valanse.valanse.security.handler.CustomOauthFailureHandler;
 import com.valanse.valanse.security.handler.CustomOauthSuccessHandler;
-import com.valanse.valanse.security.filter.JwtExceptionFilter;
 import com.valanse.valanse.security.service.CustomOAuth2UserService;
-import com.valanse.valanse.security.filter.JwtAuthFilter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
@@ -34,12 +34,11 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception { // 보안 구성 설정; 요청이 서버로 들어오면 필터 체인을 통해 요청이 처리됨
 
-        httpSecurity
-                .csrf(AbstractHttpConfigurer::disable) // csrf 비활성화 -> cookie 를 사용하지 않으면 꺼도 된다. (cookie 를 사용할 경우 httpOnly(XSS 방어), sameSite(CSRF 방어)로 방어해야 한다.)
-//                .cors(AbstractHttpConfigurer::disable) // cors 비활성화 -> 프론트와 연결 시 따로 설정 필요
-//                .httpBasic(AbstractHttpConfigurer::disable) // 기본 인증 로그인 비활성화
-//                .formLogin(AbstractHttpConfigurer::disable) // 기본 login form 비활성화
-//                .logout(AbstractHttpConfigurer::disable) // 기본 logout 비활성화
+        httpSecurity.csrf(AbstractHttpConfigurer::disable); // csrf 비활성화
+
+        httpSecurity.httpBasic(AbstractHttpConfigurer::disable) // 기본 인증 로그인 비활성화
+                .formLogin(AbstractHttpConfigurer::disable) // 기본 login form 비활성화
+                .logout(AbstractHttpConfigurer::disable) // 기본 logout 비활성화
                 .sessionManagement(sessionManagement -> // 세션 관리 정책 설정
                         sessionManagement.sessionCreationPolicy(SessionCreationPolicy.STATELESS)) // 세션 사용하지 않음
 

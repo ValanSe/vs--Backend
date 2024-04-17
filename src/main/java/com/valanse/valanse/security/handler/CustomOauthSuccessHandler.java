@@ -1,11 +1,11 @@
 package com.valanse.valanse.security.handler;
 
 import com.valanse.valanse.entity.User;
-import com.valanse.valanse.repository.jpa.GoogleUserRepository;
-import com.valanse.valanse.repository.jpa.KakaoUserRepository;
-import com.valanse.valanse.repository.jpa.NaverUserRepository;
-import com.valanse.valanse.repository.jpa.UserRepository;
-import com.valanse.valanse.security.dto.GeneratedToken;
+import com.valanse.valanse.repository.GoogleUserRepository;
+import com.valanse.valanse.repository.KakaoUserRepository;
+import com.valanse.valanse.repository.NaverUserRepository;
+import com.valanse.valanse.repository.UserRepository;
+import com.valanse.valanse.security.dto.GeneratedTokenDto;
 import com.valanse.valanse.security.util.JwtUtil;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.servlet.ServletException;
@@ -13,6 +13,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
@@ -20,8 +21,10 @@ import org.springframework.security.oauth2.core.OAuth2AuthenticationException;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationSuccessHandler;
 import org.springframework.stereotype.Component;
+import org.springframework.web.util.UriComponentsBuilder;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.Map;
 
 @Slf4j
@@ -34,6 +37,9 @@ public class CustomOauthSuccessHandler extends SimpleUrlAuthenticationSuccessHan
     private final NaverUserRepository naverUserRepository;
     private final KakaoUserRepository kakaoUserRepository;
     private final UserRepository userRepository;
+
+    @Value("${frontend.url}")
+    private String frontendUrl;
 
     @Override
     public void onAuthenticationSuccess(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse, Authentication authentication) throws IOException, ServletException {
@@ -49,14 +55,22 @@ public class CustomOauthSuccessHandler extends SimpleUrlAuthenticationSuccessHan
             User user = processUserInformation(registrationId, oAuth2User);
 
             // JWT 토큰을 생성하고 HTTP 응답 헤더에 포함시켜 클라이언트에 전달
-            GeneratedToken generatedToken = jwtUtil.generateToken(user.getUserId(), user.getRole());
-            log.info("accessToken = {}", generatedToken.getAccessToken());
-            log.info("refreshToken = {}", generatedToken.getRefreshToken());
+            GeneratedTokenDto generatedTokenDto = jwtUtil.generateToken(user.getUserId(), user.getRole());
+            log.info("accessToken = {}", generatedTokenDto.getAccessToken());
+            log.info("refreshToken = {}", generatedTokenDto.getRefreshToken());
+            log.info("stateToken = {}", generatedTokenDto.getStateToken());
 
-            httpServletResponse.setHeader("Authorization", "Bearer " + generatedToken.getAccessToken());
+            int expiry = 60 * 60; // For example, 1 hours
 
             // 사용자를 리디렉션할 URL 설정
-            httpServletResponse.sendRedirect("/success");
+            String targetUrl = UriComponentsBuilder.fromUriString(frontendUrl)
+                    .queryParam("userIdx", generatedTokenDto.getStateToken())
+                    .build()
+                    .encode(StandardCharsets.UTF_8)
+                    .toUriString();
+
+            // 로그인 확인 페이지로 리다이렉트 시킨다.
+            getRedirectStrategy().sendRedirect(httpServletRequest, httpServletResponse, targetUrl);
 
         }
     }

@@ -1,7 +1,11 @@
 package com.valanse.valanse.security.util;
 
-import com.valanse.valanse.security.dto.GeneratedToken;
-import com.valanse.valanse.redis.jwt.RefreshTokenService;
+import com.valanse.valanse.exception.InvalidStateTokenException;
+import com.valanse.valanse.redis.entity.AccessToken;
+import com.valanse.valanse.redis.repository.AccessTokenRepository;
+import com.valanse.valanse.redis.repository.RefreshTokenRepository;
+import com.valanse.valanse.redis.service.TokenService;
+import com.valanse.valanse.security.dto.GeneratedTokenDto;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jws;
 import io.jsonwebtoken.Jwts;
@@ -12,6 +16,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.nio.charset.StandardCharsets;
 import java.security.Key;
@@ -23,7 +28,10 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class JwtUtil {
 
-    private final RefreshTokenService refreshTokenService;
+    private final TokenService tokenService;
+    private final AccessTokenRepository accessTokenRepository;
+    private final RefreshTokenRepository refreshTokenRepository;
+    private final StateTokenUtil stateTokenUtil;
 
     @Value("${jwt.secret}")
     private String stringSecretKey;
@@ -36,14 +44,20 @@ public class JwtUtil {
         secretKey = Keys.hmacShaKeyFor(stringSecretKey.getBytes(StandardCharsets.UTF_8));
     }
 
-    public GeneratedToken generateToken(Integer userIdx, String role) {
-        // refreshToken과 accessToken을 생성한다.
-        String refreshToken = generateRefreshToken(userIdx, role);
+    public GeneratedTokenDto generateToken(Integer userIdx, String role) {
+        // accessToken 발급을 위한 stateToken을 생성한다.
+        // stateToken은 엑세스 토큰 발급을 위한 일회용 토큰이다.
+        String stateToken = stateTokenUtil.getStateToken();
+
+        // accessToken과 refreshToken을 생성한다.
         String accessToken = generateAccessToken(userIdx, role);
+        String refreshToken = generateRefreshToken(userIdx, role);
 
         // 토큰을 Redis에 저장한다.
-        refreshTokenService.saveTokenInfo(userIdx, accessToken, refreshToken);
-        return new GeneratedToken(accessToken, refreshToken);
+        tokenService.saveAccessTokenInfo(stateToken, accessToken);
+        // userIdx를 키로 하여 refreshToken을 저장한다. accessToken은 인덱싱을 위한 메타데이터로 사용되기도 한다.
+        tokenService.saveRefreshTokenInfo(userIdx, accessToken, refreshToken);
+        return new GeneratedTokenDto(stateToken, accessToken, refreshToken);
     }
 
     public String generateRefreshToken(int userIdx, String role) {
@@ -108,8 +122,19 @@ public class JwtUtil {
         }
     }
 
+    @Transactional
+    public String getAccessTokenByStateToken(String stateToken) {
+        String accessToken = accessTokenRepository.findByStateToken(stateToken)
+                .orElseThrow(() -> new InvalidStateTokenException("Invalid state token provided."))
+                .getAccessToken();
+
+        accessTokenRepository.deleteById(stateToken);
+
+        return accessToken; // AccessToken 객체에서 액세스 토큰 문자열 반환
+    }
+
     // 토큰에서 USERIDX(유저 식별자)만 추출한다.
-    public int getIdx(String token) {
+    public int getUserIdx(String token) {
         return Jwts.parserBuilder()
                 .setSigningKey(secretKey)
                 .build()
@@ -119,7 +144,7 @@ public class JwtUtil {
     }
 
     // 토큰에서 ROLE(권한)만 추출한다.
-    public String getRole(String token) {
+    public String getUserRole(String token) {
         return Jwts.parserBuilder()
                 .setSigningKey(secretKey)
                 .build()
@@ -158,5 +183,6 @@ public class JwtUtil {
                 .parseClaimsJws(token)
                 .getBody();
     }
+
 
 }

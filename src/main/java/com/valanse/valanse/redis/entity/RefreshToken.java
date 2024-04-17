@@ -1,4 +1,4 @@
-package com.valanse.valanse.security.dto;
+package com.valanse.valanse.redis.entity;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -11,12 +11,11 @@ import java.io.Serializable;
 
 @Getter
 @AllArgsConstructor
-@RedisHash(value = "jwtRefreshToken", timeToLive = 60 * 60 * 24 * 14)
+@RedisHash(value = "RefreshToken", timeToLive = 60 * 60 * 24 * 14)
 public class RefreshToken implements Serializable {
 
     @Id
     private Integer userIdx;
-
 
     @Indexed
     private String accessToken;

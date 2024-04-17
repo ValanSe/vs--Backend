@@ -25,4 +25,9 @@ public class QuizController {
     public ResponseEntity<StatusResponseDto> getQuiz(@PathVariable("quizId") Integer quizId) {
         return ResponseEntity.ok(StatusResponseDto.success(quizService.getQuiz(quizId)));
     }
+
+    @GetMapping("/quiz/test/test")
+    public ResponseEntity<StatusResponseDto> getTestReq(){
+        return ResponseEntity.ok(StatusResponseDto.success("success"));
+    }
 }

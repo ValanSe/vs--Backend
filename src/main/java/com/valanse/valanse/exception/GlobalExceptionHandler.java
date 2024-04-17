@@ -181,5 +181,17 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(errorResponse, HttpStatus.UNAUTHORIZED); // 혹은 적절한 다른 HTTP 상태 코드
     }
 
+    @ExceptionHandler(InvalidStateTokenException.class)
+    public ResponseEntity<ErrorResponse> handleInvalidStateTokenException(InvalidStateTokenException e, WebRequest request) {
+        ErrorResponse errorResponse = new ErrorResponse(
+                LocalDateTime.now(),
+                HttpStatus.BAD_REQUEST.value(), // 400 Bad Request 상태 코드 사용
+                "Invalid State Token",
+                "The provided state token is invalid or expired. Please request a new state token.",
+                request.getDescription(false));
+
+        return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
+    }
+
 
 }
