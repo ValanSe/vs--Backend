@@ -55,7 +55,7 @@ public class JwtAuthFilter extends OncePerRequestFilter { // 한 번 요청당 �
         // AccessToken의 값이 있고, 유효한 경우에 진행한다.
         if (jwtUtil.verifyToken(accessToken)) {
 
-            User user = userRepository.findById(jwtUtil.getIdx(accessToken)) // 토큰에서 사용자의 식별자를 추출하고 데이터베이스에서 해당 사용자 정보를 조회
+            User user = userRepository.findById(jwtUtil.getUserIdx(accessToken)) // 토큰에서 사용자의 식별자를 추출하고 데이터베이스에서 해당 사용자 정보를 조회
                     .orElseThrow(IllegalStateException::new);
 
             // 조회된 사용자 정보를 기반으로 SecurityContext에 등록할 User 객체를 만들어준다.

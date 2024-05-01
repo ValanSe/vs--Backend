@@ -16,9 +16,9 @@ public class QuizController {
 
     private final QuizService quizService;
 
-    @GetMapping("/quiz/random")
+    @GetMapping("/quiz/test")
     public ResponseEntity<StatusResponseDto> getRandomQuiz() {
-        return ResponseEntity.ok(StatusResponseDto.success(quizService.getRandomQuiz()));
+        return ResponseEntity.ok(StatusResponseDto.success("test05010909"));
     }
 
     @GetMapping("/quiz/{quizId}")
@@ -26,8 +26,4 @@ public class QuizController {
         return ResponseEntity.ok(StatusResponseDto.success(quizService.getQuiz(quizId)));
     }
 
-    @GetMapping("/quiz/test/test")
-    public ResponseEntity<StatusResponseDto> getTestReq(){
-        return ResponseEntity.ok(StatusResponseDto.success("success"));
-    }
 }

@@ -3,7 +3,7 @@ package com.valanse.valanse.service.BalanceProblemService;
 import com.valanse.valanse.dto.QuizDto;
 import com.valanse.valanse.entity.Quiz;
 import com.valanse.valanse.entity.UserAnswer;
-import com.valanse.valanse.repository.QuizRepository;
+import com.valanse.valanse.repository.jpa.QuizRepository;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

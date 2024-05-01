@@ -1,10 +1,10 @@
 package com.valanse.valanse.security.handler;
 
 import com.valanse.valanse.entity.User;
-import com.valanse.valanse.repository.GoogleUserRepository;
-import com.valanse.valanse.repository.KakaoUserRepository;
-import com.valanse.valanse.repository.NaverUserRepository;
-import com.valanse.valanse.repository.UserRepository;
+import com.valanse.valanse.repository.jpa.GoogleUserRepository;
+import com.valanse.valanse.repository.jpa.KakaoUserRepository;
+import com.valanse.valanse.repository.jpa.NaverUserRepository;
+import com.valanse.valanse.repository.jpa.UserRepository;
 import com.valanse.valanse.security.dto.GeneratedTokenDto;
 import com.valanse.valanse.security.util.JwtUtil;
 import jakarta.persistence.EntityNotFoundException;
@@ -64,7 +64,7 @@ public class CustomOauthSuccessHandler extends SimpleUrlAuthenticationSuccessHan
 
             // 사용자를 리디렉션할 URL 설정
             String targetUrl = UriComponentsBuilder.fromUriString(frontendUrl)
-                    .queryParam("userIdx", generatedTokenDto.getStateToken())
+                    .queryParam("stateToken", generatedTokenDto.getStateToken())
                     .build()
                     .encode(StandardCharsets.UTF_8)
                     .toUriString();

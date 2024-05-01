@@ -1,4 +1,4 @@
-package com.valanse.valanse.repository;
+package com.valanse.valanse.repository.jpa;
 
 
 import com.valanse.valanse.entity.NaverUser;

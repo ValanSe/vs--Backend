@@ -18,7 +18,6 @@ public class StatusResponseDto {
     public static StatusResponseDto addStatus(Integer status) {
         return new StatusResponseDto(status);
     }
-
     public static StatusResponseDto success(){
         return new StatusResponseDto(200);
     }
