@@ -46,6 +46,9 @@ CREATE TABLE `quiz`
     `option_b`       VARCHAR(255) NOT NULL COMMENT '선택지 B',
     `description_a`         TEXT COMMENT 'A 설명',
     `description_b`         TEXT COMMENT 'B 설명',
+    `view`           INT          NOT NULL '조회수',
+    `comment`        INT          NOT NULL '댓글 수',
+    `preference`     INT          NOT NULL '선호도 수',
     `created_at`     DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '질문 생성 시간',
     `updated_at`     DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '질문 수정 시간',
     FOREIGN KEY (`author_user_id`) REFERENCES `user` (`user_id`)
