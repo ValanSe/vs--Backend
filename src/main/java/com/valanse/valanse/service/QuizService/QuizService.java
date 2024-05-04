@@ -14,13 +14,9 @@ public interface QuizService {
 
     void increasePreference(Integer quizId, int preference); // 퀴즈의 선호도 증가
 
-    void increaseComment(Integer quizId); // 퀴즈의 댓글 수 증가
-
     Optional<Integer> getQuizPreference(Integer quizId); // 퀴즈의 선호도 조회
 
     Optional<Integer> getViewsCount(Integer quizId); // 퀴즈의 조회수 조회
-
-    Optional<Integer> getCommentsCount(Integer quizId); // 퀴즈의 댓글 수 조회
 
     List<Quiz> sortQuizByCreatedAt(); // 생성 시간에 따른 퀴즈 정렬
 

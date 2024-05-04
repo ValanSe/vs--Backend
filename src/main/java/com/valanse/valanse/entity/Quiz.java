@@ -27,23 +27,7 @@ public class Quiz {
     private String descriptionB; // 선택지 B 설명
 
     private Integer view; // 퀴즈의 조회수
-    private Integer comment; // 퀴즈의 댓글 수
     private Integer preference; // 퀴즈의 선호도 수
 
     private LocalDateTime createdAt; // 퀴즈 생성 시간
-
-    // 조회수 증가
-    public void incrementViews() {
-        this.view++;
-    }
-
-    // 댓글 수 증가
-    public void incrementComments() {
-        this.comment++;
-    }
-
-    // 선호도 수 증가
-    public void incrementPreference(Integer preference) {
-        this.preference += preference;
-    }
 }

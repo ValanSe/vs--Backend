@@ -13,7 +13,6 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class UserAnswerServicelmpl implements UserAnswerService {
 
-    @Autowired
     private UserAnswerRepository userAnswerRepository;
 
     @Override

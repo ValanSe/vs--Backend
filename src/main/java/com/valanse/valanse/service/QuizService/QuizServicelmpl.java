@@ -1,5 +1,6 @@
 package com.valanse.valanse.service.QuizService;
 
+import ch.qos.logback.classic.Logger;
 import com.valanse.valanse.dto.QuizDto;
 import com.valanse.valanse.dto.UserAnswerDto;
 import com.valanse.valanse.entity.Quiz;
@@ -16,16 +17,15 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class QuizServicelmpl implements QuizService {
 
-    @Autowired
     private final QuizRepository quizRepository;
+    private Logger log;
 
     @Override
     public QuizDto getQuiz(Integer quizId) {
-        Optional<Quiz> optionalQuiz = quizRepository.findById(quizId);
-        if(optionalQuiz.isPresent()) {
-            Quiz quiz = optionalQuiz.get();
-            quiz.incrementViews(); // 조회수 증가
-            quizRepository.save(quiz);
+        try {
+            Quiz quiz = quizRepository.findById(quizId)
+                    .orElseThrow(() -> new QuizNotFoundException("Quiz not found with id: " + quizId));
+            quizRepository.increaseView(quizId); // 조회수 증가
             return QuizDto.builder()
                     .quizId(quiz.getQuizId())
                     .authorUserId(quiz.getAuthorUserId())
@@ -36,65 +36,45 @@ public class QuizServicelmpl implements QuizService {
                     .descriptionB(quiz.getDescriptionB())
                     .createdAt(quiz.getCreatedAt())
                     .build();
-        } else {
-            throw new QuizNotFoundException("Quiz not found with id: " + quizId);
+        } catch (Exception e) {
+            log.error("Error retrieving quiz with id {}: {}", quizId, e.getMessage(), e);
+            throw e;
         }
     }
 
     @Override
     public void increasePreference(Integer quizId, int preference) {
-        Optional<Quiz> optionalQuiz = quizRepository.findById(quizId);
-        if(optionalQuiz.isPresent()) {
-            Quiz quiz = optionalQuiz.get();
-            quiz.incrementPreference(preference); // 선호도 수 증가
-            quizRepository.save(quiz);
-        } else {
-            throw new QuizNotFoundException("Quiz not found with id: " + quizId);
-        }
-    }
-
-    @Override
-    public void increaseComment(Integer quizId) {
-        Optional<Quiz> optionalQuiz = quizRepository.findById(quizId);
-        if(optionalQuiz.isPresent()) {
-            Quiz quiz = optionalQuiz.get();
-            quiz.incrementComments(); // 댓글 수 증가
-            quizRepository.save(quiz);
-        } else {
-            throw new QuizNotFoundException("Quiz not found with id: " + quizId);
+        try {
+            Quiz quiz = quizRepository.findById(quizId)
+                    .orElseThrow(() -> new QuizNotFoundException("Quiz not found with id: " + quizId));
+            quizRepository.increasePreference(quizId, preference); // 선호도 수 증가
+        } catch (Exception e) {
+            log.error("Error retrieving quiz with id {}: {}", quizId, e.getMessage(), e);
+            throw e;
         }
     }
 
     @Override
     public Optional<Integer> getQuizPreference(Integer quizId) {
-        Optional<Quiz> optionalQuiz = quizRepository.findById(quizId);
-        if(optionalQuiz.isPresent()) {
-            Quiz quiz = optionalQuiz.get();
-            return Optional.ofNullable(quiz.getPreference());
-        } else {
-            throw new QuizNotFoundException("Quiz not found with id: " + quizId);
+        try {
+            return quizRepository.findById(quizId)
+                    .map(Quiz::getPreference)
+                    .orElseThrow(() -> new QuizNotFoundException("Quiz not found with id: " + quizId)).describeConstable();
+        } catch (Exception e) {
+            log.error("Error retrieving quiz with id {}: {}", quizId, e.getMessage(), e);
+            throw e;
         }
     }
 
     @Override
     public Optional<Integer> getViewsCount(Integer quizId) {
-        Optional<Quiz> optionalQuiz = quizRepository.findById(quizId);
-        if(optionalQuiz.isPresent()) {
-            Quiz quiz = optionalQuiz.get();
-            return Optional.ofNullable(quiz.getView());
-        } else {
-            throw new QuizNotFoundException("Quiz not found with id: " + quizId);
-        }
-    }
-
-    @Override
-    public Optional<Integer> getCommentsCount(Integer quizId) {
-        Optional<Quiz> optionalQuiz = quizRepository.findById(quizId);
-        if(optionalQuiz.isPresent()) {
-            Quiz quiz = optionalQuiz.get();
-            return Optional.ofNullable(quiz.getComment());
-        } else {
-            throw new QuizNotFoundException("Quiz not found with id: " + quizId);
+        try {
+            return quizRepository.findById(quizId)
+                    .map(Quiz::getView)
+                    .orElseThrow(() -> new QuizNotFoundException("Quiz not found with id: " + quizId)).describeConstable();
+        } catch (Exception e) {
+            log.error("Error retrieving quiz with id {}: {}", quizId, e.getMessage(), e);
+            throw e;
         }
     }
 
