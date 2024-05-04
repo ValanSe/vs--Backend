@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Entity
 @Getter
@@ -24,6 +25,9 @@ public class Quiz {
     private String descriptionA; // 선택지 A 설명
     @Column(name = "description_b")
     private String descriptionB; // 선택지 B 설명
+
+    private Integer view; // 퀴즈의 조회수
+    private Integer preference; // 퀴즈의 선호도 수
 
     private LocalDateTime createdAt; // 퀴즈 생성 시간
 }
