@@ -1,12 +1,14 @@
 package com.valanse.valanse.dto;
 
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.time.LocalDateTime;
 
-@Data
+@Getter
+@ToString
 @NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class UserAnswerDto {
     private Integer answerId; // 답변 식별자
     private Integer userId; // 답변한 사용자 식별자

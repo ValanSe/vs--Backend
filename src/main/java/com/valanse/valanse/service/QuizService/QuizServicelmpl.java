@@ -6,6 +6,7 @@ import com.valanse.valanse.dto.UserAnswerDto;
 import com.valanse.valanse.entity.Quiz;
 import com.valanse.valanse.entity.UserAnswer;
 import com.valanse.valanse.repository.jpa.QuizRepository;
+import com.valanse.valanse.repository.jpa.UserAnswerRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -18,6 +19,8 @@ import java.util.Optional;
 public class QuizServicelmpl implements QuizService {
 
     private final QuizRepository quizRepository;
+    private final UserAnswerRepository userAnswerRepository;
+
     private Logger log;
 
     @Override
@@ -34,6 +37,8 @@ public class QuizServicelmpl implements QuizService {
                     .optionB(quiz.getOptionB())
                     .descriptionA(quiz.getDescriptionA())
                     .descriptionB(quiz.getDescriptionB())
+                    .view(quiz.getView())
+                    .preference(quiz.getPreference())
                     .createdAt(quiz.getCreatedAt())
                     .build();
         } catch (Exception e) {
@@ -95,6 +100,15 @@ public class QuizServicelmpl implements QuizService {
 
     @Override
     public void saveUserAnswer(UserAnswerDto userAnswer) {
-
+        UserAnswer userAnswerEntity = UserAnswer.builder()
+                .answerId(userAnswer.getAnswerId())
+                .userId(userAnswer.getUserId())
+                .quizId(userAnswer.getQuizId())
+                .selectedOption(userAnswer.getSelectedOption())
+                .answeredAt(userAnswer.getAnsweredAt())
+                .timeSpent(userAnswer.getTimeSpent())
+                .preference(userAnswer.getPreference())
+                .build();
+        userAnswerRepository.save(userAnswerEntity);
     }
 }

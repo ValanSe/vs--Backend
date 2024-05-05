@@ -18,5 +18,7 @@ public class QuizDto {
     private String optionB; // 선택지 B
     private String descriptionA; // 선택지 A 설명
     private String descriptionB; // 선택지 B 설명
+    private Integer view; // 퀴즈의 조회수
+    private Integer preference; // 퀴즈의 선호도 수
     private LocalDateTime createdAt; // 문제 생성 시간
 }
