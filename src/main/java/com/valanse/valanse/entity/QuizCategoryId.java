@@ -11,6 +11,6 @@ import java.io.Serializable;
 @NoArgsConstructor
 @EqualsAndHashCode
 public class QuizCategoryId implements Serializable {
-    private Integer category;
-    private Integer quiz;
+    private String category;
+    private Integer quizId;
 }

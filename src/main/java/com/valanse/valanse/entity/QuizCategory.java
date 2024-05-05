@@ -13,7 +13,7 @@ import lombok.*;
 @IdClass(QuizCategoryId.class)
 public class QuizCategory {
     @Id
-    private Integer category;
+    private String category;
     @Id
-    private Integer quiz;
+    private Integer quizId;
 }
