@@ -1,7 +1,6 @@
 package com.valanse.valanse.security.util;
 
 import com.valanse.valanse.exception.InvalidStateTokenException;
-import com.valanse.valanse.redis.entity.AccessToken;
 import com.valanse.valanse.redis.repository.AccessTokenRepository;
 import com.valanse.valanse.redis.repository.RefreshTokenRepository;
 import com.valanse.valanse.redis.service.TokenService;
@@ -12,6 +11,7 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
 import jakarta.annotation.PostConstruct;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -182,6 +182,17 @@ public class JwtUtil {
                 .build()
                 .parseClaimsJws(token)
                 .getBody();
+    }
+
+    public String getAccessTokenFromRequest(HttpServletRequest httpServletRequest) {
+        // JWT 토큰 추출
+        String jwtToken = httpServletRequest.getHeader("Authorization");
+
+        return jwtToken;
+    }
+
+    public int getUserIdxFromRequest(HttpServletRequest httpServletRequest) {
+        return getUserIdx(getAccessTokenFromRequest(httpServletRequest));
     }
 
 

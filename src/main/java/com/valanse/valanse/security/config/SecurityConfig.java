@@ -45,8 +45,8 @@ public class SecurityConfig {
                 // request 인증, 인가 설정
                 .authorizeHttpRequests(request ->
                         request
-                                .requestMatchers("/token/**", "/login", "/failure").permitAll()
-                                .anyRequest().authenticated() // /token/**, /login, /failure 경로에 대한 요청 외 인증 요구
+                                .requestMatchers("/token/**", "/login", "/swagger/**","/v3/api-docs/**", "/swagger/**", "/swagger-ui.html", "/swagger-ui/**").permitAll()
+                                .anyRequest().authenticated() // /token/**, /login 경로에 대한 요청 외 인증 요구
                 )
 
                 // OAuth2 로그인 설정

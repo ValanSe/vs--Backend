@@ -25,9 +25,16 @@ public class Quiz {
     private String descriptionA; // 선택지 A 설명
     @Column(name = "description_b")
     private String descriptionB; // 선택지 B 설명
+    @Column(name = "image_a")
+    private String imageA; // 선택지 A 이미지
+    @Column(name = "image_b")
+    private String imageB; // 선택지 B 이미지
 
-    private Integer view; // 퀴즈의 조회수
-    private Integer preference; // 퀴즈의 선호도 수
+    private Integer view; // 조회수
+
+    private Integer preference; // 선호도 수
 
     private LocalDateTime createdAt; // 퀴즈 생성 시간
+    private LocalDateTime updatedAt; // 퀴즈 수정 시간
+
 }

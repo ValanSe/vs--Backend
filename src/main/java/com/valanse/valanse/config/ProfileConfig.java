@@ -1,8 +1,12 @@
 package com.valanse.valanse.config;
 
+import com.valanse.valanse.repository.jpa.QuizCategoryRepository;
 import com.valanse.valanse.repository.jpa.QuizRepository;
+import com.valanse.valanse.security.util.JwtUtil;
 import com.valanse.valanse.service.BalanceProblemService.QuizService;
 import com.valanse.valanse.service.BalanceProblemService.QuizServiceImpl;
+import com.valanse.valanse.util.FileUploadUtil;
+import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
@@ -10,9 +14,17 @@ import org.springframework.context.annotation.Profile;
 @Configuration
 public class ProfileConfig {
 
+    // TODO 더 복잡해지면 팩토리 패턴 사용 예정
     @Bean
     @Profile("local")
-    public QuizService quizService(QuizRepository quizRepository) {
-        return new QuizServiceImpl(quizRepository);
+    public QuizService quizService(QuizRepository quizRepository,
+                                   FileUploadUtil fileUploadUtil,
+                                   QuizCategoryRepository quizCategoryRepository,
+                                   JwtUtil jwtUtil) {
+
+        return new QuizServiceImpl(quizRepository,
+                quizCategoryRepository,
+                fileUploadUtil,
+                jwtUtil);
     }
 }

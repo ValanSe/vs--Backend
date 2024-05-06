@@ -1,14 +1,24 @@
 package com.valanse.valanse.service.BalanceProblemService;
 
 import com.valanse.valanse.dto.QuizDto;
+import com.valanse.valanse.dto.QuizRegisterDto;
 import com.valanse.valanse.entity.Quiz;
+import com.valanse.valanse.entity.QuizCategory;
 import com.valanse.valanse.entity.UserAnswer;
+import com.valanse.valanse.repository.jpa.QuizCategoryRepository;
 import com.valanse.valanse.repository.jpa.QuizRepository;
+import com.valanse.valanse.security.util.JwtUtil;
+import com.valanse.valanse.util.FileUploadUtil;
 import jakarta.persistence.EntityNotFoundException;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.Random;
 
@@ -18,6 +28,9 @@ import java.util.Random;
 public class QuizServiceImpl implements QuizService {
 
     private final QuizRepository quizRepository;
+    private final QuizCategoryRepository quizCategoryRepository;
+    private final FileUploadUtil fileUploadUtil;
+    private final JwtUtil jwtUtil;
 
 
     // 올바르지 못한 리턴 예시
@@ -47,6 +60,52 @@ public class QuizServiceImpl implements QuizService {
 
     @Override
     public void saveUserAnswer(UserAnswer userAnswer) {
+
+
+    }
+
+    @Override
+    @Transactional
+    public void registerQuiz(HttpServletRequest httpServletRequest,
+                             QuizRegisterDto quizRegisterDto,
+                             MultipartFile image_A,
+                             MultipartFile image_B) throws IOException {
+
+        int userIdx = jwtUtil.getUserIdxFromRequest(httpServletRequest);
+
+        String path_A = fileUploadUtil.saveFile(image_A);
+        String path_B = fileUploadUtil.saveFile(image_B);
+
+        Quiz quiz = Quiz.builder()
+                .authorUserId(userIdx)
+                .content(quizRegisterDto.getContent())
+                .optionA(quizRegisterDto.getOptionA())
+                .optionB(quizRegisterDto.getOptionB())
+                .descriptionA(quizRegisterDto.getDescriptionA())
+                .descriptionB(quizRegisterDto.getDescriptionB())
+                .imageA(path_A)
+                .imageB(path_B)
+                .view(0)
+                .view(0)
+                .preference(0)
+                .createdAt(LocalDateTime.now())
+                .build();
+
+        quizRepository.save(quiz); // 퀴즈 먼저 저장하여 ID를 생성
+
+        for (String category : quizRegisterDto.getCategory()) {
+
+            if (category == null || category.trim().isEmpty()) {
+                continue; // 무효한 카테고리는 건너뛴다
+            }
+
+            QuizCategory quizCategory = QuizCategory.builder()
+                    .category(category)
+                    .quizId(quiz.getQuizId()) // 생성된 퀴즈 ID를 사용
+                    .build();
+
+            quizCategoryRepository.save(quizCategory); // 퀴즈 카테고리 저장
+        }
 
 
     }
