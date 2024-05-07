@@ -62,9 +62,9 @@ public class QuizServicelmpl implements QuizService {
     @Override
     public Optional<Integer> getQuizPreference(Integer quizId) {
         try {
-            return quizRepository.findById(quizId)
+            return Optional.ofNullable(quizRepository.findById(quizId)
                     .map(Quiz::getPreference)
-                    .orElseThrow(() -> new QuizNotFoundException("Quiz not found with id: " + quizId)).describeConstable();
+                    .orElseThrow(() -> new QuizNotFoundException("Quiz not found with id: " + quizId)));
         } catch (Exception e) {
             log.error("Error retrieving quiz with id {}: {}", quizId, e.getMessage(), e);
             throw e;
@@ -74,9 +74,9 @@ public class QuizServicelmpl implements QuizService {
     @Override
     public Optional<Integer> getViewsCount(Integer quizId) {
         try {
-            return quizRepository.findById(quizId)
+            return Optional.ofNullable(quizRepository.findById(quizId)
                     .map(Quiz::getView)
-                    .orElseThrow(() -> new QuizNotFoundException("Quiz not found with id: " + quizId)).describeConstable();
+                    .orElseThrow(() -> new QuizNotFoundException("Quiz not found with id: " + quizId)));
         } catch (Exception e) {
             log.error("Error retrieving quiz with id {}: {}", quizId, e.getMessage(), e);
             throw e;

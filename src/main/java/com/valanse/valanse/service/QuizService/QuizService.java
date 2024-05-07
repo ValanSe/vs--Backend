@@ -3,7 +3,6 @@ package com.valanse.valanse.service.QuizService;
 import com.valanse.valanse.dto.UserAnswerDto;
 import com.valanse.valanse.dto.QuizDto;
 import com.valanse.valanse.entity.Quiz;
-import com.valanse.valanse.entity.Category;
 
 import java.util.List;
 import java.util.Optional;

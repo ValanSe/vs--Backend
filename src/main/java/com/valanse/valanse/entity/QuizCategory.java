@@ -5,6 +5,8 @@ import jakarta.persistence.Id;
 import jakarta.persistence.IdClass;
 import lombok.*;
 
+import java.util.List;
+
 @Entity
 @Getter
 @Builder
@@ -16,4 +18,7 @@ public class QuizCategory {
     private String category;
     @Id
     private Integer quizId;
+
+    private Integer categoryId;
+    private List<Integer> quizIdList;
 }
