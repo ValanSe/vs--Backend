@@ -36,7 +36,7 @@ public class TokenController {
     @ApiResponse(responseCode = "200", description = "테스트 성공", content = @Content(schema = @Schema(implementation = StatusResponseDto.class)))
     @GetMapping("/test")
     public ResponseEntity<StatusResponseDto> test() {
-        return ResponseEntity.ok(StatusResponseDto.success("test05030924"));
+        return ResponseEntity.ok(StatusResponseDto.success("test0508"));
     }
 
     @Operation(summary = "Access Token 획득", description = "상태 토큰을 기반으로 Access Token을 반환합니다.")
