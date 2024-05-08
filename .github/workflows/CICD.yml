@@ -1,0 +1,56 @@
+name: CI/CD using GitHub Actions & Docker
+
+on:
+  push:
+    branches: [ "master" ]
+  pull_request:
+    branches: [ "master" ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+      
+    - name: Set up JDK 17
+      uses: actions/setup-java@v4
+      with:
+        java-version: '17'
+        distribution: 'temurin'
+
+    - name: Create directory and file if not exist
+      run: |
+        mkdir -p ./src/main/resources
+        echo "${{ secrets.APPLICATION }}" > ./src/main/resources/application.yml
+
+    - name: Set executable permission
+      run: chmod +x ./gradlew
+
+    - name: Build with Gradle
+      run: ./gradlew build --no-build-cache --rerun-tasks
+
+    - name: Build and tag Docker image using Docker Compose
+      run: |
+        docker-compose build --no-cache
+        docker tag springboot ${{ secrets.DOCKER_USERNAME }}/valanse-image:${{ github.sha }}
+
+    - name: Login to Docker Hub
+      run: docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }}
+
+    - name: Push Docker image to Docker Hub
+      run: docker push ${{ secrets.DOCKER_USERNAME }}/valanse-image:${{ github.sha }}
+
+    - name: Deploy to prod
+      uses: appleboy/ssh-action@master
+      with:
+        host: ${{ secrets.HOST_PROD }}
+        username: ec2-user
+        key: ${{ secrets.SSH_PRIVATE_KEY }}
+        script: |
+          cd valanse-project
+          docker pull ${{ secrets.DOCKER_USERNAME }}/valanse-image:${{ github.sha }}
+          docker stop springboot || true
+          docker rm springboot || true
+          docker run -d -p 8080:8080 --name springboot ${{ secrets.DOCKER_USERNAME }}/valanse-image:${{ github.sha }}
