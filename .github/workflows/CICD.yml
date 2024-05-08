@@ -28,11 +28,6 @@ jobs:
     - name: Create docker-compose.yml
       run: echo "${{ secrets.DOCKER_COMPOSE_YML }}" > docker-compose.yml
 
-    - name: Create Dockerfile
-      run: |
-        echo "${{ secrets.DOCKERFILE }}" > Dockerfile
-
-
     - name: Set executable permission
       run: chmod +x ./gradlew
 
