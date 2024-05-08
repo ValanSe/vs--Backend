@@ -28,11 +28,6 @@ jobs:
     - name: Create docker-compose.yml
       run: echo "${{ secrets.DOCKER_COMPOSE_YML }}" > docker-compose.yml
 
-    - name: Create Dockerfile
-      run: |
-        echo "${{ secrets.DOCKERFILE }}" > Dockerfile
-
-
     - name: Set executable permission
       run: chmod +x ./gradlew
 
@@ -42,7 +37,6 @@ jobs:
     - name: Build and tag Docker image using Docker Compose
       run: |
         docker-compose build --no-cache
-        docker tag springboot ${{ secrets.DOCKER_USERNAME }}/valanse-image:${{ github.sha }}
 
     - name: Login to Docker Hub
       run: docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }}
