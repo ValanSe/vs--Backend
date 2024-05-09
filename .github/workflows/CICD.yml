@@ -45,10 +45,6 @@ jobs:
     - name: Push Docker image to Docker Hub
       run: docker push ${{ secrets.DOCKER_USERNAME }}/valanse-image:${{ github.sha }}
 
-    - name: Create .env file
-      run: |
-        echo "IMAGE_TAG=${{ github.sha }}" > .env
-
     - name: Deploy to prod
       uses: appleboy/ssh-action@master
       with:
@@ -57,6 +53,7 @@ jobs:
         key: ${{ secrets.SSH_PRIVATE_KEY }}
         script: |
           cd valanse-project
+          echo "IMAGE_TAG=${{ github.sha }}" > .env
           docker pull ${{ secrets.DOCKER_USERNAME }}/valanse-image:${{ github.sha }}
           docker-compose down || true
           docker-compose up -d
