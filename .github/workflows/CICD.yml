@@ -26,7 +26,7 @@ jobs:
         echo "${{ secrets.APPLICATION }}" > ./src/main/resources/application.yml
 
     - name: Create docker-compose.yml
-      run: echo "${{ secrets.DOCKER_COMPOSE_YML }}" > docker-compose.yml
+      run: echo "${{ secrets.DOCKER_COMPOSE_YML }}" > compose.yml
 
     - name: Set executable permission
       run: chmod +x ./gradlew
