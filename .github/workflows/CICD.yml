@@ -61,3 +61,4 @@ jobs:
           docker pull ${{ secrets.DOCKER_USERNAME }}/valanse-image:${{ github.sha }}
           docker-compose down || true
           docker-compose up -d
+
