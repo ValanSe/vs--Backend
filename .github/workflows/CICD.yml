@@ -32,14 +32,17 @@ jobs:
       run: chmod +x ./gradlew
 
     - name: Build with Gradle
-      run: ./gradlew build --no-build-cache --rerun-tasks
+      run: ./gradlew build
 
     - name: Prepare environment
-      run: echo "DOCKER_IMAGE_TAG=${{ secrets.DOCKER_USERNAME }}/valanse-image:${{ github.sha }}" > .env
+      run: |
+        echo "DOCKER_IMAGE_TAG=${{ secrets.DOCKER_USERNAME }}/valanse-image:${{ github.sha }}" > .env
+        pwd
 
     - name: Build Docker image using Docker Compose
       run: |
-        docker-compose build --no-cache
+        docker-compose build
+        pwd
 
     - name: Login to Docker Hub
       run: docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_ACCESS_TOKEN }}
