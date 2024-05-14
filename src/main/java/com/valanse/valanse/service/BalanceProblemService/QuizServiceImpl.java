@@ -20,6 +20,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Random;
 
 @Service("balanceProblemQuizService")
@@ -110,5 +111,26 @@ public class QuizServiceImpl implements QuizService {
 
     }
 
+    @Override
+    @Transactional
+    public void deleteQuiz(HttpServletRequest httpServletRequest, int quizId) {
+
+        int userIdx = jwtUtil.getUserIdxFromRequest(httpServletRequest);
+
+        Quiz quiz = quizRepository.findById(quizId).orElseThrow(EntityNotFoundException::new);
+
+        if (quiz.getAuthorUserId() != userIdx) {
+            throw new UnauthorizedException("You don't have permission to delete this quiz.");
+        }
+
+        List<QuizCategory> categories = quizCategoryRepository.findByQuizId(quizId);
+
+        for(QuizCategory category : categories) {
+            quizRepository.deleteById(quizId);
+            quizCategoryRepository.save(category);
+        }
+
+        quizRepository.delete(quiz);
+    }
 
 }

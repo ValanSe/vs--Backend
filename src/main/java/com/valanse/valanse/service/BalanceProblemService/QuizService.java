@@ -18,4 +18,6 @@ public interface QuizService {
     void saveUserAnswer(UserAnswer userAnswer); // 클라이언트의 답변을 데이터베이스에 저장하는 메서드
 
     void registerQuiz(HttpServletRequest httpServletRequest, QuizRegisterDto quizRegisterDto, MultipartFile image_A, MultipartFile image_B) throws IOException;
+
+    void deleteQuiz(HttpServletRequest httpServletRequest, int quizId) throws IOException;
 }

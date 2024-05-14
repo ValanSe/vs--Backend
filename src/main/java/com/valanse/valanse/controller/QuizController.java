@@ -61,4 +61,22 @@ public class QuizController {
 
         return ResponseEntity.ok(StatusResponseDto.success("quiz register success"));
     }
+
+    @Operation(summary = "특정 퀴즈를 삭제합니다.",
+            description = "지정된 ID로 퀴즈를 삭제합니다.")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "삭제 성공", content = @Content(schema = @Schema(implementation = StatusResponseDto.class))),
+            @ApiResponse(responseCode = "404", description = "해당 ID로 퀴즈를 찾을 수 없음"),
+            @ApiResponse(responseCode = "500", description = "해당 작업에 대한 권한 없음")
+    })
+    @DeleteMapping("/delete/{quizId}")
+    public ResponseEntity<StatusResponseDto> deleteQuiz(
+            @Parameter(description = "HTTP 요청 객체", hidden = true)
+            HttpServletRequest httpServletRequest,
+            @PathVariable("quizId") Integer quizId
+    ) throws IOException {
+        quizService.deleteQuiz(httpServletRequest, quizId);
+
+        return ResponseEntity.ok(StatusResponseDto.success("Quiz deleted successfully"));
+    }
 }
