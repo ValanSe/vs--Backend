@@ -121,7 +121,7 @@ public class QuizServiceImpl implements QuizService {
         Quiz quiz = quizRepository.findById(quizId).orElseThrow(EntityNotFoundException::new);
 
         if (quiz.getAuthorUserId() != userIdx) {
-            throw new UnauthorizedException("You don't have permission to delete this quiz.");
+            throw new ForbiddenException("You don't have permission to delete this quiz.");
         }
 
         quizRepository.delete(quiz);

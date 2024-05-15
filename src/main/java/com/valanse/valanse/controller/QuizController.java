@@ -2,6 +2,7 @@ package com.valanse.valanse.controller;
 
 import com.valanse.valanse.dto.QuizRegisterDto;
 import com.valanse.valanse.dto.StatusResponseDto;
+import com.valanse.valanse.service.BalanceProblemService.ForbiddenException;
 import com.valanse.valanse.service.BalanceProblemService.QuizService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -13,6 +14,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -66,8 +68,8 @@ public class QuizController {
             description = "지정된 ID로 퀴즈를 삭제합니다.")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "삭제 성공", content = @Content(schema = @Schema(implementation = StatusResponseDto.class))),
-            @ApiResponse(responseCode = "404", description = "해당 ID로 퀴즈를 찾을 수 없음"),
-            @ApiResponse(responseCode = "500", description = "해당 작업에 대한 권한 없음")
+            @ApiResponse(responseCode = "403", description = "해당 작업에 대한 권한 없음"),
+            @ApiResponse(responseCode = "404", description = "해당 ID로 퀴즈를 찾을 수 없음")
     })
     @DeleteMapping("/delete/{quizId}")
     public ResponseEntity<StatusResponseDto> deleteQuiz(
@@ -75,8 +77,13 @@ public class QuizController {
             HttpServletRequest httpServletRequest,
             @PathVariable("quizId") Integer quizId
     ) throws IOException {
-        quizService.deleteQuiz(httpServletRequest, quizId);
+        try {
+            quizService.deleteQuiz(httpServletRequest, quizId);
 
-        return ResponseEntity.ok(StatusResponseDto.success("Quiz deleted successfully"));
+            return ResponseEntity.ok(StatusResponseDto.success("Quiz deleted successfully"));
+        } catch (ForbiddenException e) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                    .body(StatusResponseDto.error(HttpStatus.FORBIDDEN.value(), e.getMessage()));
+        }
     }
 }
