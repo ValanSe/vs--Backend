@@ -11,6 +11,7 @@ import com.valanse.valanse.security.util.JwtUtil;
 import com.valanse.valanse.util.FileUploadUtil;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.servlet.http.HttpServletRequest;
+import jdk.jfr.Category;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -121,13 +122,6 @@ public class QuizServiceImpl implements QuizService {
 
         if (quiz.getAuthorUserId() != userIdx) {
             throw new UnauthorizedException("You don't have permission to delete this quiz.");
-        }
-
-        List<QuizCategory> categories = quizCategoryRepository.findByQuizId(quizId);
-
-        for(QuizCategory category : categories) {
-            quizRepository.deleteById(quizId);
-            quizCategoryRepository.save(category);
         }
 
         quizRepository.delete(quiz);
