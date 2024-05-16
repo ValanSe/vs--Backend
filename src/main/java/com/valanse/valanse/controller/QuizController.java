@@ -64,6 +64,34 @@ public class QuizController {
         return ResponseEntity.ok(StatusResponseDto.success("quiz register success"));
     }
 
+    @Operation(summary = "특정 퀴즈를 갱신합니다.",
+            description = "지정된 ID, 퀴즈의 내용, 옵션, 이미지로 퀴즈를 갱신합니다.")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "갱신 성공", content = @Content(schema = @Schema(implementation = StatusResponseDto.class))),
+            @ApiResponse(responseCode = "403", description = "해당 작업에 대한 권한 없음"),
+            @ApiResponse(responseCode = "404", description = "해당 ID로 퀴즈를 찾을 수 없음")
+    })
+    @PutMapping("/put/{quizId}")
+    public ResponseEntity<StatusResponseDto> updateQuiz(
+            @Parameter(description = "HTTP 요청 객체", hidden = true)
+            HttpServletRequest httpServletRequest,
+            @PathVariable("quizId") Integer quizId,
+            @Parameter(description = "퀴즈 갱신에 필요한 데이터", schema = @Schema(implementation = QuizController.class))
+            @RequestPart QuizRegisterDto quizRegisterDto,
+            @Parameter(description = "옵션 A에 대한 이미지")
+            @RequestPart MultipartFile image_A,
+            @Parameter(description = "옵션 B에 대한 이미지")
+            @RequestPart MultipartFile image_B
+    ) throws IOException {
+        try {
+            quizService.updateQuiz(httpServletRequest, quizId, quizRegisterDto, image_A, image_B);
+
+            return ResponseEntity.ok(StatusResponseDto.success("quiz updated successfully"));
+        } catch (ForbiddenException e) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(StatusResponseDto.error(HttpStatus.FORBIDDEN.value(), e.getMessage()));
+        }
+    }
+
     @Operation(summary = "특정 퀴즈를 삭제합니다.",
             description = "지정된 ID로 퀴즈를 삭제합니다.")
     @ApiResponses({
@@ -82,8 +110,7 @@ public class QuizController {
 
             return ResponseEntity.ok(StatusResponseDto.success("Quiz deleted successfully"));
         } catch (ForbiddenException e) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN)
-                    .body(StatusResponseDto.error(HttpStatus.FORBIDDEN.value(), e.getMessage()));
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(StatusResponseDto.error(HttpStatus.FORBIDDEN.value(), e.getMessage()));
         }
     }
 }

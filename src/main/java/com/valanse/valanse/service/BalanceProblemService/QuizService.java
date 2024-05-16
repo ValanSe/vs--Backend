@@ -19,5 +19,7 @@ public interface QuizService {
 
     void registerQuiz(HttpServletRequest httpServletRequest, QuizRegisterDto quizRegisterDto, MultipartFile image_A, MultipartFile image_B) throws IOException;
 
+    void updateQuiz(HttpServletRequest httpServletRequest, Integer quizId, QuizRegisterDto quizRegisterDto, MultipartFile image_A, MultipartFile image_B) throws IOException;
+
     void deleteQuiz(HttpServletRequest httpServletRequest, int quizId) throws IOException;
 }
