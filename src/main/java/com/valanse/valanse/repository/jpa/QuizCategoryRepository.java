@@ -9,5 +9,7 @@ import java.util.Optional;
 
 public interface QuizCategoryRepository extends JpaRepository<QuizCategory, Integer> {
 
+    List<QuizCategory> findByCategory(String category);
+
     List<QuizCategory> findByCategoryContaining(String keyword);
 }

@@ -1,43 +1,23 @@
 package com.valanse.valanse.service.QuizCategoryService;
 
-import ch.qos.logback.classic.Logger;
 import com.valanse.valanse.entity.Quiz;
 import com.valanse.valanse.entity.QuizCategory;
 import com.valanse.valanse.repository.jpa.QuizCategoryRepository;
 import com.valanse.valanse.repository.jpa.QuizRepository;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.NoSuchElementException;
-import java.util.Optional;
 
 @Service
+@Slf4j
 @RequiredArgsConstructor
 public class QuizCategoryServicelmpl implements QuizCategoryService {
 
     private final QuizCategoryRepository quizCategoryRepository;
     private final QuizRepository quizRepository;
-    private Logger log;
-
-    @Override
-    public void addQuizToCategory(QuizCategory category, Quiz quiz) throws IllegalAccessException {
-        try {
-            Integer categoryId = category.getCategoryId();
-            Integer quizId = quiz.getQuizId();
-
-            QuizCategory existingCategory = quizCategoryRepository.findById(categoryId)
-                    .orElseThrow(() -> new NoSuchElementException("Category not found: " + categoryId));
-            if (existingCategory.getQuizIdList().contains(quizId)) {
-                throw new IllegalAccessException("Quiz with ID " + quizId + "already exists in category" + categoryId);
-            }
-            existingCategory.getQuizIdList().add(quiz.getQuizId());
-            quizCategoryRepository.save(existingCategory);
-        } catch (Exception e) {
-            log.error("Error retrieving category {}: {}", category, e.getMessage(), e);
-            throw e;
-        }
-    }
 
     @Override
     public List<QuizCategory> searchCategory(String keyword) {
@@ -45,14 +25,15 @@ public class QuizCategoryServicelmpl implements QuizCategoryService {
     }
 
     @Override
-    public Optional<Integer> getQuizCountByCategory(QuizCategory category) {
+    public int getQuizCountByCategory(String category) {
         try {
-            Integer categoryId = category.getCategoryId();
+             List<QuizCategory> quizzesInCategory = quizCategoryRepository.findByCategory(category);
 
-            QuizCategory existingCategory = quizCategoryRepository.findById(categoryId)
-                    .orElseThrow(() -> new NoSuchElementException("Category not found: " + categoryId));
+             if (quizzesInCategory.isEmpty()) {
+                 throw new EntityNotFoundException("Quiz Category not found: " + category);
+             }
 
-            return Optional.of(existingCategory.getQuizIdList().size());
+             return quizzesInCategory.size();
         } catch (Exception e) {
             log.error("Error retrieving category {}: {}", category, e.getMessage(), e);
             throw e;
@@ -60,23 +41,24 @@ public class QuizCategoryServicelmpl implements QuizCategoryService {
     }
 
     @Override
-    public Optional<Double> getAveragePreferenceByCategory(QuizCategory category) {
+    public double getAveragePreferenceByCategory(String category) {
         try {
-            Integer categoryId = category.getCategoryId();
+            List<QuizCategory> quizzesInCategory = quizCategoryRepository.findByCategory(category);
 
-            QuizCategory existingCategory = quizCategoryRepository.findById(categoryId)
-                    .orElseThrow(() -> new NoSuchElementException("Category not found: " + categoryId));
+            if (quizzesInCategory.isEmpty()) {
+                throw new EntityNotFoundException("Quiz Category not found: " + category);
+            }
 
-            List<Integer> quizIdList = existingCategory.getQuizIdList();
-            List<Quiz> quizzes = quizRepository.findAllById(quizIdList);
+            double totalPreference = 0.0;
 
-            if (quizzes.isEmpty())
-                return Optional.empty();
-            double perferenceSum = quizzes.stream()
-                    .mapToInt(Quiz::getPreference)
-                    .sum();
-            Double averagePreference = (Double) perferenceSum / quizzes.size();
-            return Optional.of(averagePreference);
+            for (QuizCategory quizCategory : quizzesInCategory) {
+                Quiz quiz = quizRepository.findById(quizCategory.getQuizId()).orElseThrow(EntityNotFoundException::new);
+
+                totalPreference += quiz.getPreference();
+            }
+
+            return totalPreference / quizzesInCategory.size();
+
         } catch (Exception e) {
             log.error("Error retrieving category {}: {}", category, e.getMessage(), e);
             throw e;
@@ -84,22 +66,24 @@ public class QuizCategoryServicelmpl implements QuizCategoryService {
     }
 
     @Override
-    public Optional<Integer> getViewsCountByCategory(QuizCategory category) {
+    public int getViewsCountByCategory(String category) {
         try {
-            Integer categoryId = category.getCategoryId();
+            List<QuizCategory> quizzesInCategory = quizCategoryRepository.findByCategory(category);
 
-            QuizCategory existingCategory = quizCategoryRepository.findById(categoryId)
-                    .orElseThrow(() -> new NoSuchElementException("Category not found: " + categoryId));
+            if (quizzesInCategory.isEmpty()) {
+                throw new EntityNotFoundException("Quiz Category not found: " + category);
+            }
 
-            List<Integer> quizIdList = existingCategory.getQuizIdList();
-            List<Quiz> quizzes = quizRepository.findAllById(quizIdList);
+            int totalView = 0;
 
-            if (quizzes.isEmpty())
-                return Optional.empty();
-            Integer viewsSum = quizzes.stream()
-                    .mapToInt(Quiz::getView)
-                    .sum();
-            return Optional.of(viewsSum);
+            for (QuizCategory quizCategory : quizzesInCategory) {
+                Quiz quiz = quizRepository.findById(quizCategory.getQuizId()).orElseThrow(EntityNotFoundException::new);
+
+                totalView += quiz.getView();
+            }
+
+            return totalView;
+
         } catch (Exception e) {
             log.error("Error retrieving category {}: {}", category, e.getMessage(), e);
             throw e;

@@ -18,7 +18,4 @@ public class QuizCategory {
     private String category;
     @Id
     private Integer quizId;
-
-    private Integer categoryId;
-    private List<Integer> quizIdList;
 }
