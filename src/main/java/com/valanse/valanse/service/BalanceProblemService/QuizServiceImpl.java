@@ -118,21 +118,13 @@ public class QuizServiceImpl implements QuizService {
 
         int userIdx = jwtUtil.getUserIdxFromRequest(httpServletRequest);
 
-        String imagePathA = null;
-        String imagePathB = null;
+        String imagePathA = fileUploadUtil.saveFile(image_A);
+        String imagePathB = fileUploadUtil.saveFile(image_B);
 
         Quiz quiz = quizRepository.findById(quizId).orElseThrow(EntityNotFoundException::new);
 
         if (quiz.getAuthorUserId() != userIdx) {
             throw new ForbiddenException("You don't have permission to update this quizRegisterDto.");
-        }
-
-        if (image_A != null) {
-            imagePathA = fileUploadUtil.saveFile(image_A);
-        }
-
-        if (image_B != null) {
-            imagePathB = fileUploadUtil.saveFile(image_B);
         }
 
         quiz = Quiz.builder()
@@ -143,8 +135,8 @@ public class QuizServiceImpl implements QuizService {
                 .optionB(quizRegisterDto.getOptionB() != null ? quizRegisterDto.getOptionB() : quiz.getOptionB())
                 .descriptionA(quizRegisterDto.getDescriptionA())
                 .descriptionB(quizRegisterDto.getDescriptionB())
-                .imageA(imagePathA != null ? imagePathA : quiz.getImageA())
-                .imageB(imagePathB != null ? imagePathB : quiz.getImageB())
+                .imageA(imagePathA)
+                .imageB(imagePathB)
                 .view(quiz.getView())
                 .preference(quiz.getPreference())
                 .createdAt(quiz.getCreatedAt())
@@ -156,7 +148,7 @@ public class QuizServiceImpl implements QuizService {
 
     @Override
     @Transactional
-    public void deleteQuiz(HttpServletRequest httpServletRequest, int quizId) {
+    public void deleteQuiz(HttpServletRequest httpServletRequest, Integer quizId) {
 
         int userIdx = jwtUtil.getUserIdxFromRequest(httpServletRequest);
 

@@ -71,7 +71,7 @@ public class QuizController {
             @ApiResponse(responseCode = "403", description = "해당 작업에 대한 권한 없음"),
             @ApiResponse(responseCode = "404", description = "해당 ID로 퀴즈를 찾을 수 없음")
     })
-    @PutMapping("/put/{quizId}")
+    @PatchMapping("/patch/{quizId}")
     public ResponseEntity<StatusResponseDto> updateQuiz(
             @Parameter(description = "HTTP 요청 객체", hidden = true)
             HttpServletRequest httpServletRequest,
@@ -104,7 +104,7 @@ public class QuizController {
             @Parameter(description = "HTTP 요청 객체", hidden = true)
             HttpServletRequest httpServletRequest,
             @PathVariable("quizId") Integer quizId
-    ) throws IOException {
+    ) {
         try {
             quizService.deleteQuiz(httpServletRequest, quizId);
 
