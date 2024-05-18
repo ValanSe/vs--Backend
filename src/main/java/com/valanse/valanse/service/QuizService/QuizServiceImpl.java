@@ -32,7 +32,6 @@ public class QuizServiceImpl implements QuizService {
     private final S3ImageService s3ImageService;
     private final JwtUtil jwtUtil;
 
-
     @Override
     public QuizDto getQuiz(Integer quizId) {
         try {
