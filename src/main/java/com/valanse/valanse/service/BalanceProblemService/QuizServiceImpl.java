@@ -115,50 +115,60 @@ public class QuizServiceImpl implements QuizService {
     @Override
     @Transactional
     public void updateQuiz(HttpServletRequest httpServletRequest, Integer quizId, QuizRegisterDto quizRegisterDto, MultipartFile image_A, MultipartFile image_B) throws IOException {
+        try {
+            int userIdx = jwtUtil.getUserIdxFromRequest(httpServletRequest);
 
-        int userIdx = jwtUtil.getUserIdxFromRequest(httpServletRequest);
+            String imagePathA = fileUploadUtil.saveFile(image_A);
+            String imagePathB = fileUploadUtil.saveFile(image_B);
 
-        String imagePathA = fileUploadUtil.saveFile(image_A);
-        String imagePathB = fileUploadUtil.saveFile(image_B);
+            Quiz existingQuiz = quizRepository.findById(quizId).orElseThrow(EntityNotFoundException::new);
 
-        Quiz quiz = quizRepository.findById(quizId).orElseThrow(EntityNotFoundException::new);
+            if (existingQuiz.getAuthorUserId() != userIdx) {
+                throw new ForbiddenException("You don't have permission to update.");
+            }
 
-        if (quiz.getAuthorUserId() != userIdx) {
-            throw new ForbiddenException("You don't have permission to update this quizRegisterDto.");
+            existingQuiz = Quiz.builder()
+                    .quizId(existingQuiz.getQuizId())
+                    .authorUserId(existingQuiz.getAuthorUserId())
+                    .content(quizRegisterDto.getContent() != null ? quizRegisterDto.getContent() : existingQuiz.getContent())
+                    .optionA(quizRegisterDto.getOptionA() != null ? quizRegisterDto.getOptionA() : existingQuiz.getOptionA())
+                    .optionB(quizRegisterDto.getOptionB() != null ? quizRegisterDto.getOptionB() : existingQuiz.getOptionB())
+                    .descriptionA(quizRegisterDto.getDescriptionA())
+                    .descriptionB(quizRegisterDto.getDescriptionB())
+                    .imageA(imagePathA)
+                    .imageB(imagePathB)
+                    .view(existingQuiz.getView())
+                    .preference(existingQuiz.getPreference())
+                    .createdAt(existingQuiz.getCreatedAt())
+                    .updatedAt(LocalDateTime.now())
+                    .build();
+
+            quizRepository.save(existingQuiz);
+
+        } catch (ForbiddenException e) {
+            log.error("Forbidden to update quiz with id {}", quizId, e);
+            throw e;
         }
-
-        quiz = Quiz.builder()
-                .quizId(quiz.getQuizId())
-                .authorUserId(quiz.getAuthorUserId())
-                .content(quizRegisterDto.getContent() != null ? quizRegisterDto.getContent() : quiz.getContent())
-                .optionA(quizRegisterDto.getOptionA() != null ? quizRegisterDto.getOptionA() : quiz.getOptionA())
-                .optionB(quizRegisterDto.getOptionB() != null ? quizRegisterDto.getOptionB() : quiz.getOptionB())
-                .descriptionA(quizRegisterDto.getDescriptionA())
-                .descriptionB(quizRegisterDto.getDescriptionB())
-                .imageA(imagePathA)
-                .imageB(imagePathB)
-                .view(quiz.getView())
-                .preference(quiz.getPreference())
-                .createdAt(quiz.getCreatedAt())
-                .updatedAt(LocalDateTime.now())
-                .build();
-
-        quizRepository.save(quiz);
     }
 
     @Override
     @Transactional
     public void deleteQuiz(HttpServletRequest httpServletRequest, Integer quizId) {
+        try {
+            int userIdx = jwtUtil.getUserIdxFromRequest(httpServletRequest);
 
-        int userIdx = jwtUtil.getUserIdxFromRequest(httpServletRequest);
+            Quiz quiz = quizRepository.findById(quizId).orElseThrow(EntityNotFoundException::new);
 
-        Quiz quiz = quizRepository.findById(quizId).orElseThrow(EntityNotFoundException::new);
+            if (quiz.getAuthorUserId() != userIdx) {
+                throw new ForbiddenException("You don't have permission to delete.");
+            }
 
-        if (quiz.getAuthorUserId() != userIdx) {
-            throw new ForbiddenException("You don't have permission to delete this quiz.");
+            quizRepository.delete(quiz);
+
+        } catch (ForbiddenException e) {
+            log.error("Forbidden to delete quiz with id {}", quizId, e);
+            throw e;
         }
-
-        quizRepository.delete(quiz);
     }
 
 }
