@@ -32,7 +32,6 @@ public class TokenController {
     private final TokenService tokenService;
     private final JwtUtil jwtUtil;
 
-
     @Operation(summary = "테스트 엔드포인트", description = "토큰 컨트롤러의 테스트 엔드포인트입니다.")
     @ApiResponse(responseCode = "200", description = "테스트 성공", content = @Content(schema = @Schema(implementation = StatusResponseDto.class)))
     @GetMapping("/test")
