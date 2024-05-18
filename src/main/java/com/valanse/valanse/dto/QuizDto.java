@@ -18,5 +18,8 @@ public class QuizDto {
     private String optionB; // 선택지 B
     private String descriptionA; // 선택지 A 설명
     private String descriptionB; // 선택지 B 설명
+    private String imageA; // 선택지 A 이미지 URL
+    private String imageB; // 선택지 B 이미지 URL
     private LocalDateTime createdAt; // 문제 생성 시간
+    private LocalDateTime updatedAt; // 문제 수정 시간
 }

@@ -3,10 +3,9 @@ package com.valanse.valanse.config;
 import com.valanse.valanse.repository.jpa.QuizCategoryRepository;
 import com.valanse.valanse.repository.jpa.QuizRepository;
 import com.valanse.valanse.security.util.JwtUtil;
-import com.valanse.valanse.service.BalanceProblemService.QuizService;
-import com.valanse.valanse.service.BalanceProblemService.QuizServiceImpl;
-import com.valanse.valanse.util.FileUploadUtil;
-import lombok.RequiredArgsConstructor;
+import com.valanse.valanse.service.ImageService.S3ImageService;
+import com.valanse.valanse.service.QuizService.QuizService;
+import com.valanse.valanse.service.QuizService.QuizServiceImpl;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
@@ -18,13 +17,13 @@ public class ProfileConfig {
     @Bean
     @Profile("local")
     public QuizService quizService(QuizRepository quizRepository,
-                                   FileUploadUtil fileUploadUtil,
                                    QuizCategoryRepository quizCategoryRepository,
+                                   S3ImageService s3ImageService,
                                    JwtUtil jwtUtil) {
 
         return new QuizServiceImpl(quizRepository,
                 quizCategoryRepository,
-                fileUploadUtil,
+                s3ImageService,
                 jwtUtil);
     }
 }

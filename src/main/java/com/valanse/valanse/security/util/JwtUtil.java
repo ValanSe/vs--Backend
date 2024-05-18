@@ -45,17 +45,17 @@ public class JwtUtil {
     }
 
     public GeneratedTokenDto generateToken(Integer userIdx, String role) {
-        // accessToken 발급을 위한 stateToken을 생성한다.
-        // stateToken은 엑세스 토큰 발급을 위한 일회용 토큰이다.
+        // 엑세스 토큰 발급을 위한 상태 토큰을 생성한다.
+        // 상태 토큰은 엑세스 토큰 발급을 위한 일회용 토큰이다.
         String stateToken = stateTokenUtil.getStateToken();
 
-        // accessToken과 refreshToken을 생성한다.
+        // 엑세스 토큰, 리프레시 토큰을 생성한다.
         String accessToken = generateAccessToken(userIdx, role);
         String refreshToken = generateRefreshToken(userIdx, role);
 
-        // 토큰을 Redis에 저장한다.
+        // 상태 토큰을 키로 엑세스 토큰을 Redis에 저장한다.
         tokenService.saveAccessTokenInfo(stateToken, accessToken);
-        // userIdx를 키로 하여 refreshToken을 저장한다. accessToken은 인덱싱을 위한 메타데이터로 사용되기도 한다.
+        // userIdx를 키로 하여 리프레시 토큰을 저장한다. 엑세스 토큰은 인덱싱을 위한 메타데이터로 사용되기도 한다.
         tokenService.saveRefreshTokenInfo(userIdx, accessToken, refreshToken);
         return new GeneratedTokenDto(stateToken, accessToken, refreshToken);
     }

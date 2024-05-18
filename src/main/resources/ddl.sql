@@ -44,13 +44,17 @@ CREATE TABLE `quiz`
     `content`        TEXT         NOT NULL COMMENT '질문 내용',
     `option_a`       VARCHAR(255) NOT NULL COMMENT '선택지 A',
     `option_b`       VARCHAR(255) NOT NULL COMMENT '선택지 B',
-    `description_a`         TEXT COMMENT 'A 설명',
-    `description_b`         TEXT COMMENT 'B 설명',
+    `description_a`  TEXT COMMENT 'A 설명',
+    `description_b`  TEXT COMMENT 'B 설명',
+    `image_a`        TEXT COMMENT 'A 이미지',
+    `image_b`        TEXT COMMENT 'B 이미지',
+    `view`           INT          NOT NULL COMMENT '조회수',
+    `preference`     INT          NOT NULL COMMENT '선호도 수',
     `created_at`     DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '질문 생성 시간',
-    `updated_at`     DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '질문 수정 시간',
+    `updated_at`     DATETIME              DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '질문 수정 시간',
     FOREIGN KEY (`author_user_id`) REFERENCES `user` (`user_id`)
-) ENGINE = InnoDB  
-  DEFAULT CHARSET = utf8mb4  
+) ENGINE = InnoDB
+  DEFAULT CHARSET = utf8mb4
   COLLATE = utf8mb4_general_ci;
 
 CREATE TABLE `answer`
@@ -65,26 +69,16 @@ CREATE TABLE `answer`
     `difficulty_level` INT      NOT NULL COMMENT '사용자가 선택한 문제의 난이도 (쉬움: 1, 보통: 2, 어려움: 3)',
     FOREIGN KEY (`user_id`) REFERENCES `user` (`user_id`),
     FOREIGN KEY (`quiz_id`) REFERENCES `quiz` (`quiz_id`)
-) ENGINE = InnoDB  
-  DEFAULT CHARSET = utf8mb4  
-  COLLATE = utf8mb4_general_ci;
-
-CREATE TABLE `category`
-(
-    `category_id` INT AUTO_INCREMENT PRIMARY KEY COMMENT '카테고리 식별자',
-    `name`        VARCHAR(255) NOT NULL COMMENT '카테고리 이름',
-    `description` TEXT COMMENT '카테고리 설명'
-) ENGINE = InnoDB  
-  DEFAULT CHARSET = utf8mb4  
+) ENGINE = InnoDB
+  DEFAULT CHARSET = utf8mb4
   COLLATE = utf8mb4_general_ci;
 
 CREATE TABLE `quiz_category`
 (
-    `quiz_id`     INT NOT NULL COMMENT '질문 식별자',
-    `category_id` INT NOT NULL COMMENT '카테고리 식별자',
-    PRIMARY KEY (`quiz_id`, `category_id`),
-    FOREIGN KEY (`quiz_id`) REFERENCES `quiz` (`quiz_id`) ON DELETE CASCADE,
-    FOREIGN KEY (`category_id`) REFERENCES `category` (`category_id`) ON DELETE CASCADE
-) ENGINE = InnoDB  
-  DEFAULT CHARSET = utf8mb4  
+    `quiz_id`  INT          NOT NULL COMMENT '질문 식별자',
+    `category` VARCHAR(100) NOT NULL COMMENT '카테고리 식별자',
+    PRIMARY KEY (`quiz_id`, `category`),
+    FOREIGN KEY (`quiz_id`) REFERENCES `quiz` (`quiz_id`) ON DELETE CASCADE
+) ENGINE = InnoDB
+  DEFAULT CHARSET = utf8mb4
   COLLATE = utf8mb4_general_ci;
