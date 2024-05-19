@@ -104,6 +104,7 @@ public class QuizServicelmpl implements QuizService {
                 .answeredAt(userAnswerDto.getAnsweredAt())
                 .timeSpent(userAnswerDto.getTimeSpent())
                 .preference(userAnswerDto.getPreference())
+                .difficultyLevel(userAnswerDto.getDifficultyLevel())
                 .build();
         userAnswerRepository.save(userAnswer);
     }

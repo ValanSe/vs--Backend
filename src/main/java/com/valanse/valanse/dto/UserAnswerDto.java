@@ -18,5 +18,5 @@ public class UserAnswerDto {
     private Integer timeSpent; // 답변에 소요된 시간 (초)
     private Integer preference; // 퀴즈에 대한 선호도
 
-    // private Integer difficultyLevel 사용자가 선택한 난이도
+    private Integer difficultyLevel; // 사용자가 선택한 난이도
 }
