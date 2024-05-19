@@ -9,6 +9,7 @@ import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -21,6 +22,7 @@ public class QuizServicelmpl implements QuizService {
     private final UserAnswerRepository userAnswerRepository;
 
     @Override
+    @Transactional
     public void increaseView(Integer quizId) {
         try {
             Quiz quiz = quizRepository.findById(quizId).orElseThrow(EntityNotFoundException::new);
@@ -32,6 +34,7 @@ public class QuizServicelmpl implements QuizService {
     }
 
     @Override
+    @Transactional
     public void increasePreference(Integer quizId) {
         try {
             Quiz quiz = quizRepository.findById(quizId).orElseThrow(EntityNotFoundException::new);
@@ -43,6 +46,7 @@ public class QuizServicelmpl implements QuizService {
     }
 
     @Override
+    @Transactional
     public void decreasePreference(Integer quizId) {
         try {
             Quiz quiz = quizRepository.findById(quizId).orElseThrow(EntityNotFoundException::new);
