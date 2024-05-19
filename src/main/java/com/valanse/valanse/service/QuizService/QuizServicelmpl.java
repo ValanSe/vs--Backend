@@ -22,32 +22,57 @@ public class QuizServicelmpl implements QuizService {
 
     @Override
     public void increaseView(Integer quizId) {
-        Quiz quiz = quizRepository.findById(quizId).orElseThrow(EntityNotFoundException::new);
-        quizRepository.increaseView(quiz.getQuizId()); // 조회수 증가
+        try {
+            Quiz quiz = quizRepository.findById(quizId).orElseThrow(EntityNotFoundException::new);
+            quizRepository.increaseView(quiz.getQuizId()); // 조회수 증가
+        } catch (EntityNotFoundException e) {
+            log.error("Quiz not found with id {}", quizId, e);
+            throw e;
+        }
     }
 
     @Override
     public void increasePreference(Integer quizId) {
-        Quiz quiz = quizRepository.findById(quizId).orElseThrow(EntityNotFoundException::new);
-        quizRepository.increasePreference(quiz.getQuizId()); // 선호도 수 증가
+        try {
+            Quiz quiz = quizRepository.findById(quizId).orElseThrow(EntityNotFoundException::new);
+            quizRepository.increasePreference(quiz.getQuizId()); // 선호도 수 증가
+        } catch (EntityNotFoundException e) {
+            log.error("Quiz not found with id {}", quizId, e);
+            throw e;
+        }
     }
 
     @Override
     public void decreasePreference(Integer quizId) {
-        Quiz quiz = quizRepository.findById(quizId).orElseThrow(EntityNotFoundException::new);
-        quizRepository.decreasePreference(quiz.getQuizId()); // 선호도 수 감소
+        try {
+            Quiz quiz = quizRepository.findById(quizId).orElseThrow(EntityNotFoundException::new);
+            quizRepository.decreasePreference(quiz.getQuizId()); // 선호도 수 감소
+        } catch (EntityNotFoundException e) {
+            log.error("Quiz not found with id {}", quizId, e);
+            throw e;
+        }
     }
 
     @Override
     public int getQuizPreference(Integer quizId) {
-        Quiz quiz = quizRepository.findById(quizId).orElseThrow(EntityNotFoundException::new);
-        return quiz.getPreference();
+        try {
+            Quiz quiz = quizRepository.findById(quizId).orElseThrow(EntityNotFoundException::new);
+            return quiz.getPreference();
+        } catch (EntityNotFoundException e) {
+            log.error("Quiz not found with id {}", quizId, e);
+            throw e;
+        }
     }
 
     @Override
     public int getViewsCount(Integer quizId) {
-        Quiz quiz = quizRepository.findById(quizId).orElseThrow(EntityNotFoundException::new);
-        return quiz.getView();
+        try {
+            Quiz quiz = quizRepository.findById(quizId).orElseThrow(EntityNotFoundException::new);
+            return quiz.getView();
+        } catch (EntityNotFoundException e) {
+            log.error("Quiz not found with id {}", quizId, e);
+            throw e;
+        }
     }
 
     @Override
