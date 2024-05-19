@@ -1,6 +1,5 @@
 package com.valanse.valanse.controller;
 
-import com.valanse.valanse.dto.StatusResponseDto;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -18,8 +17,8 @@ import org.springframework.web.servlet.view.RedirectView;
 @RestController
 @Slf4j
 @RequiredArgsConstructor
-@Tag(name = "OAuth Login Controller", description = "OAuth 로그인 관련 엔드포인트를 관리합니다.")
-public class LoginController {
+@Tag(name = "OAuth Controller", description = "OAuth 로그인 관련 엔드포인트를 관리합니다.")
+public class OAuthController {
 
     @Value("${spring.security.oauth2.client.registration.naver.redirect-uri}")
     private String naverUri;
