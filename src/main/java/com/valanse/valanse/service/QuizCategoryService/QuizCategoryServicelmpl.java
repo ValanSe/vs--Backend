@@ -34,8 +34,8 @@ public class QuizCategoryServicelmpl implements QuizCategoryService {
              }
 
              return quizzesInCategory.size();
-        } catch (Exception e) {
-            log.error("Error retrieving category {}: {}", category, e.getMessage(), e);
+        } catch (EntityNotFoundException e) {
+            log.error("{} not found", category, e);
             throw e;
         }
     }
@@ -52,15 +52,20 @@ public class QuizCategoryServicelmpl implements QuizCategoryService {
             double totalPreference = 0.0;
 
             for (QuizCategory quizCategory : quizzesInCategory) {
-                Quiz quiz = quizRepository.findById(quizCategory.getQuizId()).orElseThrow(EntityNotFoundException::new);
+                try {
+                    Quiz quiz = quizRepository.findById(quizCategory.getQuizId()).orElseThrow(EntityNotFoundException::new);
 
-                totalPreference += quiz.getPreference();
+                    totalPreference += quiz.getPreference();
+
+                } catch (EntityNotFoundException e) {
+                    log.error("Quiz not found with id {}", quizCategory.getQuizId(), e);
+                    throw e;
+                }
             }
 
             return totalPreference / quizzesInCategory.size();
-
-        } catch (Exception e) {
-            log.error("Error retrieving category {}: {}", category, e.getMessage(), e);
+        } catch (EntityNotFoundException e) {
+            log.error("{} not found", category, e);
             throw e;
         }
     }
@@ -77,15 +82,20 @@ public class QuizCategoryServicelmpl implements QuizCategoryService {
             int totalView = 0;
 
             for (QuizCategory quizCategory : quizzesInCategory) {
-                Quiz quiz = quizRepository.findById(quizCategory.getQuizId()).orElseThrow(EntityNotFoundException::new);
+                try {
+                    Quiz quiz = quizRepository.findById(quizCategory.getQuizId()).orElseThrow(EntityNotFoundException::new);
 
-                totalView += quiz.getView();
+                    totalView += quiz.getView();
+
+                } catch (EntityNotFoundException e) {
+                    log.error("Quiz not found with id {}", quizCategory.getQuizId(), e);
+                    throw e;
+                }
             }
 
             return totalView;
-
-        } catch (Exception e) {
-            log.error("Error retrieving category {}: {}", category, e.getMessage(), e);
+        } catch (EntityNotFoundException e) {
+            log.error("{} not found", category, e);
             throw e;
         }
     }
