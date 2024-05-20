@@ -15,6 +15,7 @@ import jdk.jfr.Category;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -124,7 +125,7 @@ public class QuizServiceImpl implements QuizService {
             Quiz existingQuiz = quizRepository.findById(quizId).orElseThrow(EntityNotFoundException::new);
 
             if (existingQuiz.getAuthorUserId() != userIdx) {
-                throw new ForbiddenException("You don't have permission to update.");
+                throw new AccessDeniedException("You don't have permission to update.");
             }
 
             existingQuiz = Quiz.builder()
@@ -145,7 +146,7 @@ public class QuizServiceImpl implements QuizService {
 
             quizRepository.save(existingQuiz);
 
-        } catch (ForbiddenException e) {
+        } catch (AccessDeniedException e) {
             log.error("Forbidden to update quiz with id {}", quizId, e);
             throw e;
         }
@@ -160,12 +161,12 @@ public class QuizServiceImpl implements QuizService {
             Quiz quiz = quizRepository.findById(quizId).orElseThrow(EntityNotFoundException::new);
 
             if (quiz.getAuthorUserId() != userIdx) {
-                throw new ForbiddenException("You don't have permission to delete.");
+                throw new AccessDeniedException("You don't have permission to delete.");
             }
 
             quizRepository.delete(quiz);
 
-        } catch (ForbiddenException e) {
+        } catch (AccessDeniedException e) {
             log.error("Forbidden to delete quiz with id {}", quizId, e);
             throw e;
         }

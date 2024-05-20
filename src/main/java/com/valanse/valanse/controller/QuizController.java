@@ -2,7 +2,6 @@ package com.valanse.valanse.controller;
 
 import com.valanse.valanse.dto.QuizRegisterDto;
 import com.valanse.valanse.dto.StatusResponseDto;
-import com.valanse.valanse.service.BalanceProblemService.ForbiddenException;
 import com.valanse.valanse.service.BalanceProblemService.QuizService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -83,13 +82,9 @@ public class QuizController {
             @Parameter(description = "옵션 B에 대한 이미지")
             @RequestPart MultipartFile image_B
     ) throws IOException {
-        try {
-            quizService.updateQuiz(httpServletRequest, quizId, quizRegisterDto, image_A, image_B);
+        quizService.updateQuiz(httpServletRequest, quizId, quizRegisterDto, image_A, image_B);
 
-            return ResponseEntity.ok(StatusResponseDto.success("quiz updated successfully"));
-        } catch (ForbiddenException e) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(StatusResponseDto.error(HttpStatus.FORBIDDEN.value(), e.getMessage()));
-        }
+        return ResponseEntity.ok(StatusResponseDto.success("quiz updated successfully"));
     }
 
     @Operation(summary = "특정 퀴즈를 삭제합니다.",
@@ -105,12 +100,8 @@ public class QuizController {
             HttpServletRequest httpServletRequest,
             @PathVariable("quizId") Integer quizId
     ) {
-        try {
-            quizService.deleteQuiz(httpServletRequest, quizId);
+        quizService.deleteQuiz(httpServletRequest, quizId);
 
-            return ResponseEntity.ok(StatusResponseDto.success("Quiz deleted successfully"));
-        } catch (ForbiddenException e) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(StatusResponseDto.error(HttpStatus.FORBIDDEN.value(), e.getMessage()));
-        }
+        return ResponseEntity.ok(StatusResponseDto.success("Quiz deleted successfully"));
     }
 }
