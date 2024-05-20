@@ -67,6 +67,7 @@ public class QuizController {
             description = "지정된 ID, 퀴즈의 내용, 옵션, 이미지로 퀴즈를 갱신합니다.")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "갱신 성공", content = @Content(schema = @Schema(implementation = StatusResponseDto.class))),
+            @ApiResponse(responseCode = "400", description = "잘못된 요청 형식"),
             @ApiResponse(responseCode = "403", description = "해당 작업에 대한 권한 없음"),
             @ApiResponse(responseCode = "404", description = "해당 ID로 퀴즈를 찾을 수 없음")
     })
