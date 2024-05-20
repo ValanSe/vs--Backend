@@ -28,9 +28,13 @@ public class S3ImageService {
     @Value("${spring.servlet.multipart.max-file-size}")
     private String maxSizeString;
 
+    @Value("${cloud.aws.cloud-front}")
+    private String cloudFront;
+
 
     // 단일 이미지 저장
     public String uploadImage(MultipartFile file) {
+
         String randomFilename = generateRandomFilename(file);
         log.info("File upload started: " + randomFilename);
 
@@ -42,7 +46,8 @@ public class S3ImageService {
             amazonS3.putObject(bucket, randomFilename, file.getInputStream(), metadata);
             log.info("File upload completed: " + randomFilename);
 
-            return amazonS3.getUrl(bucket, randomFilename).toString();
+            return cloudFront + randomFilename;
+
 
         } catch (AmazonS3Exception e) {
             log.error("Amazon S3 error while uploading file: " + e.getMessage());
