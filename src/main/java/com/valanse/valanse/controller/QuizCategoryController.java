@@ -34,7 +34,7 @@ public class QuizCategoryController {
     })
     @GetMapping("/search")
     public ResponseEntity<List<QuizCategory>> searchCategory(
-            @Parameter(description = "카테고리 검색을 위한 키워드", required = true)
+            @Parameter(description = "카테고리 검색을 위한 키워드", required = false)
             @RequestParam String keyword
     ) {
         return ResponseEntity.ok(quizCategoryService.searchCategory(keyword));
