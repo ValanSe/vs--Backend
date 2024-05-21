@@ -2,19 +2,19 @@ package com.valanse.valanse.service.BalanceProblemService;
 
 import com.valanse.valanse.dto.QuizDto;
 import com.valanse.valanse.dto.QuizRegisterDto;
+import com.valanse.valanse.dto.UserAnswerDto;
 import com.valanse.valanse.entity.Quiz;
 import com.valanse.valanse.entity.QuizCategory;
 import com.valanse.valanse.entity.UserAnswer;
 import com.valanse.valanse.repository.jpa.QuizCategoryRepository;
 import com.valanse.valanse.repository.jpa.QuizRepository;
+import com.valanse.valanse.repository.jpa.UserAnswerRepository;
 import com.valanse.valanse.security.util.JwtUtil;
 import com.valanse.valanse.util.FileUploadUtil;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.servlet.http.HttpServletRequest;
-import jdk.jfr.Category;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -22,19 +22,20 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-@Service("balanceProblemQuizService")
+@Service
 @RequiredArgsConstructor
 @Slf4j
 public class QuizServiceImpl implements QuizService {
 
     private final QuizRepository quizRepository;
     private final QuizCategoryRepository quizCategoryRepository;
+    private final UserAnswerRepository userAnswerRepository;
     private final FileUploadUtil fileUploadUtil;
     private final JwtUtil jwtUtil;
-
 
     // 올바르지 못한 리턴 예시
     @Override
@@ -46,8 +47,11 @@ public class QuizServiceImpl implements QuizService {
     }
 
     @Override
+    @Transactional
     public QuizDto getQuiz(int quizId) {
         Quiz quiz = quizRepository.findById(quizId).orElseThrow(EntityNotFoundException::new);
+
+        quizRepository.increaseView(quiz.getQuizId());
 
         return QuizDto.builder()
                 .quizId(quiz.getQuizId())
@@ -59,12 +63,6 @@ public class QuizServiceImpl implements QuizService {
                 .descriptionB(quiz.getDescriptionB())
                 .createdAt(LocalDateTime.now())
                 .build();
-    }
-
-    @Override
-    public void saveUserAnswer(UserAnswer userAnswer) {
-
-
     }
 
     @Override
@@ -146,6 +144,19 @@ public class QuizServiceImpl implements QuizService {
 
             quizRepository.save(existingQuiz);
 
+            List<String> updatedCategory = quizRegisterDto.getCategory() != null ? quizRegisterDto.getCategory() : new ArrayList<>();
+
+            quizCategoryRepository.deleteByQuizId(quizId);
+
+            for (String category : updatedCategory) {
+                QuizCategory quizCategory = QuizCategory.builder()
+                        .category(category)
+                        .quizId(quizId)
+                        .build();
+
+                quizCategoryRepository.save(quizCategory);
+            }
+
         } catch (AccessDeniedException e) {
             log.error("Forbidden to update quiz with id {}", quizId, e);
             throw e;
@@ -172,4 +183,79 @@ public class QuizServiceImpl implements QuizService {
         }
     }
 
+    @Override
+    @Transactional
+    public void increasePreference(Integer quizId) {
+        try {
+            Quiz quiz = quizRepository.findById(quizId).orElseThrow(EntityNotFoundException::new);
+            quizRepository.increasePreference(quiz.getQuizId()); // 선호도 수 증가
+        } catch (EntityNotFoundException e) {
+            log.error("Quiz not found with id {}", quizId, e);
+            throw e;
+        }
+    }
+
+    @Override
+    @Transactional
+    public void decreasePreference(Integer quizId) {
+        try {
+            Quiz quiz = quizRepository.findById(quizId).orElseThrow(EntityNotFoundException::new);
+            quizRepository.decreasePreference(quiz.getQuizId()); // 선호도 수 감소
+        } catch (EntityNotFoundException e) {
+            log.error("Quiz not found with id {}", quizId, e);
+            throw e;
+        }
+    }
+
+    @Override
+    public int getQuizPreference(Integer quizId) {
+        try {
+            Quiz quiz = quizRepository.findById(quizId).orElseThrow(EntityNotFoundException::new);
+            return quiz.getPreference();
+        } catch (EntityNotFoundException e) {
+            log.error("Quiz not found with id {}", quizId, e);
+            throw e;
+        }
+    }
+
+    @Override
+    public int getViewsCount(Integer quizId) {
+        try {
+            Quiz quiz = quizRepository.findById(quizId).orElseThrow(EntityNotFoundException::new);
+            return quiz.getView();
+        } catch (EntityNotFoundException e) {
+            log.error("Quiz not found with id {}", quizId, e);
+            throw e;
+        }
+    }
+
+    @Override
+    public List<Quiz> sortQuizByCreatedAt() {
+        return quizRepository.findAllByOrderByCreatedAtDesc();
+    }
+
+    @Override
+    public List<Quiz> sortQuizByPreference() {
+        return quizRepository.findAllByOrderByPreferenceDesc();
+    }
+
+    @Override
+    public List<Quiz> searchQuiz(String keyword) {
+        return quizRepository.findByContentContaining(keyword);
+    }
+
+    @Override
+    public void saveUserAnswer(UserAnswerDto userAnswerDto) {
+        UserAnswer userAnswer = UserAnswer.builder()
+                .answerId(userAnswerDto.getAnswerId())
+                .userId(userAnswerDto.getUserId())
+                .quizId(userAnswerDto.getQuizId())
+                .selectedOption(userAnswerDto.getSelectedOption())
+                .answeredAt(userAnswerDto.getAnsweredAt())
+                .timeSpent(userAnswerDto.getTimeSpent())
+                .preference(userAnswerDto.getPreference())
+                .difficultyLevel(userAnswerDto.getDifficultyLevel())
+                .build();
+        userAnswerRepository.save(userAnswer);
+    }
 }

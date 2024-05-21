@@ -2,6 +2,7 @@ package com.valanse.valanse.config;
 
 import com.valanse.valanse.repository.jpa.QuizCategoryRepository;
 import com.valanse.valanse.repository.jpa.QuizRepository;
+import com.valanse.valanse.repository.jpa.UserAnswerRepository;
 import com.valanse.valanse.security.util.JwtUtil;
 import com.valanse.valanse.service.BalanceProblemService.QuizService;
 import com.valanse.valanse.service.BalanceProblemService.QuizServiceImpl;
@@ -18,12 +19,14 @@ public class ProfileConfig {
     @Bean
     @Profile("local")
     public QuizService quizService(QuizRepository quizRepository,
-                                   FileUploadUtil fileUploadUtil,
                                    QuizCategoryRepository quizCategoryRepository,
+                                   UserAnswerRepository userAnswerRepository,
+                                   FileUploadUtil fileUploadUtil,
                                    JwtUtil jwtUtil) {
 
         return new QuizServiceImpl(quizRepository,
                 quizCategoryRepository,
+                userAnswerRepository,
                 fileUploadUtil,
                 jwtUtil);
     }
