@@ -1,4 +1,4 @@
-package com.valanse.valanse.service.BalanceProblemService;
+package com.valanse.valanse.service.QuizService;
 
 import com.valanse.valanse.dto.QuizDto;
 import com.valanse.valanse.dto.QuizRegisterDto;
@@ -22,7 +22,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 

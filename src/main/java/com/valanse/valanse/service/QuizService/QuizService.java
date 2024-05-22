@@ -1,4 +1,4 @@
-package com.valanse.valanse.service.BalanceProblemService;
+package com.valanse.valanse.service.QuizService;
 
 import com.valanse.valanse.dto.QuizDto;
 import com.valanse.valanse.dto.QuizRegisterDto;

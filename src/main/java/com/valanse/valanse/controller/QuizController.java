@@ -4,7 +4,7 @@ import com.valanse.valanse.dto.QuizRegisterDto;
 import com.valanse.valanse.dto.StatusResponseDto;
 import com.valanse.valanse.dto.UserAnswerDto;
 import com.valanse.valanse.entity.Quiz;
-import com.valanse.valanse.service.BalanceProblemService.QuizService;
+import com.valanse.valanse.service.QuizService.QuizService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
