@@ -144,11 +144,9 @@ public class QuizServiceImpl implements QuizService {
 
             quizRepository.save(existingQuiz);
 
-            List<String> updatedCategory = quizRegisterDto.getCategory() != null ? quizRegisterDto.getCategory() : new ArrayList<>();
-
             quizCategoryRepository.deleteByQuizId(quizId);
 
-            for (String category : updatedCategory) {
+            for (String category : quizRegisterDto.getCategory()) {
                 QuizCategory quizCategory = QuizCategory.builder()
                         .category(category)
                         .quizId(quizId)
