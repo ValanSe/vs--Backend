@@ -5,16 +5,12 @@ import com.valanse.valanse.dto.QuizRegisterDto;
 import com.valanse.valanse.dto.UserAnswerDto;
 import com.valanse.valanse.entity.Quiz;
 import com.valanse.valanse.entity.QuizCategory;
-import com.valanse.valanse.repository.jpa.QuizCategoryRepository;
-import com.valanse.valanse.repository.jpa.QuizRepository;
-import com.valanse.valanse.security.util.JwtUtil;
-import com.valanse.valanse.service.ImageService.S3ImageService;
 import com.valanse.valanse.entity.UserAnswer;
 import com.valanse.valanse.repository.jpa.QuizCategoryRepository;
 import com.valanse.valanse.repository.jpa.QuizRepository;
 import com.valanse.valanse.repository.jpa.UserAnswerRepository;
 import com.valanse.valanse.security.util.JwtUtil;
-import com.valanse.valanse.util.FileUploadUtil;
+import com.valanse.valanse.service.ImageService.S3ImageService;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
@@ -29,8 +25,6 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
-import java.util.List;
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -185,8 +179,8 @@ public class QuizServiceImpl implements QuizService {
         } catch (AccessDeniedException e) {
             log.error("Forbidden to update quiz with id {}", quizId, e);
             throw e;
-            }
         }
+    }
 
     @Override
     @Transactional

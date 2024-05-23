@@ -1,12 +1,9 @@
 package com.valanse.valanse.service.QuizService;
 
-import com.valanse.valanse.dto.QuizRegisterDto;
-import com.valanse.valanse.dto.UserAnswerDto;
 import com.valanse.valanse.dto.QuizDto;
 import com.valanse.valanse.dto.QuizRegisterDto;
 import com.valanse.valanse.dto.UserAnswerDto;
 import com.valanse.valanse.entity.Quiz;
-import com.valanse.valanse.entity.Category;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -40,7 +37,4 @@ public interface QuizService {
     List<Quiz> searchQuiz(String keyword); // 퀴즈 검색
 
     void saveUserAnswer(UserAnswerDto userAnswer); // 클라이언트의 답변을 데이터베이스에 저장
-
-    void registerQuiz(HttpServletRequest httpServletRequest, QuizRegisterDto quizRegisterDto, MultipartFile image_A, MultipartFile image_B) throws IOException;
-
 }

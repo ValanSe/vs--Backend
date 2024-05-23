@@ -33,7 +33,7 @@ public class JwtUtil {
     private final RefreshTokenRepository refreshTokenRepository;
     private final StateTokenUtil stateTokenUtil;
 
-    @Value("${spring.jwt.secret}")
+    @Value("${jwt.secret}")
     private String stringSecretKey;
 
     private Key secretKey;
