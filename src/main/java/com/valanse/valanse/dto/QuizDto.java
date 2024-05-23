@@ -20,6 +20,8 @@ public class QuizDto {
     private String descriptionB; // 선택지 B 설명
     private String imageA; // 선택지 A 이미지 URL
     private String imageB; // 선택지 B 이미지 URL
+    private Integer view; // 퀴즈의 조회수
+    private Integer preference; // 퀴즈의 선호도 수
     private LocalDateTime createdAt; // 문제 생성 시간
     private LocalDateTime updatedAt; // 문제 수정 시간
 }

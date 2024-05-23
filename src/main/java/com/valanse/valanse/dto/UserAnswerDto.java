@@ -1,12 +1,14 @@
 package com.valanse.valanse.dto;
 
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.time.LocalDateTime;
 
-@Data
+@Getter
+@ToString
 @NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class UserAnswerDto {
     private Integer answerId; // 답변 식별자
     private Integer userId; // 답변한 사용자 식별자
@@ -16,5 +18,5 @@ public class UserAnswerDto {
     private Integer timeSpent; // 답변에 소요된 시간 (초)
     private Integer preference; // 퀴즈에 대한 선호도
 
-    // private Integer difficultyLevel 사용자가 선택한 난이도
+    private Integer difficultyLevel; // 사용자가 선택한 난이도
 }

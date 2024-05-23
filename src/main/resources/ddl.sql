@@ -51,18 +51,18 @@ CREATE TABLE `quiz`
     `view`           INT          NOT NULL COMMENT '조회수',
     `preference`     INT          NOT NULL COMMENT '선호도 수',
     `created_at`     DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '질문 생성 시간',
-    `updated_at`     DATETIME              DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '질문 수정 시간',
+    `updated_at`     DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '질문 수정 시간',
     FOREIGN KEY (`author_user_id`) REFERENCES `user` (`user_id`)
 ) ENGINE = InnoDB
   DEFAULT CHARSET = utf8mb4
   COLLATE = utf8mb4_general_ci;
 
-CREATE TABLE `answer`
+CREATE TABLE `user_answer`
 (
     `answer_id`        INT AUTO_INCREMENT PRIMARY KEY COMMENT '답변 식별자',
     `user_id`          INT      NOT NULL COMMENT '답변한 사용자 식별자',
     `quiz_id`          INT      NOT NULL COMMENT '답변한 질문 식별자',
-    `selected_option`  ENUM('A', 'B') COMMENT '선택된 옵션 (시간 내 선택하지 못한 경우 NULL)',
+    `selected_option`  VARCHAR(255) COMMENT '선택된 옵션 (시간 내 선택하지 못한 경우 NULL)',
     `answered_at`      DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '답변 시간',
     `time_spent`       INT      NOT NULL COMMENT '답변에 걸린 시간(초)',
     `preference`       INT      NOT NULL COMMENT '문제에 대한 사용자의 호감도',

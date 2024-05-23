@@ -24,4 +24,5 @@ public class StatusResponseDto {
     public static StatusResponseDto success(Object data){
         return new StatusResponseDto(200, data);
     }
+    public static StatusResponseDto error(Integer status, String message) { return new StatusResponseDto(status, message); }
 }
