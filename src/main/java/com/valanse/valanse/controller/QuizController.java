@@ -1,6 +1,7 @@
 package com.valanse.valanse.controller;
 
 import com.valanse.valanse.dto.QuizRegisterDto;
+import com.valanse.valanse.dto.QuizStatsDto;
 import com.valanse.valanse.dto.StatusResponseDto;
 import com.valanse.valanse.dto.UserAnswerDto;
 import com.valanse.valanse.entity.Quiz;
@@ -134,26 +135,20 @@ public class QuizController {
         return ResponseEntity.ok(StatusResponseDto.success("Preference decreased successfully"));
     }
 
-    @Operation(summary = "특정 퀴즈 선호도 조회",
-            description = "지정된 ID의 퀴즈의 선호도를 조회합니다.")
+    @Operation(summary = "특정 퀴즈 조회수 및 선호도 조회",
+            description = "지정된 ID의 퀴즈의 조회수와 선호도를 조회합니다.")
     @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "선호도 조회 성공", content = @Content(schema = @Schema(implementation = StatusResponseDto.class))),
+            @ApiResponse(responseCode = "200", description = "조회수 및 선호도 조회 성공", content = @Content(schema = @Schema(implementation = StatusResponseDto.class))),
             @ApiResponse(responseCode = "404", description = "해당 ID로 퀴즈를 찾을 수 없음")
     })
-    @GetMapping("/{quizId}/preference")
-    public ResponseEntity<StatusResponseDto> getQuizPreference(@PathVariable Integer quizId) {
-        return ResponseEntity.ok(StatusResponseDto.success(quizService.getQuizPreference(quizId)));
-    }
+    @GetMapping("/{quizId}/stats")
+    public ResponseEntity<StatusResponseDto> getQuizStats(@PathVariable Integer quizId) {
+        QuizStatsDto stats = QuizStatsDto.builder()
+                .viewsCount(quizService.getViewsCount(quizId))
+                .preference(quizService.getQuizPreference(quizId))
+                .build();
 
-    @Operation(summary = "특정 퀴즈 조회수 조회",
-            description = "지정된 ID의 퀴즈의 조회수를 조회합니다.")
-    @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "조회수 조회 성공", content = @Content(schema = @Schema(implementation = StatusResponseDto.class))),
-            @ApiResponse(responseCode = "404", description = "해당 ID로 퀴즈를 찾을 수 없음")
-    })
-    @GetMapping("/{quizId}/views")
-    public ResponseEntity<StatusResponseDto> getViewsCount(@PathVariable Integer quizId) {
-        return ResponseEntity.ok(StatusResponseDto.success(quizService.getViewsCount(quizId)));
+        return ResponseEntity.ok(StatusResponseDto.success(stats));
     }
 
     @Operation(summary = "퀴즈 생성 시간 순 정렬",
@@ -163,9 +158,7 @@ public class QuizController {
     })
     @GetMapping("/sort-by-created-at")
     public ResponseEntity<StatusResponseDto> sortQuizByCreatedAt() {
-        List<Quiz> quizzes = quizService.sortQuizByCreatedAt();
-
-        return ResponseEntity.ok(StatusResponseDto.success(quizzes));
+        return ResponseEntity.ok(StatusResponseDto.success(quizService.sortQuizByCreatedAt()));
     }
 
     @Operation(summary = "퀴즈 선호도 순 정렬",
@@ -175,9 +168,7 @@ public class QuizController {
     })
     @GetMapping("/sort-by-preference")
     public ResponseEntity<StatusResponseDto> sortQuizByPreference() {
-        List<Quiz> quizzes = quizService.sortQuizByPreference();
-
-        return ResponseEntity.ok(StatusResponseDto.success(quizzes));
+        return ResponseEntity.ok(StatusResponseDto.success(quizService.sortQuizByPreference()));
     }
 
     @Operation(summary = "퀴즈 검색",
@@ -188,12 +179,10 @@ public class QuizController {
     })
     @GetMapping("/search")
     public ResponseEntity<StatusResponseDto> searchQuiz(
-            @Parameter(description = "퀴즈 검색을 위한 키워드", required = false)
+            @Parameter(description = "퀴즈 검색을 위한 키워드")
             @RequestParam String keyword
     ) {
-        List<Quiz> quizzes = quizService.searchQuiz(keyword);
-
-        return ResponseEntity.ok(StatusResponseDto.success(quizzes));
+        return ResponseEntity.ok(StatusResponseDto.success(quizService.searchQuiz(keyword)));
     }
 
     @Operation(summary = "사용자의 답변 저장",
