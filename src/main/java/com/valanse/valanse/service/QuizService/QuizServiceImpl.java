@@ -22,6 +22,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
@@ -73,8 +74,16 @@ public class QuizServiceImpl implements QuizService {
 
         int userIdx = jwtUtil.getUserIdxFromRequest(httpServletRequest);
 
-        String path_A = fileUploadUtil.saveFile(image_A);
-        String path_B = fileUploadUtil.saveFile(image_B);
+        String path_A = null;
+        String path_B = null;
+
+        if (image_A != null) {
+            path_A = fileUploadUtil.saveFile(image_A);
+        }
+
+        if (image_B != null) {
+            path_B = fileUploadUtil.saveFile(image_B);
+        }
 
         Quiz quiz = Quiz.builder()
                 .authorUserId(userIdx)
@@ -86,14 +95,15 @@ public class QuizServiceImpl implements QuizService {
                 .imageA(path_A)
                 .imageB(path_B)
                 .view(0)
-                .view(0)
                 .preference(0)
                 .createdAt(LocalDateTime.now())
                 .build();
 
         quizRepository.save(quiz); // 퀴즈 먼저 저장하여 ID를 생성
 
-        for (String category : quizRegisterDto.getCategory()) {
+        List<String> categories = quizRegisterDto.getCategory() != null ? quizRegisterDto.getCategory() : new ArrayList<>();
+
+        for (String category : categories) {
 
             if (category == null || category.trim().isEmpty()) {
                 continue; // 무효한 카테고리는 건너뛴다
@@ -116,8 +126,16 @@ public class QuizServiceImpl implements QuizService {
         try {
             int userIdx = jwtUtil.getUserIdxFromRequest(httpServletRequest);
 
-            String imagePathA = fileUploadUtil.saveFile(image_A);
-            String imagePathB = fileUploadUtil.saveFile(image_B);
+            String imagePathA = null;
+            String imagePathB = null;
+
+            if (image_A != null) {
+                imagePathA = fileUploadUtil.saveFile(image_A);
+            }
+
+            if (image_B != null) {
+                imagePathB = fileUploadUtil.saveFile(image_B);
+            }
 
             Quiz existingQuiz = quizRepository.findById(quizId).orElseThrow(EntityNotFoundException::new);
 
@@ -128,12 +146,12 @@ public class QuizServiceImpl implements QuizService {
             existingQuiz = Quiz.builder()
                     .quizId(existingQuiz.getQuizId())
                     .authorUserId(existingQuiz.getAuthorUserId())
-                    .content(quizRegisterDto.getContent() != null ? quizRegisterDto.getContent() : existingQuiz.getContent())
+                    .content(quizRegisterDto.getContent() != null ? quizRegisterDto.getContent() : existingQuiz.getContent()) // db에서 NOT NULL이라 입력 값이 널이면 기존 db에 저장된 값
                     .optionA(quizRegisterDto.getOptionA() != null ? quizRegisterDto.getOptionA() : existingQuiz.getOptionA())
                     .optionB(quizRegisterDto.getOptionB() != null ? quizRegisterDto.getOptionB() : existingQuiz.getOptionB())
-                    .descriptionA(quizRegisterDto.getDescriptionA())
+                    .descriptionA(quizRegisterDto.getDescriptionA()) // 널이어도 되므로 입력 값 그대로
                     .descriptionB(quizRegisterDto.getDescriptionB())
-                    .imageA(imagePathA)
+                    .imageA(imagePathA) // imagePath는 이미지가 널이 아니면 이미지의 경로, 널이면 널
                     .imageB(imagePathB)
                     .view(existingQuiz.getView())
                     .preference(existingQuiz.getPreference())
@@ -143,9 +161,13 @@ public class QuizServiceImpl implements QuizService {
 
             quizRepository.save(existingQuiz);
 
-            quizCategoryRepository.deleteByQuizId(quizId);
+            // 입력 카테고리 값이 널이 아니면 입력 값, 널이면 빈 리스트
+            List<String> updatedCategory = quizRegisterDto.getCategory() != null ? quizRegisterDto.getCategory() : new ArrayList<>();
 
-            for (String category : quizRegisterDto.getCategory()) {
+            quizCategoryRepository.deleteByQuizId(quizId); // quizId에 해당하는 quizId 컬럼과 기존에 매핑된 QuizCategory Entity 삭제
+
+            // 입력 받은 카테고리 값과 quizId 매핑
+            for (String category : updatedCategory) {
                 QuizCategory quizCategory = QuizCategory.builder()
                         .category(category)
                         .quizId(quizId)
