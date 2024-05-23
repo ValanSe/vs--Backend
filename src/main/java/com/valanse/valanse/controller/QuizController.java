@@ -3,9 +3,7 @@ package com.valanse.valanse.controller;
 import com.valanse.valanse.dto.QuizRegisterDto;
 import com.valanse.valanse.dto.QuizStatsDto;
 import com.valanse.valanse.dto.StatusResponseDto;
-import com.valanse.valanse.service.QuizService.QuizService;
 import com.valanse.valanse.dto.UserAnswerDto;
-import com.valanse.valanse.entity.Quiz;
 import com.valanse.valanse.service.QuizService.QuizService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -22,7 +20,6 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.util.List;
 
 @Slf4j
 @RestController
