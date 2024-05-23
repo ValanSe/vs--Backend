@@ -5,6 +5,10 @@ import com.valanse.valanse.dto.QuizRegisterDto;
 import com.valanse.valanse.dto.UserAnswerDto;
 import com.valanse.valanse.entity.Quiz;
 import com.valanse.valanse.entity.QuizCategory;
+import com.valanse.valanse.repository.jpa.QuizCategoryRepository;
+import com.valanse.valanse.repository.jpa.QuizRepository;
+import com.valanse.valanse.security.util.JwtUtil;
+import com.valanse.valanse.service.ImageService.S3ImageService;
 import com.valanse.valanse.entity.UserAnswer;
 import com.valanse.valanse.repository.jpa.QuizCategoryRepository;
 import com.valanse.valanse.repository.jpa.QuizRepository;
@@ -25,6 +29,8 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
+import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -34,7 +40,7 @@ public class QuizServiceImpl implements QuizService {
     private final QuizRepository quizRepository;
     private final QuizCategoryRepository quizCategoryRepository;
     private final UserAnswerRepository userAnswerRepository;
-    private final FileUploadUtil fileUploadUtil;
+    private final S3ImageService s3ImageService;
     private final JwtUtil jwtUtil;
 
     // 올바르지 못한 리턴 예시
@@ -78,11 +84,11 @@ public class QuizServiceImpl implements QuizService {
         String path_B = null;
 
         if (image_A != null) {
-            path_A = fileUploadUtil.saveFile(image_A);
+            path_A = s3ImageService.uploadImage(image_A);
         }
 
         if (image_B != null) {
-            path_B = fileUploadUtil.saveFile(image_B);
+            path_B = s3ImageService.uploadImage(image_B);
         }
 
         Quiz quiz = Quiz.builder()
@@ -130,11 +136,11 @@ public class QuizServiceImpl implements QuizService {
             String imagePathB = null;
 
             if (image_A != null) {
-                imagePathA = fileUploadUtil.saveFile(image_A);
+                imagePathA = s3ImageService.uploadImage(image_A);
             }
 
             if (image_B != null) {
-                imagePathB = fileUploadUtil.saveFile(image_B);
+                imagePathB = s3ImageService.uploadImage(image_B);
             }
 
             Quiz existingQuiz = quizRepository.findById(quizId).orElseThrow(EntityNotFoundException::new);
@@ -179,8 +185,8 @@ public class QuizServiceImpl implements QuizService {
         } catch (AccessDeniedException e) {
             log.error("Forbidden to update quiz with id {}", quizId, e);
             throw e;
+            }
         }
-    }
 
     @Override
     @Transactional

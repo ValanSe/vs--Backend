@@ -3,6 +3,7 @@ package com.valanse.valanse.controller;
 import com.valanse.valanse.dto.QuizRegisterDto;
 import com.valanse.valanse.dto.QuizStatsDto;
 import com.valanse.valanse.dto.StatusResponseDto;
+import com.valanse.valanse.service.QuizService.QuizService;
 import com.valanse.valanse.dto.UserAnswerDto;
 import com.valanse.valanse.entity.Quiz;
 import com.valanse.valanse.service.QuizService.QuizService;
@@ -54,11 +55,14 @@ public class QuizController {
     public ResponseEntity<StatusResponseDto> registerQuiz(
             @Parameter(description = "HTTP 요청 객체", hidden = true)
             HttpServletRequest httpServletRequest,
+
             @Parameter(description = "퀴즈 등록에 필요한 데이터", required = true, schema = @Schema(implementation = QuizRegisterDto.class))
             @RequestPart QuizRegisterDto quizRegisterDto,
-            @Parameter(description = "옵션 A에 대한 이미지", required = true)
+
+            @Parameter(description = "옵션 A에 대한 이미지", required = false)
             @RequestPart MultipartFile image_A,
-            @Parameter(description = "옵션 B에 대한 이미지", required = true)
+
+            @Parameter(description = "옵션 B에 대한 이미지", required = false)
             @RequestPart MultipartFile image_B
     ) throws IOException {
         quizService.registerQuiz(httpServletRequest, quizRegisterDto, image_A, image_B);

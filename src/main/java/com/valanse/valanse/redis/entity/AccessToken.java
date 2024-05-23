@@ -7,7 +7,7 @@ import org.springframework.data.redis.core.RedisHash;
 
 @Getter
 @AllArgsConstructor
-@RedisHash(value = "AccessToken", timeToLive = 60 * 3)
+@RedisHash(value = "AccessToken", timeToLive = 20)
 public class AccessToken {
     @Id
     private String stateToken; // 상태 토큰을 ID로 사용

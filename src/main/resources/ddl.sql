@@ -51,7 +51,7 @@ CREATE TABLE `quiz`
     `view`           INT          NOT NULL COMMENT '조회수',
     `preference`     INT          NOT NULL COMMENT '선호도 수',
     `created_at`     DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '질문 생성 시간',
-    `updated_at`     DATETIME     DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '질문 수정 시간',
+    `updated_at`     DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '질문 수정 시간',
     FOREIGN KEY (`author_user_id`) REFERENCES `user` (`user_id`)
 ) ENGINE = InnoDB
   DEFAULT CHARSET = utf8mb4
@@ -73,14 +73,21 @@ CREATE TABLE `answer`
   DEFAULT CHARSET = utf8mb4
   COLLATE = utf8mb4_general_ci;
 
+CREATE TABLE `category`
+(
+    `category_id` INT AUTO_INCREMENT PRIMARY KEY COMMENT '카테고리 식별자',
+    `name`        VARCHAR(255) NOT NULL COMMENT '카테고리 이름',
+    `description` TEXT COMMENT '카테고리 설명'
+) ENGINE = InnoDB  
+  DEFAULT CHARSET = utf8mb4  
+  COLLATE = utf8mb4_general_ci;
+
 CREATE TABLE `quiz_category`
 (
-    `quiz_id`     INT NOT NULL COMMENT '질문 식별자',
-    `category` VARCHAR(100) NOT NULL COMMENT '카테고리',
-    `category_id` INT NOT NULL COMMENT '카테고리 식별자',
-    `quiz_id_list` INT NOT NULL COMMEnt '퀴즈 목록',
-    PRIMARY KEY (`quiz_id`, `category_id`),
-    FOREIGN KEY (`quiz_id`) REFERENCES `quiz` (`quiz_id`) ON DELETE CASCADE,
+    `quiz_id`  INT          NOT NULL COMMENT '질문 식별자',
+    `category` VARCHAR(100) NOT NULL COMMENT '카테고리 식별자',
+    PRIMARY KEY (`quiz_id`, `category`),
+    FOREIGN KEY (`quiz_id`) REFERENCES `quiz` (`quiz_id`) ON DELETE CASCADE
 ) ENGINE = InnoDB
-  DEFAULT CHARSET = utf8mb4  
+  DEFAULT CHARSET = utf8mb4
   COLLATE = utf8mb4_general_ci;

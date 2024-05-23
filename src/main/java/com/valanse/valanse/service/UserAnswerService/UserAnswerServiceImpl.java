@@ -3,15 +3,13 @@ package com.valanse.valanse.service.UserAnswerService;
 import com.valanse.valanse.entity.Quiz;
 import com.valanse.valanse.repository.jpa.UserAnswerRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
-public class UserAnswerServicelmpl implements UserAnswerService {
+public class UserAnswerServiceImpl implements UserAnswerService {
 
     private UserAnswerRepository userAnswerRepository;
 
