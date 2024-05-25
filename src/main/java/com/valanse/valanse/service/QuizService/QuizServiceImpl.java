@@ -61,7 +61,10 @@ public class QuizServiceImpl implements QuizService {
                 .optionB(quiz.getOptionB())
                 .descriptionA(quiz.getDescriptionA())
                 .descriptionB(quiz.getDescriptionB())
-                .createdAt(LocalDateTime.now())
+                .view(quiz.getView())
+                .preference(quiz.getPreference())
+                .createdAt(quiz.getCreatedAt())
+                .updatedAt(quiz.getUpdatedAt())
                 .build();
     }
 
@@ -77,11 +80,11 @@ public class QuizServiceImpl implements QuizService {
         String path_A = null;
         String path_B = null;
 
-        if (image_A != null) {
+        if (image_A != null && !image_A.isEmpty()) {
             path_A = s3ImageService.uploadImage(image_A);
         }
 
-        if (image_B != null) {
+        if (image_B != null && !image_B.isEmpty()) {
             path_B = s3ImageService.uploadImage(image_B);
         }
 
@@ -129,11 +132,11 @@ public class QuizServiceImpl implements QuizService {
             String imagePathA = null;
             String imagePathB = null;
 
-            if (image_A != null) {
+            if (image_A != null && !image_A.isEmpty()) {
                 imagePathA = s3ImageService.uploadImage(image_A);
             }
 
-            if (image_B != null) {
+            if (image_B != null && !image_B.isEmpty()) {
                 imagePathB = s3ImageService.uploadImage(image_B);
             }
 

@@ -216,7 +216,7 @@ public class GlobalExceptionHandler {
         ErrorResponse errorResponse = new ErrorResponse(
                 LocalDateTime.now(),
                 HttpStatus.BAD_REQUEST.value(),
-                "Missing Request Part",
+                "Missing Request part",
                 e.getMessage(),
                 "Required request part is missing");
         return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
@@ -230,19 +230,6 @@ public class GlobalExceptionHandler {
                 LocalDateTime.now(),
                 HttpStatus.BAD_REQUEST.value(),
                 "Failed to process multipart request",
-                e.getMessage(),
-                request.getDescription(false));
-        return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
-    }
-
-    @ExceptionHandler(NullPointerException.class)
-    public ResponseEntity<ErrorResponse> handleNullPointerException(NullPointerException e, WebRequest request) {
-        log.error("NullPointerException occurred: {}", e.getMessage(), e);
-
-        ErrorResponse errorResponse = new ErrorResponse(
-                LocalDateTime.now(),
-                HttpStatus.BAD_REQUEST.value(),
-                "Required data is missing.",
                 e.getMessage(),
                 request.getDescription(false));
         return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);

@@ -3,9 +3,7 @@ package com.valanse.valanse.controller;
 import com.valanse.valanse.dto.QuizRegisterDto;
 import com.valanse.valanse.dto.QuizStatsDto;
 import com.valanse.valanse.dto.StatusResponseDto;
-import com.valanse.valanse.service.QuizService.QuizService;
 import com.valanse.valanse.dto.UserAnswerDto;
-import com.valanse.valanse.entity.Quiz;
 import com.valanse.valanse.service.QuizService.QuizService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -22,7 +20,6 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.util.List;
 
 @Slf4j
 @RestController
@@ -49,6 +46,7 @@ public class QuizController {
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "등록 성공", content = @Content(schema = @Schema(implementation = StatusResponseDto.class))),
             @ApiResponse(responseCode = "400", description = "잘못된 요청 형식"),
+            @ApiResponse(responseCode = "409", description = "필수 항목 불입력"),
             @ApiResponse(responseCode = "500", description = "서버 오류로 인해 퀴즈 등록 실패")
     })
     @PostMapping("/register")
@@ -83,7 +81,7 @@ public class QuizController {
             @Parameter(description = "HTTP 요청 객체", hidden = true)
             HttpServletRequest httpServletRequest,
             @PathVariable("quizId") Integer quizId,
-            @Parameter(description = "퀴즈 갱신에 필요한 데이터", schema = @Schema(implementation = QuizController.class))
+            @Parameter(description = "퀴즈 갱신에 필요한 데이터", schema = @Schema(implementation = QuizRegisterDto.class))
             @RequestPart QuizRegisterDto quizRegisterDto,
             @Parameter(description = "옵션 A에 대한 이미지")
             @RequestPart MultipartFile image_A,
@@ -193,7 +191,8 @@ public class QuizController {
             description = "사용자의 답변을 데이터베이스에 저장")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "저장 성공", content = @Content(schema = @Schema(implementation = StatusResponseDto.class))),
-            @ApiResponse(responseCode = "400", description = "잘못된 요청 형식")
+            @ApiResponse(responseCode = "400", description = "잘못된 요청 형식"),
+            @ApiResponse(responseCode = "409", description = "필수 항목 불입력")
     })
     @PostMapping("/save-user-answer")
     public ResponseEntity<StatusResponseDto> saveUserAnswer(

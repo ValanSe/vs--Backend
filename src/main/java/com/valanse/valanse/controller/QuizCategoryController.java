@@ -2,7 +2,6 @@ package com.valanse.valanse.controller;
 
 import com.valanse.valanse.dto.QuizCategoryStatsDto;
 import com.valanse.valanse.dto.StatusResponseDto;
-import com.valanse.valanse.entity.QuizCategory;
 import com.valanse.valanse.service.QuizCategoryService.QuizCategoryService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -15,8 +14,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @Slf4j
 @RestController
