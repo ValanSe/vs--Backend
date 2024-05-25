@@ -209,6 +209,19 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
     }
 
+    @ExceptionHandler(MissingServletRequestPartException.class)
+    public ResponseEntity<ErrorResponse> handleMissingServletRequestPartException(MissingServletRequestPartException e) {
+        log.error("Required request part is missing", e);
+
+        ErrorResponse errorResponse = new ErrorResponse(
+                LocalDateTime.now(),
+                HttpStatus.BAD_REQUEST.value(),
+                "Missing Request part",
+                e.getMessage(),
+                "Required request part is missing");
+        return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
+    }
+
     @ExceptionHandler(MultipartException.class)
     public ResponseEntity<ErrorResponse> handleMultipartException(MultipartException e, WebRequest request) {
         log.error("Failed to process multipart request", e);
