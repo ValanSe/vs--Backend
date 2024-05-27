@@ -1,6 +1,7 @@
 package com.valanse.valanse.service.QuizService;
 
 import com.valanse.valanse.dto.*;
+import com.valanse.valanse.entity.OptionAB;
 import com.valanse.valanse.entity.Quiz;
 import com.valanse.valanse.entity.QuizCategory;
 import com.valanse.valanse.entity.UserAnswer;
@@ -282,16 +283,23 @@ public class QuizServiceImpl implements QuizService {
 
     @Override
     public void saveUserAnswer(UserAnswerDto userAnswerDto) {
-        UserAnswer userAnswer = UserAnswer.builder()
-                .answerId(userAnswerDto.getAnswerId())
-                .userId(userAnswerDto.getUserId())
-                .quizId(userAnswerDto.getQuizId())
-                .selectedOption(userAnswerDto.getSelectedOption())
-                .answeredAt(userAnswerDto.getAnsweredAt())
-                .timeSpent(userAnswerDto.getTimeSpent())
-                .preference(userAnswerDto.getPreference())
-                .difficultyLevel(userAnswerDto.getDifficultyLevel())
-                .build();
+        UserAnswer userAnswer = null;
+        try {
+            userAnswer = UserAnswer.builder()
+                    .answerId(userAnswerDto.getAnswerId())
+                    .userId(userAnswerDto.getUserId())
+                    .quizId(userAnswerDto.getQuizId())
+                    .selectedOption(OptionAB.valueOf(userAnswerDto.getSelectedOption().toUpperCase())) // 입력 값이 대소문자에 관계없이 처리되도록 변환
+                    .answeredAt(userAnswerDto.getAnsweredAt())
+                    .timeSpent(userAnswerDto.getTimeSpent())
+                    .preference(userAnswerDto.getPreference())
+                    .difficultyLevel(userAnswerDto.getDifficultyLevel())
+                    .build();
+        } catch (IllegalArgumentException e) {
+            // 유효하지 않은 옵션 값에 대한 상세한 예외 메시지
+            throw new InvalidOptionException("Invalid option value: " + userAnswerDto.getSelectedOption() +
+                    ". Please select either 'A' or 'B'.", e);
+        }
 
         userAnswerRepository.save(userAnswer);
     }
