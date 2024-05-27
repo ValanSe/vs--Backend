@@ -38,7 +38,7 @@ public class NoticeController {
             @Parameter(description = "HTTP 요청 객체", hidden = true)
             HttpServletRequest httpServletRequest,
             @Parameter(description = "공지사항 등록에 필요한 데이터", required = true, schema = @Schema(implementation = NoticeRegisterDto.class))
-            @RequestPart NoticeRegisterDto noticeRegisterDto
+            @RequestBody NoticeRegisterDto noticeRegisterDto
     ) {
         noticeService.registerNotice(httpServletRequest, noticeRegisterDto);
 
@@ -70,7 +70,7 @@ public class NoticeController {
             HttpServletRequest httpServletRequest,
             @PathVariable("noticeId") Integer noticeId,
             @Parameter(description = "공지사항 갱신에 필요한 데이터", required = true, schema = @Schema(implementation = NoticeRegisterDto.class))
-            @RequestPart NoticeRegisterDto noticeRegisterDto
+            @RequestBody NoticeRegisterDto noticeRegisterDto
     ) {
         noticeService.updateNotice(httpServletRequest, noticeId, noticeRegisterDto);
 
