@@ -1,7 +1,6 @@
 package com.valanse.valanse.controller;
 
 import com.valanse.valanse.dto.QuizRegisterDto;
-import com.valanse.valanse.dto.QuizStatsDto;
 import com.valanse.valanse.dto.StatusResponseDto;
 import com.valanse.valanse.dto.UserAnswerDto;
 import com.valanse.valanse.service.QuizService.QuizService;
@@ -25,7 +24,7 @@ import java.io.IOException;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/quiz")
-@Tag(name = "Quiz Controller", description = "퀴즈 관련 API를 관리합니다")
+@Tag(name = "Quiz Controller", description = "퀴즈 관련 API를 관리합니다.")
 public class QuizController {
 
     private final QuizService quizService;
@@ -145,18 +144,24 @@ public class QuizController {
     })
     @GetMapping("/{quizId}/stats")
     public ResponseEntity<StatusResponseDto> getQuizStats(@PathVariable Integer quizId) {
-        QuizStatsDto stats = QuizStatsDto.builder()
-                .viewsCount(quizService.getViewsCount(quizId))
-                .preference(quizService.getQuizPreference(quizId))
-                .build();
+        return ResponseEntity.ok(StatusResponseDto.success(quizService.getQuizStats(quizId)));
+    }
 
-        return ResponseEntity.ok(StatusResponseDto.success(stats));
+    @Operation(summary = "특정 퀴즈 좋아요 수 및 싫어요 수 조회",
+            description = "지정된 ID의 퀴즈의 좋아요 수와 싫어요 수를 조회합니다.")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "좋아요 수 및 싫어요 수 조회 성공", content = @Content(schema = @Schema(implementation = StatusResponseDto.class))),
+            @ApiResponse(responseCode = "404", description = "해당 ID로 퀴즈를 찾을 수 없음")
+    })
+    @GetMapping("/{quizId}/like-stats")
+    public ResponseEntity<StatusResponseDto> getQuizLikeStats(@PathVariable Integer quizId) {
+        return ResponseEntity.ok(StatusResponseDto.success(quizService.getQuizLikeStats(quizId)));
     }
 
     @Operation(summary = "퀴즈 생성 시간 순 정렬",
             description = "퀴즈를 생성 시간이 최신인 순으로 정렬")
     @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "정렬 성공", content = @Content(schema = @Schema(implementation = StatusResponseDto.class))),
+            @ApiResponse(responseCode = "200", description = "정렬 성공", content = @Content(schema = @Schema(implementation = StatusResponseDto.class)))
     })
     @GetMapping("/sort-by-created-at")
     public ResponseEntity<StatusResponseDto> sortQuizByCreatedAt() {
@@ -166,7 +171,7 @@ public class QuizController {
     @Operation(summary = "퀴즈 선호도 순 정렬",
             description = "퀴즈를 선호도가 높은 순으로 정렬")
     @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "정렬 성공", content = @Content(schema = @Schema(implementation = StatusResponseDto.class))),
+            @ApiResponse(responseCode = "200", description = "정렬 성공", content = @Content(schema = @Schema(implementation = StatusResponseDto.class)))
     })
     @GetMapping("/sort-by-preference")
     public ResponseEntity<StatusResponseDto> sortQuizByPreference() {
@@ -197,7 +202,7 @@ public class QuizController {
     @PostMapping("/save-user-answer")
     public ResponseEntity<StatusResponseDto> saveUserAnswer(
             @Parameter(description = "사용자의 답변", required = true, schema = @Schema(implementation = UserAnswerDto.class))
-            @RequestPart UserAnswerDto userAnswerDto
+            @RequestBody UserAnswerDto userAnswerDto
     ) {
         quizService.saveUserAnswer(userAnswerDto);
 
