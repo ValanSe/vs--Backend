@@ -1,8 +1,6 @@
 package com.valanse.valanse.service.QuizService;
 
-import com.valanse.valanse.dto.QuizDto;
-import com.valanse.valanse.dto.QuizRegisterDto;
-import com.valanse.valanse.dto.UserAnswerDto;
+import com.valanse.valanse.dto.*;
 import com.valanse.valanse.entity.Quiz;
 import com.valanse.valanse.entity.QuizCategory;
 import com.valanse.valanse.entity.UserAnswer;
@@ -63,6 +61,8 @@ public class QuizServiceImpl implements QuizService {
                 .descriptionB(quiz.getDescriptionB())
                 .view(quiz.getView())
                 .preference(quiz.getPreference())
+                .likeCount(quiz.getLikeCount())
+                .unlikeCount(quiz.getUnlikeCount())
                 .createdAt(quiz.getCreatedAt())
                 .updatedAt(quiz.getUpdatedAt())
                 .build();
@@ -210,7 +210,9 @@ public class QuizServiceImpl implements QuizService {
     public void increasePreference(Integer quizId) {
         try {
             Quiz quiz = quizRepository.findById(quizId).orElseThrow(EntityNotFoundException::new);
+
             quizRepository.increasePreference(quiz.getQuizId()); // 선호도 수 증가
+            quizRepository.increaseLikeCount(quiz.getQuizId()); // 좋아요 수 증가
         } catch (EntityNotFoundException e) {
             log.error("Quiz not found with id {}", quizId, e);
             throw e;
@@ -222,7 +224,9 @@ public class QuizServiceImpl implements QuizService {
     public void decreasePreference(Integer quizId) {
         try {
             Quiz quiz = quizRepository.findById(quizId).orElseThrow(EntityNotFoundException::new);
+
             quizRepository.decreasePreference(quiz.getQuizId()); // 선호도 수 감소
+            quizRepository.increaseUnlikeCount(quiz.getQuizId()); // 싫어요 수 증가
         } catch (EntityNotFoundException e) {
             log.error("Quiz not found with id {}", quizId, e);
             throw e;
@@ -230,10 +234,14 @@ public class QuizServiceImpl implements QuizService {
     }
 
     @Override
-    public int getQuizPreference(Integer quizId) {
+    public QuizStatsDto getQuizStats(Integer quizId) {
         try {
             Quiz quiz = quizRepository.findById(quizId).orElseThrow(EntityNotFoundException::new);
-            return quiz.getPreference();
+
+            return QuizStatsDto.builder()
+                    .viewsCount(quiz.getView())
+                    .preference(quiz.getPreference())
+                    .build();
         } catch (EntityNotFoundException e) {
             log.error("Quiz not found with id {}", quizId, e);
             throw e;
@@ -241,10 +249,14 @@ public class QuizServiceImpl implements QuizService {
     }
 
     @Override
-    public int getViewsCount(Integer quizId) {
+    public QuizLikeStatsDto getQuizLikeStats(Integer quizId) {
         try {
             Quiz quiz = quizRepository.findById(quizId).orElseThrow(EntityNotFoundException::new);
-            return quiz.getView();
+
+            return QuizLikeStatsDto.builder()
+                    .likeCount(quiz.getLikeCount())
+                    .unlikeCount(quiz.getUnlikeCount())
+                    .build();
         } catch (EntityNotFoundException e) {
             log.error("Quiz not found with id {}", quizId, e);
             throw e;
@@ -278,6 +290,7 @@ public class QuizServiceImpl implements QuizService {
                 .preference(userAnswerDto.getPreference())
                 .difficultyLevel(userAnswerDto.getDifficultyLevel())
                 .build();
+
         userAnswerRepository.save(userAnswer);
     }
 }
