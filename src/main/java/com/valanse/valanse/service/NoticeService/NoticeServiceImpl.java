@@ -56,8 +56,6 @@ public class NoticeServiceImpl implements NoticeService {
     public NoticeDto getNotice(Integer noticeId) {
         Notice notice = noticeRepository.findById(noticeId).orElseThrow(EntityNotFoundException::new);
 
-        noticeRepository.increaseView(notice.getNoticeId());
-
         return NoticeDto.builder()
                 .noticeId(notice.getNoticeId())
                 .title(notice.getTitle())
@@ -117,5 +115,12 @@ public class NoticeServiceImpl implements NoticeService {
             log.error("User does not have permission to delete notices.", e);
             throw e;
         }
+    }
+
+    @Override
+    public void increaseView(Integer noticeId) {
+        Notice notice = noticeRepository.findById(noticeId).orElseThrow(EntityNotFoundException::new);
+
+        noticeRepository.increaseView(notice.getNoticeId());
     }
 }

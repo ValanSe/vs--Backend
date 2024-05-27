@@ -12,4 +12,6 @@ public interface NoticeService {
     void updateNotice(HttpServletRequest httpServletRequest, Integer noticeId, NoticeRegisterDto noticeRegisterDto);
 
     void deleteNotice(HttpServletRequest httpServletRequest, Integer noticeId);
+
+    void increaseView(Integer noticeId);
 }
