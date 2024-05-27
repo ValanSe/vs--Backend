@@ -94,4 +94,17 @@ public class NoticeController {
 
         return ResponseEntity.ok(StatusResponseDto.success("notice deleted successfully"));
     }
+
+    @Operation(summary = "특정 공지사항 조회수를 증가합니다.",
+            description = "지정된 ID로 공지사항 조회수를 증가합니다.")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "조회수 증가 성공", content = @Content(schema = @Schema(implementation = StatusResponseDto.class))),
+            @ApiResponse(responseCode = "404", description = "해당 ID로 공지사항을 찾을 수 없음")
+    })
+    @PostMapping("/{noticeId}/increase-view")
+    public ResponseEntity<StatusResponseDto> increaseView(@PathVariable("noticeId") Integer noticeId) {
+        noticeService.increaseView(noticeId);
+
+        return ResponseEntity.ok(StatusResponseDto.success("notice view increased successfully"));
+    }
 }

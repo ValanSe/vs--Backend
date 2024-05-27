@@ -18,23 +18,13 @@ public interface QuizRepository extends JpaRepository<Quiz, Integer> {
 
     @Modifying
     @Transactional
-    @Query("UPDATE Quiz q SET q.preference = q.preference + 1 WHERE q.quizId = :quizId")
+    @Query(value = "UPDATE Quiz SET preference = preference + 1, like_count = like_count + 1 WHERE quiz_id = :quizId", nativeQuery = true)
     void increasePreference(@Param("quizId") Integer quizId);
 
     @Modifying
     @Transactional
-    @Query("UPDATE Quiz q SET q.preference = q.preference - 1 WHERE q.quizId = :quizId")
+    @Query(value = "UPDATE Quiz SET preference = preference - 1, unlike_count = unlike_count + 1 WHERE quiz_id = :quizId", nativeQuery = true)
     void decreasePreference(@Param("quizId") Integer quizId);
-
-    @Modifying
-    @Transactional
-    @Query("UPDATE Quiz q SET q.likeCount = q.likeCount + 1 WHERE q.quizId = :quizId")
-    void increaseLikeCount(@Param("quizId") Integer quizId);
-
-    @Modifying
-    @Transactional
-    @Query("UPDATE Quiz q SET q.unlikeCount = q.unlikeCount + 1 WHERE q.quizId = :quizId")
-    void increaseUnlikeCount(@Param("quizId") Integer quizId);
 
     List<Quiz> findAllByOrderByCreatedAtDesc();
 

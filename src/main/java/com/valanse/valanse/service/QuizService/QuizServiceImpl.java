@@ -102,6 +102,8 @@ public class QuizServiceImpl implements QuizService {
                 .imageB(path_B)
                 .viewCount(0)
                 .preference(0)
+                .likeCount(0)
+                .unlikeCount(0)
                 .createdAt(LocalDateTime.now())
                 .build();
 
@@ -161,6 +163,8 @@ public class QuizServiceImpl implements QuizService {
                     .imageB(imagePathB)
                     .viewCount(existingQuiz.getViewCount())
                     .preference(existingQuiz.getPreference())
+                    .likeCount(existingQuiz.getLikeCount())
+                    .unlikeCount(existingQuiz.getUnlikeCount())
                     .createdAt(existingQuiz.getCreatedAt())
                     .updatedAt(LocalDateTime.now())
                     .build();
@@ -214,8 +218,7 @@ public class QuizServiceImpl implements QuizService {
         try {
             Quiz quiz = quizRepository.findById(quizId).orElseThrow(EntityNotFoundException::new);
 
-            quizRepository.increasePreference(quiz.getQuizId()); // 선호도 수 증가
-            quizRepository.increaseLikeCount(quiz.getQuizId()); // 좋아요 수 증가
+            quizRepository.increasePreference(quiz.getQuizId());
         } catch (EntityNotFoundException e) {
             log.error("Quiz not found with id {}", quizId, e);
             throw e;
@@ -228,8 +231,7 @@ public class QuizServiceImpl implements QuizService {
         try {
             Quiz quiz = quizRepository.findById(quizId).orElseThrow(EntityNotFoundException::new);
 
-            quizRepository.decreasePreference(quiz.getQuizId()); // 선호도 수 감소
-            quizRepository.increaseUnlikeCount(quiz.getQuizId()); // 싫어요 수 증가
+            quizRepository.decreasePreference(quiz.getQuizId());
         } catch (EntityNotFoundException e) {
             log.error("Quiz not found with id {}", quizId, e);
             throw e;
