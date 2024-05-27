@@ -1,5 +1,6 @@
 package com.valanse.valanse.service.QuizCategoryService;
 
+import com.valanse.valanse.dto.QuizCategoryStatsDto;
 import com.valanse.valanse.entity.Quiz;
 import com.valanse.valanse.entity.QuizCategory;
 import com.valanse.valanse.repository.jpa.QuizCategoryRepository;
@@ -25,53 +26,7 @@ public class QuizCategoryServicelmpl implements QuizCategoryService {
     }
 
     @Override
-    public int getQuizCountByCategory(String category) {
-        try {
-             List<QuizCategory> quizzesInCategory = quizCategoryRepository.findByCategory(category);
-
-             if (quizzesInCategory.isEmpty()) {
-                 throw new EntityNotFoundException("Quiz Category not found: " + category);
-             }
-
-             return quizzesInCategory.size();
-        } catch (EntityNotFoundException e) {
-            log.error("{} not found", category, e);
-            throw e;
-        }
-    }
-
-    @Override
-    public double getAveragePreferenceByCategory(String category) {
-        try {
-            List<QuizCategory> quizzesInCategory = quizCategoryRepository.findByCategory(category);
-
-            if (quizzesInCategory.isEmpty()) {
-                throw new EntityNotFoundException("Quiz Category not found: " + category);
-            }
-
-            double totalPreference = 0.0;
-
-            for (QuizCategory quizCategory : quizzesInCategory) {
-                try {
-                    Quiz quiz = quizRepository.findById(quizCategory.getQuizId()).orElseThrow(EntityNotFoundException::new);
-
-                    totalPreference += quiz.getPreference();
-
-                } catch (EntityNotFoundException e) {
-                    log.error("Quiz not found with id {}", quizCategory.getQuizId(), e);
-                    throw e;
-                }
-            }
-
-            return totalPreference / quizzesInCategory.size();
-        } catch (EntityNotFoundException e) {
-            log.error("{} not found", category, e);
-            throw e;
-        }
-    }
-
-    @Override
-    public int getViewsCountByCategory(String category) {
+    public QuizCategoryStatsDto getStatsByCategory(String category) {
         try {
             List<QuizCategory> quizzesInCategory = quizCategoryRepository.findByCategory(category);
 
@@ -80,20 +35,21 @@ public class QuizCategoryServicelmpl implements QuizCategoryService {
             }
 
             int totalView = 0;
+            double totalPreference = 0.0;
 
             for (QuizCategory quizCategory : quizzesInCategory) {
-                try {
-                    Quiz quiz = quizRepository.findById(quizCategory.getQuizId()).orElseThrow(EntityNotFoundException::new);
+                Quiz quiz = quizRepository.findById(quizCategory.getQuizId()).orElseThrow(EntityNotFoundException::new);
 
-                    totalView += quiz.getView();
-
-                } catch (EntityNotFoundException e) {
-                    log.error("Quiz not found with id {}", quizCategory.getQuizId(), e);
-                    throw e;
-                }
+                totalView += quiz.getView();
+                totalPreference += quiz.getPreference();
             }
 
-            return totalView;
+            return QuizCategoryStatsDto.builder()
+                    .quizCount(quizzesInCategory.size())
+                    .viewsCount(totalView)
+                    .averagePreference(totalPreference / quizzesInCategory.size())
+                    .build();
+
         } catch (EntityNotFoundException e) {
             log.error("{} not found", category, e);
             throw e;
