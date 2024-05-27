@@ -48,8 +48,10 @@ CREATE TABLE `quiz`
     `description_b`  TEXT COMMENT 'B 설명',
     `image_a`        TEXT COMMENT 'A 이미지',
     `image_b`        TEXT COMMENT 'B 이미지',
-    `view`           INT          NOT NULL COMMENT '조회수',
-    `preference`     INT          NOT NULL COMMENT '선호도 수',
+    `view_count`     INT          NOT NULL COMMENT '조회수',
+    `preference`     INT          NOT NULL COMMENT '선호도',
+    `like_count`     INT          NOT NULL COMMENT '좋아요 수',
+    `unlike_count`   INT          NOT NULL COMMENT '싫어요 수',
     `created_at`     DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '질문 생성 시간',
     `updated_at`     DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '질문 수정 시간',
     FOREIGN KEY (`author_user_id`) REFERENCES `user` (`user_id`)
@@ -82,3 +84,20 @@ CREATE TABLE `quiz_category`
 ) ENGINE = InnoDB
   DEFAULT CHARSET = utf8mb4
   COLLATE = utf8mb4_general_ci;
+
+ddl
+
+CREATE TABLE notice
+(
+    notice_id  INT AUTO_INCREMENT PRIMARY KEY COMMENT '공지사항 식별자',
+    title      VARCHAR(255) NOT NULL COMMENT '제목',
+    content    TEXT         NOT NULL COMMENT '내용',
+    author_id  INT          NOT NULL COMMENT '공지사항을 등록한 관리자 식별자',
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP COMMENT '공지사항 생성 시간',
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '공지사항 수정 시간',
+    views      INT      DEFAULT 0 COMMENT '조회수',
+    FOREIGN KEY (author_id) REFERENCES user (user_id) ON DELETE CASCADE
+) ENGINE = InnoDB
+DEFAULT CHARSET = utf8mb4
+COLLATE = utf8mb4_general_ci;
+

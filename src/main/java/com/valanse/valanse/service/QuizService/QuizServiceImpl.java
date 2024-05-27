@@ -49,7 +49,7 @@ public class QuizServiceImpl implements QuizService {
     public QuizDto getQuiz(int quizId) {
         Quiz quiz = quizRepository.findById(quizId).orElseThrow(EntityNotFoundException::new);
 
-        quizRepository.increaseView(quiz.getQuizId());
+        quizRepository.increaseViewCount(quiz.getQuizId());
 
         return QuizDto.builder()
                 .quizId(quiz.getQuizId())
@@ -59,7 +59,7 @@ public class QuizServiceImpl implements QuizService {
                 .optionB(quiz.getOptionB())
                 .descriptionA(quiz.getDescriptionA())
                 .descriptionB(quiz.getDescriptionB())
-                .view(quiz.getView())
+                .view(quiz.getViewCount())
                 .preference(quiz.getPreference())
                 .likeCount(quiz.getLikeCount())
                 .unlikeCount(quiz.getUnlikeCount())
@@ -97,7 +97,7 @@ public class QuizServiceImpl implements QuizService {
                 .descriptionB(quizRegisterDto.getDescriptionB())
                 .imageA(path_A)
                 .imageB(path_B)
-                .view(0)
+                .viewCount(0)
                 .preference(0)
                 .createdAt(LocalDateTime.now())
                 .build();
@@ -156,7 +156,7 @@ public class QuizServiceImpl implements QuizService {
                     .descriptionB(quizRegisterDto.getDescriptionB())
                     .imageA(imagePathA) // imagePath는 이미지가 널이 아니면 이미지의 경로, 널이면 널
                     .imageB(imagePathB)
-                    .view(existingQuiz.getView())
+                    .viewCount(existingQuiz.getViewCount())
                     .preference(existingQuiz.getPreference())
                     .createdAt(existingQuiz.getCreatedAt())
                     .updatedAt(LocalDateTime.now())
@@ -239,7 +239,7 @@ public class QuizServiceImpl implements QuizService {
             Quiz quiz = quizRepository.findById(quizId).orElseThrow(EntityNotFoundException::new);
 
             return QuizStatsDto.builder()
-                    .viewsCount(quiz.getView())
+                    .viewsCount(quiz.getViewCount())
                     .preference(quiz.getPreference())
                     .build();
         } catch (EntityNotFoundException e) {
