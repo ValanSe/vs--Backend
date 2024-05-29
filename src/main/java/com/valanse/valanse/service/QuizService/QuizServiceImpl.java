@@ -266,6 +266,13 @@ public class QuizServiceImpl implements QuizService {
     }
 
     @Override
+    public List<Quiz> getQuizByUser(HttpServletRequest httpServletRequest) {
+        int userIdx = jwtUtil.getUserIdxFromRequest(httpServletRequest);
+
+        return quizRepository.findByAuthorUserId(userIdx);
+    }
+
+    @Override
     public List<Quiz> sortQuizByCreatedAt() {
         return quizRepository.findAllByOrderByCreatedAtDesc();
     }

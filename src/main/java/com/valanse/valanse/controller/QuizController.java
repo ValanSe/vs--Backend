@@ -158,6 +158,19 @@ public class QuizController {
         return ResponseEntity.ok(StatusResponseDto.success(quizService.getQuizLikeStats(quizId)));
     }
 
+    @Operation(summary = "특정 사용자가 작성한 퀴즈 목록 조회",
+            description = "특정 사용자가 작성한 퀴즈 목록을 조회합니다.")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "퀴즈 목록 조회 성공", content = @Content(schema = @Schema(implementation = StatusResponseDto.class)))
+    })
+    @GetMapping("/user")
+    public ResponseEntity<StatusResponseDto> getQuizByUser(
+            @Parameter(description = "HTTP 요청 객체", hidden = true)
+            HttpServletRequest httpServletRequest
+    ) {
+        return ResponseEntity.ok(StatusResponseDto.success(quizService.getQuizByUser(httpServletRequest)));
+    }
+
     @Operation(summary = "퀴즈 생성 시간 순 정렬",
             description = "퀴즈를 생성 시간이 최신인 순으로 정렬")
     @ApiResponses({
