@@ -85,7 +85,7 @@ public class QuizServiceImpl implements QuizService {
                         .descriptionB(quiz.getDescriptionB())
                         .imageA(quiz.getImageA())
                         .imageB(quiz.getImageB())
-                        .view(quiz.getView())
+                        .view(quiz.getViewCount())
                         .preference(quiz.getPreference())
                         .likeCount(quiz.getLikeCount())
                         .unlikeCount(quiz.getUnlikeCount())
