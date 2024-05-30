@@ -23,6 +23,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -66,6 +67,29 @@ public class QuizServiceImpl implements QuizService {
                 .createdAt(quiz.getCreatedAt())
                 .updatedAt(quiz.getUpdatedAt())
                 .build();
+    }
+
+    @Override
+    public List<QuizDto> getAllQuiz() {
+        return quizRepository.findAll().stream()
+                .map(quiz -> QuizDto.builder()
+                        .quizId(quiz.getQuizId())
+                        .authorUserId(quiz.getAuthorUserId())
+                        .content(quiz.getContent())
+                        .optionA(quiz.getOptionA())
+                        .optionB(quiz.getOptionB())
+                        .descriptionA(quiz.getDescriptionA())
+                        .descriptionB(quiz.getDescriptionB())
+                        .imageA(quiz.getImageA())
+                        .imageB(quiz.getImageB())
+                        .view(quiz.getView())
+                        .preference(quiz.getPreference())
+                        .likeCount(quiz.getLikeCount())
+                        .unlikeCount(quiz.getUnlikeCount())
+                        .createdAt(quiz.getCreatedAt())
+                        .updatedAt(quiz.getUpdatedAt())
+                        .build())
+                .collect(Collectors.toList());
     }
 
     @Override

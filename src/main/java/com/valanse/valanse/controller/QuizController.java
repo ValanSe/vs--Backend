@@ -40,6 +40,16 @@ public class QuizController {
         return ResponseEntity.ok(StatusResponseDto.success(quizService.getQuiz(quizId)));
     }
 
+    @Operation(summary = "모든 퀴즈를 조회합니다.",
+            description = "모든 퀴즈 정보를 조회합니다.")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "조회 성공", content = @Content(schema = @Schema(implementation = StatusResponseDto.class)))
+    })
+    @GetMapping("/all")
+    public ResponseEntity<StatusResponseDto> getAllQuiz() {
+        return ResponseEntity.ok(StatusResponseDto.success(quizService.getAllQuiz()));
+    }
+
     @Operation(summary = "새로운 퀴즈를 등록합니다.",
             description = "퀴즈의 내용, 옵션, 이미지를 등록하여 새로운 퀴즈를 생성합니다.")
     @ApiResponses({
