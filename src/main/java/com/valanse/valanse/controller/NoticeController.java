@@ -56,6 +56,16 @@ public class NoticeController {
         return ResponseEntity.ok(StatusResponseDto.success(noticeService.getNotice(noticeId)));
     }
 
+    @Operation(summary = "모든 공지사항을 조회합니다.",
+            description = "모든 공지사항 정보를 조회합니다.")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "조회 성공", content = @Content(schema = @Schema(implementation = StatusResponseDto.class)))
+    })
+    @GetMapping("/all")
+    public ResponseEntity<StatusResponseDto> getAllNotice() {
+        return ResponseEntity.ok(StatusResponseDto.success(noticeService.getAllNotice()));
+    }
+
     @Operation(summary = "특정 공지사항을 갱신합니다.",
             description = "지정된 ID, 공지사항의 제목, 내용으로 공지사항을 갱신합니다.")
     @ApiResponses({
