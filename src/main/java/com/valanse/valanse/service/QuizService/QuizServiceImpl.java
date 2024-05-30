@@ -1,13 +1,11 @@
 package com.valanse.valanse.service.QuizService;
 
 import com.valanse.valanse.dto.*;
-import com.valanse.valanse.entity.OptionAB;
-import com.valanse.valanse.entity.Quiz;
-import com.valanse.valanse.entity.QuizCategory;
-import com.valanse.valanse.entity.UserAnswer;
+import com.valanse.valanse.entity.*;
 import com.valanse.valanse.repository.jpa.QuizCategoryRepository;
 import com.valanse.valanse.repository.jpa.QuizRepository;
 import com.valanse.valanse.repository.jpa.UserAnswerRepository;
+import com.valanse.valanse.repository.jpa.UserPreferenceRepository;
 import com.valanse.valanse.security.util.JwtUtil;
 import com.valanse.valanse.service.ImageService.S3ImageService;
 import jakarta.persistence.EntityNotFoundException;
@@ -34,6 +32,7 @@ public class QuizServiceImpl implements QuizService {
     private final QuizRepository quizRepository;
     private final QuizCategoryRepository quizCategoryRepository;
     private final UserAnswerRepository userAnswerRepository;
+    private final UserPreferenceRepository userPreferenceRepository;
     private final S3ImageService s3ImageService;
     private final JwtUtil jwtUtil;
 
@@ -238,26 +237,68 @@ public class QuizServiceImpl implements QuizService {
 
     @Override
     @Transactional
-    public void increasePreference(Integer quizId) {
+    public void increasePreference(HttpServletRequest httpServletRequest, Integer quizId) {
         try {
+            int userIdx = jwtUtil.getUserIdxFromRequest(httpServletRequest);
+
+            UserPreference userPreference = userPreferenceRepository.findByUserIdAndQuizId(userIdx, quizId);
+
+            if (userPreference != null) {
+                if ("LIKE".equals(userPreference.getStatus())) {
+                    throw new IllegalStateException("User has already liked this quiz");
+                } else if ("DISLIKE".equals(userPreference.getStatus())) {
+                    throw new IllegalStateException("User has already disliked this quiz");
+                }
+            }
+
             Quiz quiz = quizRepository.findById(quizId).orElseThrow(EntityNotFoundException::new);
 
             quizRepository.increasePreference(quiz.getQuizId());
-        } catch (EntityNotFoundException e) {
-            log.error("Quiz not found with id {}", quizId, e);
+
+            userPreference = UserPreference.builder()
+                    .userId(userIdx)
+                    .quizId(quiz.getQuizId())
+                    .status("LIKE")
+                    .build();
+
+            userPreferenceRepository.save(userPreference);
+
+        } catch (IllegalStateException e) {
+            log.error("User has already interacted with this quiz");
             throw e;
         }
     }
 
     @Override
     @Transactional
-    public void decreasePreference(Integer quizId) {
+    public void decreasePreference(HttpServletRequest httpServletRequest, Integer quizId) {
         try {
+            int userIdx = jwtUtil.getUserIdxFromRequest(httpServletRequest);
+
+            UserPreference userPreference = userPreferenceRepository.findByUserIdAndQuizId(userIdx, quizId);
+
+            if (userPreference != null) {
+                if ("LIKE".equals(userPreference.getStatus())) {
+                    throw new IllegalStateException("User has already liked this quiz");
+                } else if ("DISLIKE".equals(userPreference.getStatus())) {
+                    throw new IllegalStateException("User has already disliked this quiz");
+                }
+            }
+
             Quiz quiz = quizRepository.findById(quizId).orElseThrow(EntityNotFoundException::new);
 
             quizRepository.decreasePreference(quiz.getQuizId());
-        } catch (EntityNotFoundException e) {
-            log.error("Quiz not found with id {}", quizId, e);
+
+            userPreference = UserPreference.builder()
+                    .userId(userIdx)
+                    .quizId(quiz.getQuizId())
+                    .status("DISLIKE")
+                    .build();
+
+            userPreferenceRepository.save(userPreference);
+
+        } catch (IllegalStateException e) {
+            log.error("User has already interacted with this quiz");
             throw e;
         }
     }

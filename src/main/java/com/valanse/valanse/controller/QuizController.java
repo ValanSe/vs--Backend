@@ -121,11 +121,16 @@ public class QuizController {
             description = "지정된 ID의 퀴즈의 선호도를 증가합니다.")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "선호도 증가 성공", content = @Content(schema = @Schema(implementation = StatusResponseDto.class))),
+            @ApiResponse(responseCode = "400", description = "동일한 퀴즈 선호도 증가"),
             @ApiResponse(responseCode = "404", description = "해당 ID로 퀴즈를 찾을 수 없음")
     })
     @PostMapping("/{quizId}/increase-preference")
-    public ResponseEntity<StatusResponseDto> increasePreference(@PathVariable Integer quizId) {
-        quizService.increasePreference(quizId);
+    public ResponseEntity<StatusResponseDto> increasePreference(
+            @Parameter(description = "HTTP 요청 객체", hidden = true)
+            HttpServletRequest httpServletRequest,
+            @PathVariable Integer quizId
+    ) {
+        quizService.increasePreference(httpServletRequest, quizId);
 
         return ResponseEntity.ok(StatusResponseDto.success("Preference increased successfully"));
     }
@@ -134,11 +139,16 @@ public class QuizController {
             description = "지정된 ID의 퀴즈의 선호도를 감소합니다.")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "선호도 감소 성공", content = @Content(schema = @Schema(implementation = StatusResponseDto.class))),
+            @ApiResponse(responseCode = "400", description = "동일한 퀴즈 선호도 감소"),
             @ApiResponse(responseCode = "404", description = "해당 ID로 퀴즈를 찾을 수 없음")
     })
     @PostMapping("/{quizId}/decrease-preference")
-    public ResponseEntity<StatusResponseDto> decreasePreference(@PathVariable Integer quizId) {
-        quizService.decreasePreference(quizId);
+    public ResponseEntity<StatusResponseDto> decreasePreference(
+            @Parameter(description = "HTTP 요청 객체", hidden = true)
+            HttpServletRequest httpServletRequest,
+            @PathVariable Integer quizId
+    ) {
+        quizService.decreasePreference(httpServletRequest, quizId);
 
         return ResponseEntity.ok(StatusResponseDto.success("Preference decreased successfully"));
     }

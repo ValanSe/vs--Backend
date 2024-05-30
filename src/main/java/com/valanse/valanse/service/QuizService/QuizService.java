@@ -22,9 +22,9 @@ public interface QuizService {
 
     void deleteQuiz(HttpServletRequest httpServletRequest, Integer quizId);
 
-    void increasePreference(Integer quizId); // 퀴즈의 선호도, 좋아요 수 증가
+    void increasePreference(HttpServletRequest httpServletRequest, Integer quizId); // 퀴즈의 선호도, 좋아요 수 증가
 
-    void decreasePreference(Integer quizId); // 퀴즈의 선호도 감소, 싫어요 수 증가
+    void decreasePreference(HttpServletRequest httpServletRequest, Integer quizId); // 퀴즈의 선호도 감소, 싫어요 수 증가
 
     QuizStatsDto getQuizStats(Integer quizId); // 퀴즈의 조회수, 선호도 조회
 
