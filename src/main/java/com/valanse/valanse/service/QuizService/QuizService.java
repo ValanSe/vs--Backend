@@ -38,5 +38,5 @@ public interface QuizService {
 
     List<Quiz> searchQuiz(String keyword); // 퀴즈 검색
 
-    void saveUserAnswer(UserAnswerDto userAnswer); // 클라이언트의 답변을 데이터베이스에 저장
+    void saveUserAnswer(UserAnswerDto userAnswer) throws InvalidOptionException; // 클라이언트의 답변을 데이터베이스에 저장
 }

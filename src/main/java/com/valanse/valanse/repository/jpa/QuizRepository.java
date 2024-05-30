@@ -13,8 +13,8 @@ public interface QuizRepository extends JpaRepository<Quiz, Integer> {
 
     @Modifying
     @Transactional
-    @Query("UPDATE  Quiz q SET q.view = q.view + 1 WHERE q.quizId = :quizId")
-    void increaseView(@Param("quizId") Integer quizId);
+    @Query("UPDATE  Quiz q SET q.viewCount = q.viewCount + 1 WHERE q.quizId = :quizId")
+    void increaseViewCount(@Param("quizId") Integer quizId);
 
     @Modifying
     @Transactional

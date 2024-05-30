@@ -30,7 +30,7 @@ public class Quiz {
     @Column(name = "image_b")
     private String imageB; // 선택지 B 이미지
 
-    private Integer view; // 조회수
+    private Integer viewCount; // 조회수
     private Integer preference; // 선호도 수
     private Integer likeCount; // 좋아요 수
     private Integer unlikeCount; // 싫어요 수

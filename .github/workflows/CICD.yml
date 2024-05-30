@@ -3,8 +3,6 @@ name: CI/CD using GitHub Actions & Docker
 on:
   push:
     branches: [ "master" ]
-  pull_request:
-    branches: [ "master" ]
 
 jobs:
   build:
@@ -35,9 +33,10 @@ jobs:
       run: ./gradlew build
 
     - name: Build Docker image using Docker Compose
-      run: |
-        docker-compose build
-        docker tag makingjjj/valanse-image:latest makingjjj/valanse-image:${{ github.sha }}
+      run: docker-compose build
+
+    - name: Tag Docker image
+      run: docker tag makingjjj/valanse-image:latest makingjjj/valanse-image:${{ github.sha }}
 
     - name: Login to Docker Hub
       run: docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_ACCESS_TOKEN }}

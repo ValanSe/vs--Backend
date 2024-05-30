@@ -52,7 +52,7 @@ public class QuizCategoryServicelmpl implements QuizCategoryService {
             for (QuizCategory quizCategory : quizzesInCategory) {
                 Quiz quiz = quizRepository.findById(quizCategory.getQuizId()).orElseThrow(EntityNotFoundException::new);
 
-                totalView += quiz.getView();
+                totalView += quiz.getViewCount();
                 totalPreference += quiz.getPreference();
             }
 
