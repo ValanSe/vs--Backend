@@ -9,4 +9,6 @@ import java.util.List;
 public interface UserAnswerRepository extends JpaRepository<UserAnswer, Integer> {
 
     List<Quiz> findByUserIdAndPreferenceGreaterThanEqual(Integer userId, int preference);
+
+    UserAnswer findByUserIdAndQuizId(Integer userId, Integer quizId);
 }

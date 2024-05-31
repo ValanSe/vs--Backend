@@ -5,7 +5,6 @@ import com.valanse.valanse.entity.*;
 import com.valanse.valanse.repository.jpa.QuizCategoryRepository;
 import com.valanse.valanse.repository.jpa.QuizRepository;
 import com.valanse.valanse.repository.jpa.UserAnswerRepository;
-import com.valanse.valanse.repository.jpa.UserPreferenceRepository;
 import com.valanse.valanse.security.util.JwtUtil;
 import com.valanse.valanse.service.ImageService.S3ImageService;
 import jakarta.persistence.EntityNotFoundException;
@@ -32,7 +31,6 @@ public class QuizServiceImpl implements QuizService {
     private final QuizRepository quizRepository;
     private final QuizCategoryRepository quizCategoryRepository;
     private final UserAnswerRepository userAnswerRepository;
-    private final UserPreferenceRepository userPreferenceRepository;
     private final S3ImageService s3ImageService;
     private final JwtUtil jwtUtil;
 
@@ -241,12 +239,12 @@ public class QuizServiceImpl implements QuizService {
         try {
             int userIdx = jwtUtil.getUserIdxFromRequest(httpServletRequest);
 
-            UserPreference userPreference = userPreferenceRepository.findByUserIdAndQuizId(userIdx, quizId);
+            UserAnswer userAnswer = userAnswerRepository.findByUserIdAndQuizId(userIdx, quizId);
 
-            if (userPreference != null) {
-                if ("LIKE".equals(userPreference.getStatus())) {
+            if (userAnswer != null) {
+                if ("LIKE".equals(userAnswer.getStatus())) {
                     throw new IllegalStateException("User has already liked this quiz");
-                } else if ("DISLIKE".equals(userPreference.getStatus())) {
+                } else if ("DISLIKE".equals(userAnswer.getStatus())) {
                     throw new IllegalStateException("User has already disliked this quiz");
                 }
             }
@@ -255,13 +253,15 @@ public class QuizServiceImpl implements QuizService {
 
             quizRepository.increasePreference(quiz.getQuizId());
 
-            userPreference = UserPreference.builder()
+            userAnswer = UserAnswer.builder()
                     .userId(userIdx)
                     .quizId(quiz.getQuizId())
                     .status("LIKE")
+                    .answeredAt(LocalDateTime.now())
+                    .preference(1)
                     .build();
 
-            userPreferenceRepository.save(userPreference);
+            userAnswerRepository.save(userAnswer);
 
         } catch (IllegalStateException e) {
             log.error("User has already interacted with this quiz");
@@ -275,12 +275,12 @@ public class QuizServiceImpl implements QuizService {
         try {
             int userIdx = jwtUtil.getUserIdxFromRequest(httpServletRequest);
 
-            UserPreference userPreference = userPreferenceRepository.findByUserIdAndQuizId(userIdx, quizId);
+            UserAnswer userAnswer = userAnswerRepository.findByUserIdAndQuizId(userIdx, quizId);
 
-            if (userPreference != null) {
-                if ("LIKE".equals(userPreference.getStatus())) {
+            if (userAnswer != null) {
+                if ("LIKE".equals(userAnswer.getStatus())) {
                     throw new IllegalStateException("User has already liked this quiz");
-                } else if ("DISLIKE".equals(userPreference.getStatus())) {
+                } else if ("DISLIKE".equals(userAnswer.getStatus())) {
                     throw new IllegalStateException("User has already disliked this quiz");
                 }
             }
@@ -289,13 +289,15 @@ public class QuizServiceImpl implements QuizService {
 
             quizRepository.decreasePreference(quiz.getQuizId());
 
-            userPreference = UserPreference.builder()
+            userAnswer = UserAnswer.builder()
                     .userId(userIdx)
                     .quizId(quiz.getQuizId())
                     .status("DISLIKE")
+                    .answeredAt(LocalDateTime.now())
+                    .preference(-1)
                     .build();
 
-            userPreferenceRepository.save(userPreference);
+            userAnswerRepository.save(userAnswer);
 
         } catch (IllegalStateException e) {
             log.error("User has already interacted with this quiz");
@@ -365,9 +367,7 @@ public class QuizServiceImpl implements QuizService {
                     .quizId(userAnswerDto.getQuizId())
                     .selectedOption(OptionAB.valueOf(userAnswerDto.getSelectedOption().toUpperCase())) // 입력 값이 대소문자에 관계없이 처리되도록 변환
                     .answeredAt(userAnswerDto.getAnsweredAt())
-                    .timeSpent(userAnswerDto.getTimeSpent())
                     .preference(userAnswerDto.getPreference())
-                    .difficultyLevel(userAnswerDto.getDifficultyLevel())
                     .build();
         } catch (IllegalArgumentException e) {
             // 유효하지 않은 옵션 값에 대한 상세한 예외 메시지
