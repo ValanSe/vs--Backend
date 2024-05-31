@@ -368,6 +368,7 @@ public class QuizServiceImpl implements QuizService {
                     .selectedOption(OptionAB.valueOf(userAnswerDto.getSelectedOption().toUpperCase())) // 입력 값이 대소문자에 관계없이 처리되도록 변환
                     .answeredAt(userAnswerDto.getAnsweredAt())
                     .preference(userAnswerDto.getPreference())
+                    .status(userAnswerDto.getStatus())
                     .build();
         } catch (IllegalArgumentException e) {
             // 유효하지 않은 옵션 값에 대한 상세한 예외 메시지
