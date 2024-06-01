@@ -181,11 +181,11 @@ public class QuizController {
             @ApiResponse(responseCode = "200", description = "퀴즈 목록 조회 성공", content = @Content(schema = @Schema(implementation = StatusResponseDto.class)))
     })
     @GetMapping("/user")
-    public ResponseEntity<StatusResponseDto> getQuizByUser(
+    public ResponseEntity<StatusResponseDto> getQuizzesByUserId(
             @Parameter(description = "HTTP 요청 객체", hidden = true)
             HttpServletRequest httpServletRequest
     ) {
-        return ResponseEntity.ok(StatusResponseDto.success(quizService.getQuizByUser(httpServletRequest)));
+        return ResponseEntity.ok(StatusResponseDto.success(quizService.getQuizzesByUserId(httpServletRequest)));
     }
 
     @Operation(summary = "퀴즈 생성 시간 순 정렬",
