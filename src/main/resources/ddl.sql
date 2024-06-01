@@ -67,7 +67,7 @@ CREATE TABLE `user_answer`
     `selected_option`  VARCHAR(255) COMMENT '선택된 옵션',
     `answered_at`      DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '답변 시간',
     `preference`       INT      NOT NULL COMMENT '문제에 대한 사용자의 호감도',
-    `status`  varchar(100),
+    `status`  varchar(100) COMMENT '답변 상태(추천: LIKE, 비추천: DISLIKE)',
     FOREIGN KEY (`user_id`) REFERENCES `user` (`user_id`),
     FOREIGN KEY (`quiz_id`) REFERENCES `quiz` (`quiz_id`)
 ) ENGINE = InnoDB
@@ -84,7 +84,7 @@ CREATE TABLE `quiz_category`
   DEFAULT CHARSET = utf8mb4
   COLLATE = utf8mb4_general_ci;
 
-CREATE TABLE `Notice` (
+CREATE TABLE `notice` (
     notice_id INT AUTO_INCREMENT PRIMARY KEY COMMENT '공지사항 식별자',
     title VARCHAR(255) NOT NULL COMMENT '제목',
     content TEXT NOT NULL COMMENT '내용',
@@ -97,12 +97,12 @@ CREATE TABLE `Notice` (
   DEFAULT CHARSET = utf8mb4
   COLLATE = utf8mb4_general_ci;
 
-CREATE TABLE Comment (
-    comment_id INT AUTO_INCREMENT PRIMARY KEY,
-    author_user_id INT NOT NULL,
-    content VARCHAR(255) NOT NULL,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+CREATE TABLE comment (
+    comment_id INT AUTO_INCREMENT PRIMARY KEY COMMENT '댓글 식별자',
+    author_user_id INT NOT NULL COMMENT '댓글 작성 식별자',
+    content VARCHAR(255) NOT NULL COMMENT '댓글 내용',
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP COMMENT '댓글 생성 시간',
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '댓글 수정 시간'
 ) ENGINE = InnoDB
   DEFAULT CHARSET = utf8mb4
   COLLATE = utf8mb4_general_ci;
