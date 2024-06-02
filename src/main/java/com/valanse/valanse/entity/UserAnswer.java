@@ -10,11 +10,12 @@ import java.time.LocalDateTime;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@IdClass(UserAnswerId.class)
 public class UserAnswer {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer answerId; // 답변 식별자
     private Integer userId; // 답변한 사용자 식별자
+
+    @Id
     private Integer quizId; // 답변한 퀴즈 식별자
 
     @Enumerated(EnumType.STRING)
