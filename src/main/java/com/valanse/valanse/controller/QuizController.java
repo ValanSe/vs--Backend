@@ -121,7 +121,6 @@ public class QuizController {
             description = "지정된 ID의 퀴즈의 선호도를 증가합니다.")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "선호도 증가 성공", content = @Content(schema = @Schema(implementation = StatusResponseDto.class))),
-            @ApiResponse(responseCode = "400", description = "동일한 퀴즈 선호도 증가"),
             @ApiResponse(responseCode = "404", description = "해당 ID로 퀴즈를 찾을 수 없음")
     })
     @PostMapping("/{quizId}/increase-preference")
@@ -139,7 +138,6 @@ public class QuizController {
             description = "지정된 ID의 퀴즈의 선호도를 감소합니다.")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "선호도 감소 성공", content = @Content(schema = @Schema(implementation = StatusResponseDto.class))),
-            @ApiResponse(responseCode = "400", description = "동일한 퀴즈 선호도 감소"),
             @ApiResponse(responseCode = "404", description = "해당 ID로 퀴즈를 찾을 수 없음")
     })
     @PostMapping("/{quizId}/decrease-preference")

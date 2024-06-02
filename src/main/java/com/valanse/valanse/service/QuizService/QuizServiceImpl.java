@@ -5,6 +5,7 @@ import com.valanse.valanse.entity.*;
 import com.valanse.valanse.repository.jpa.QuizCategoryRepository;
 import com.valanse.valanse.repository.jpa.QuizRepository;
 import com.valanse.valanse.repository.jpa.UserAnswerRepository;
+import com.valanse.valanse.repository.jpa.UserPreferenceRepository;
 import com.valanse.valanse.security.util.JwtUtil;
 import com.valanse.valanse.service.ImageService.S3ImageService;
 import jakarta.persistence.EntityNotFoundException;
@@ -31,6 +32,7 @@ public class QuizServiceImpl implements QuizService {
     private final QuizRepository quizRepository;
     private final QuizCategoryRepository quizCategoryRepository;
     private final UserAnswerRepository userAnswerRepository;
+    private final UserPreferenceRepository userPreferenceRepository;
     private final S3ImageService s3ImageService;
     private final JwtUtil jwtUtil;
 
@@ -236,73 +238,101 @@ public class QuizServiceImpl implements QuizService {
     @Override
     @Transactional
     public void increasePreference(HttpServletRequest httpServletRequest, Integer quizId) {
-        try {
-            int userIdx = jwtUtil.getUserIdxFromRequest(httpServletRequest);
+        int userIdx = jwtUtil.getUserIdxFromRequest(httpServletRequest);
 
-            UserAnswer userAnswer = userAnswerRepository.findByUserIdAndQuizId(userIdx, quizId);
+        Quiz quiz = quizRepository.findById(quizId).orElseThrow(EntityNotFoundException::new);
 
-            if (userAnswer != null) {
-                if ("LIKE".equals(userAnswer.getStatus())) {
-                    throw new IllegalStateException("User has already liked this quiz");
-                } else if ("DISLIKE".equals(userAnswer.getStatus())) {
-                    throw new IllegalStateException("User has already disliked this quiz");
-                }
+        UserPreference userPreference = userPreferenceRepository.findByQuizIdAndUserId(quizId, userIdx);
+
+        if (userPreference != null) {
+            if ("LIKE".equals(userPreference.getStatus())) {
+                quizRepository.decreasePreferenceAndLikeCount(quiz.getQuizId());
+
+                userPreference = UserPreference.builder()
+                        .userId(userIdx)
+                        .quizId(quiz.getQuizId())
+                        .build();
+
+                userPreferenceRepository.save(userPreference);
+
+                return;
+
+            } else if ("DISLIKE".equals(userPreference.getStatus())) {
+                quizRepository.increasePreferenceAndDecreaseUnlikeCount(quiz.getQuizId());
+                quizRepository.increasePreferenceAndLikeCount(quiz.getQuizId());
+
+                userPreference = UserPreference.builder()
+                        .userId(userIdx)
+                        .quizId(quiz.getQuizId())
+                        .status("LIKE")
+                        .build();
+
+                userPreferenceRepository.save(userPreference);
+
+                return;
             }
-
-            Quiz quiz = quizRepository.findById(quizId).orElseThrow(EntityNotFoundException::new);
-
-            quizRepository.increasePreference(quiz.getQuizId());
-
-            userAnswer = UserAnswer.builder()
-                    .userId(userIdx)
-                    .quizId(quiz.getQuizId())
-                    .status("LIKE")
-                    .answeredAt(LocalDateTime.now())
-                    .preference(1)
-                    .build();
-
-            userAnswerRepository.save(userAnswer);
-
-        } catch (IllegalStateException e) {
-            log.error("User has already interacted with this quiz");
-            throw e;
         }
+
+        quizRepository.increasePreferenceAndLikeCount(quiz.getQuizId());
+
+        userPreference = UserPreference.builder()
+                .userId(userIdx)
+                .quizId(quiz.getQuizId())
+                .status("LIKE")
+                .build();
+
+        userPreferenceRepository.save(userPreference);
+
     }
 
     @Override
     @Transactional
     public void decreasePreference(HttpServletRequest httpServletRequest, Integer quizId) {
-        try {
-            int userIdx = jwtUtil.getUserIdxFromRequest(httpServletRequest);
+        int userIdx = jwtUtil.getUserIdxFromRequest(httpServletRequest);
 
-            UserAnswer userAnswer = userAnswerRepository.findByUserIdAndQuizId(userIdx, quizId);
+        Quiz quiz = quizRepository.findById(quizId).orElseThrow(EntityNotFoundException::new);
 
-            if (userAnswer != null) {
-                if ("LIKE".equals(userAnswer.getStatus())) {
-                    throw new IllegalStateException("User has already liked this quiz");
-                } else if ("DISLIKE".equals(userAnswer.getStatus())) {
-                    throw new IllegalStateException("User has already disliked this quiz");
-                }
+        UserPreference userPreference = userPreferenceRepository.findByQuizIdAndUserId(quizId, userIdx);
+
+        if (userPreference != null) {
+            if ("LIKE".equals(userPreference.getStatus())) {
+                quizRepository.decreasePreferenceAndLikeCount(quiz.getQuizId());
+                quizRepository.decreasePreferenceAndIncreaseUnlikeCount(quiz.getQuizId());
+
+                userPreference = UserPreference.builder()
+                        .userId(userIdx)
+                        .quizId(quiz.getQuizId())
+                        .status("DISLIKE")
+                        .build();
+
+                userPreferenceRepository.save(userPreference);
+
+                return;
+
+            } else if ("DISLIKE".equals(userPreference.getStatus())) {
+                quizRepository.increasePreferenceAndDecreaseUnlikeCount(quiz.getQuizId());
+
+                userPreference = UserPreference.builder()
+                        .userId(userIdx)
+                        .quizId(quiz.getQuizId())
+                        .build();
+
+                userPreferenceRepository.save(userPreference);
+
+                return;
             }
-
-            Quiz quiz = quizRepository.findById(quizId).orElseThrow(EntityNotFoundException::new);
-
-            quizRepository.decreasePreference(quiz.getQuizId());
-
-            userAnswer = UserAnswer.builder()
-                    .userId(userIdx)
-                    .quizId(quiz.getQuizId())
-                    .status("DISLIKE")
-                    .answeredAt(LocalDateTime.now())
-                    .preference(-1)
-                    .build();
-
-            userAnswerRepository.save(userAnswer);
-
-        } catch (IllegalStateException e) {
-            log.error("User has already interacted with this quiz");
-            throw e;
         }
+
+        quizRepository.decreasePreferenceAndIncreaseUnlikeCount(quiz.getQuizId());
+
+        userPreference = UserPreference.builder()
+                .userId(userIdx)
+                .quizId(quiz.getQuizId())
+                .status("DISLIKE")
+                .build();
+
+        userPreferenceRepository.save(userPreference);
+
     }
 
     @Override
