@@ -5,7 +5,6 @@ import com.valanse.valanse.entity.*;
 import com.valanse.valanse.repository.jpa.QuizCategoryRepository;
 import com.valanse.valanse.repository.jpa.QuizRepository;
 import com.valanse.valanse.repository.jpa.UserAnswerRepository;
-import com.valanse.valanse.repository.jpa.UserPreferenceRepository;
 import com.valanse.valanse.security.util.JwtUtil;
 import com.valanse.valanse.service.ImageService.S3ImageService;
 import jakarta.persistence.EntityNotFoundException;
@@ -32,7 +31,6 @@ public class QuizServiceImpl implements QuizService {
     private final QuizRepository quizRepository;
     private final QuizCategoryRepository quizCategoryRepository;
     private final UserAnswerRepository userAnswerRepository;
-    private final UserPreferenceRepository userPreferenceRepository;
     private final S3ImageService s3ImageService;
     private final JwtUtil jwtUtil;
 
@@ -242,32 +240,37 @@ public class QuizServiceImpl implements QuizService {
 
         Quiz quiz = quizRepository.findById(quizId).orElseThrow(EntityNotFoundException::new);
 
-        UserPreference userPreference = userPreferenceRepository.findByQuizIdAndUserId(quizId, userIdx);
+        UserAnswer userAnswer = userAnswerRepository.findByUserIdAndQuizId(userIdx, quizId);
 
-        if (userPreference != null) {
-            if ("LIKE".equals(userPreference.getStatus())) {
+        if (userAnswer != null) {
+            if ("LIKE".equals(userAnswer.getStatus())) {
                 quizRepository.decreasePreferenceAndLikeCount(quiz.getQuizId());
 
-                userPreference = UserPreference.builder()
+                userAnswer = UserAnswer.builder()
                         .userId(userIdx)
                         .quizId(quiz.getQuizId())
+                        .answeredAt(LocalDateTime.now())
+                        .preference(-1)
+                        .status(null)
                         .build();
 
-                userPreferenceRepository.save(userPreference);
+                userAnswerRepository.save(userAnswer);
 
                 return;
 
-            } else if ("DISLIKE".equals(userPreference.getStatus())) {
+            } else if ("DISLIKE".equals(userAnswer.getStatus())) {
                 quizRepository.increasePreferenceAndDecreaseUnlikeCount(quiz.getQuizId());
                 quizRepository.increasePreferenceAndLikeCount(quiz.getQuizId());
 
-                userPreference = UserPreference.builder()
+                userAnswer = UserAnswer.builder()
                         .userId(userIdx)
                         .quizId(quiz.getQuizId())
+                        .answeredAt(LocalDateTime.now())
+                        .preference(2)
                         .status("LIKE")
                         .build();
 
-                userPreferenceRepository.save(userPreference);
+                userAnswerRepository.save(userAnswer);
 
                 return;
             }
@@ -275,13 +278,15 @@ public class QuizServiceImpl implements QuizService {
 
         quizRepository.increasePreferenceAndLikeCount(quiz.getQuizId());
 
-        userPreference = UserPreference.builder()
+        userAnswer = UserAnswer.builder()
                 .userId(userIdx)
                 .quizId(quiz.getQuizId())
+                .answeredAt(LocalDateTime.now())
+                .preference(1)
                 .status("LIKE")
                 .build();
 
-        userPreferenceRepository.save(userPreference);
+        userAnswerRepository.save(userAnswer);
 
     }
 
@@ -292,32 +297,37 @@ public class QuizServiceImpl implements QuizService {
 
         Quiz quiz = quizRepository.findById(quizId).orElseThrow(EntityNotFoundException::new);
 
-        UserPreference userPreference = userPreferenceRepository.findByQuizIdAndUserId(quizId, userIdx);
+        UserAnswer userAnswer = userAnswerRepository.findByUserIdAndQuizId(userIdx, quizId);
 
-        if (userPreference != null) {
-            if ("LIKE".equals(userPreference.getStatus())) {
+        if (userAnswer != null) {
+            if ("LIKE".equals(userAnswer.getStatus())) {
                 quizRepository.decreasePreferenceAndLikeCount(quiz.getQuizId());
                 quizRepository.decreasePreferenceAndIncreaseUnlikeCount(quiz.getQuizId());
 
-                userPreference = UserPreference.builder()
+                userAnswer = UserAnswer.builder()
                         .userId(userIdx)
                         .quizId(quiz.getQuizId())
+                        .answeredAt(LocalDateTime.now())
+                        .preference(-2)
                         .status("DISLIKE")
                         .build();
 
-                userPreferenceRepository.save(userPreference);
+                userAnswerRepository.save(userAnswer);
 
                 return;
 
-            } else if ("DISLIKE".equals(userPreference.getStatus())) {
+            } else if ("DISLIKE".equals(userAnswer.getStatus())) {
                 quizRepository.increasePreferenceAndDecreaseUnlikeCount(quiz.getQuizId());
 
-                userPreference = UserPreference.builder()
+                userAnswer = UserAnswer.builder()
                         .userId(userIdx)
                         .quizId(quiz.getQuizId())
+                        .answeredAt(LocalDateTime.now())
+                        .preference(1)
+                        .status(null)
                         .build();
 
-                userPreferenceRepository.save(userPreference);
+                userAnswerRepository.save(userAnswer);
 
                 return;
             }
@@ -325,13 +335,15 @@ public class QuizServiceImpl implements QuizService {
 
         quizRepository.decreasePreferenceAndIncreaseUnlikeCount(quiz.getQuizId());
 
-        userPreference = UserPreference.builder()
+        userAnswer = UserAnswer.builder()
                 .userId(userIdx)
                 .quizId(quiz.getQuizId())
+                .answeredAt(LocalDateTime.now())
+                .preference(-1)
                 .status("DISLIKE")
                 .build();
 
-        userPreferenceRepository.save(userPreference);
+        userAnswerRepository.save(userAnswer);
 
     }
 
@@ -392,7 +404,6 @@ public class QuizServiceImpl implements QuizService {
         UserAnswer userAnswer = null;
         try {
             userAnswer = UserAnswer.builder()
-                    .answerId(userAnswerDto.getAnswerId())
                     .userId(userAnswerDto.getUserId())
                     .quizId(userAnswerDto.getQuizId())
                     .selectedOption(OptionAB.valueOf(userAnswerDto.getSelectedOption().toUpperCase())) // 입력 값이 대소문자에 관계없이 처리되도록 변환
