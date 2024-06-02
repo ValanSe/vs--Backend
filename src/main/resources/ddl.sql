@@ -67,7 +67,6 @@ CREATE TABLE `user_answer`
     `selected_option`  VARCHAR(255) COMMENT '선택된 옵션',
     `answered_at`      DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '답변 시간',
     `preference`       INT      NOT NULL COMMENT '문제에 대한 사용자의 호감도',
-    `status`  varchar(100) COMMENT '답변 상태(추천: LIKE, 비추천: DISLIKE)',
     FOREIGN KEY (`user_id`) REFERENCES `user` (`user_id`),
     FOREIGN KEY (`quiz_id`) REFERENCES `quiz` (`quiz_id`)
 ) ENGINE = InnoDB
@@ -108,11 +107,22 @@ CREATE TABLE comment (
   COLLATE = utf8mb4_general_ci;
 
 CREATE TABLE `comment_quiz` (
-    `quiz_id` INT NOT NULL,
-    `comment_id`  INT NOT NULL,
+    `quiz_id` INT NOT NULL COMMENT '퀴즈 식별자',
+    `comment_id`  INT NOT NULL COMMENT '댓글 식별자',
     PRIMARY KEY (`quiz_id`, `comment_id`),
     FOREIGN KEY (`quiz_id`) REFERENCES `quiz` (`quiz_id`) ON DELETE CASCADE,
     FOREIGN KEY (`comment_id`) REFERENCES `comment` (`comment_id`) ON DELETE CASCADE
+) ENGINE = InnoDB
+  DEFAULT CHARSET = utf8mb4
+  COLLATE = utf8mb4_general_ci;
+
+CREATE TABLE `user_preference` (
+    `quiz_id` INT NOT NULL COMMENT '퀴즈 식별자',
+    `user_id` INT NOT NULL COMMENT '답변한 사용자 식별자',
+    `status`  VARCHAR(100) COMMENT '답변 상태(추천: LIKE, 비추천: DISLIKE)',
+    PRIMARY KEY (`quiz_id`, `user_id`),
+    FOREIGN KEY (`quiz_id`) REFERENCES `quiz` (`quiz_id`) ON DELETE CASCADE,
+    FOREIGN KEY (`user_id`) REFERENCES `user` (`user_id`) ON DELETE CASCADE
 ) ENGINE = InnoDB
   DEFAULT CHARSET = utf8mb4
   COLLATE = utf8mb4_general_ci;
