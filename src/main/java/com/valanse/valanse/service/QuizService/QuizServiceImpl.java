@@ -243,22 +243,21 @@ public class QuizServiceImpl implements QuizService {
         UserAnswer userAnswer = userAnswerRepository.findByUserIdAndQuizId(userIdx, quizId);
 
         if (userAnswer != null) {
-            if ("LIKE".equals(userAnswer.getStatus())) {
+            if (userAnswer.getPreference() == 1) {
                 quizRepository.decreasePreferenceAndLikeCount(quiz.getQuizId());
 
                 userAnswer = UserAnswer.builder()
                         .userId(userIdx)
                         .quizId(quiz.getQuizId())
                         .answeredAt(LocalDateTime.now())
-                        .preference(-1)
-                        .status(null)
+                        .preference(0)
                         .build();
 
                 userAnswerRepository.save(userAnswer);
 
                 return;
 
-            } else if ("DISLIKE".equals(userAnswer.getStatus())) {
+            } else if (userAnswer.getPreference() == -1) {
                 quizRepository.increasePreferenceAndDecreaseUnlikeCount(quiz.getQuizId());
                 quizRepository.increasePreferenceAndLikeCount(quiz.getQuizId());
 
@@ -266,8 +265,7 @@ public class QuizServiceImpl implements QuizService {
                         .userId(userIdx)
                         .quizId(quiz.getQuizId())
                         .answeredAt(LocalDateTime.now())
-                        .preference(2)
-                        .status("LIKE")
+                        .preference(1)
                         .build();
 
                 userAnswerRepository.save(userAnswer);
@@ -283,7 +281,6 @@ public class QuizServiceImpl implements QuizService {
                 .quizId(quiz.getQuizId())
                 .answeredAt(LocalDateTime.now())
                 .preference(1)
-                .status("LIKE")
                 .build();
 
         userAnswerRepository.save(userAnswer);
@@ -300,7 +297,7 @@ public class QuizServiceImpl implements QuizService {
         UserAnswer userAnswer = userAnswerRepository.findByUserIdAndQuizId(userIdx, quizId);
 
         if (userAnswer != null) {
-            if ("LIKE".equals(userAnswer.getStatus())) {
+            if (userAnswer.getPreference() == 1) {
                 quizRepository.decreasePreferenceAndLikeCount(quiz.getQuizId());
                 quizRepository.decreasePreferenceAndIncreaseUnlikeCount(quiz.getQuizId());
 
@@ -308,23 +305,21 @@ public class QuizServiceImpl implements QuizService {
                         .userId(userIdx)
                         .quizId(quiz.getQuizId())
                         .answeredAt(LocalDateTime.now())
-                        .preference(-2)
-                        .status("DISLIKE")
+                        .preference(-1)
                         .build();
 
                 userAnswerRepository.save(userAnswer);
 
                 return;
 
-            } else if ("DISLIKE".equals(userAnswer.getStatus())) {
+            } else if (userAnswer.getPreference() == -1) {
                 quizRepository.increasePreferenceAndDecreaseUnlikeCount(quiz.getQuizId());
 
                 userAnswer = UserAnswer.builder()
                         .userId(userIdx)
                         .quizId(quiz.getQuizId())
                         .answeredAt(LocalDateTime.now())
-                        .preference(1)
-                        .status(null)
+                        .preference(0)
                         .build();
 
                 userAnswerRepository.save(userAnswer);
@@ -340,7 +335,6 @@ public class QuizServiceImpl implements QuizService {
                 .quizId(quiz.getQuizId())
                 .answeredAt(LocalDateTime.now())
                 .preference(-1)
-                .status("DISLIKE")
                 .build();
 
         userAnswerRepository.save(userAnswer);
