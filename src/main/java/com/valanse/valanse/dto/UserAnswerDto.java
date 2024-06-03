@@ -15,5 +15,4 @@ public class UserAnswerDto {
     private String selectedOption; // 선택한 옵션
     private LocalDateTime answeredAt; // 답변한 시간
     private Integer preference; // 퀴즈에 대한 선호도
-    private String status;
 }
