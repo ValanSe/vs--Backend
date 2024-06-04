@@ -1,8 +1,8 @@
 package com.valanse.valanse.service.CommentService;
 
 import com.valanse.valanse.dto.CommentDto;
+import com.valanse.valanse.dto.CommentQuizDto;
 import com.valanse.valanse.dto.CommentRegisterDto;
-import com.valanse.valanse.dto.CommentUpdateDto;
 import com.valanse.valanse.entity.Comment;
 import com.valanse.valanse.entity.CommentQuiz;
 import com.valanse.valanse.entity.Quiz;
@@ -20,9 +20,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -95,8 +97,18 @@ public class CommentServiceImpl implements CommentService {
     }
 
     @Override
+    public List<CommentQuizDto> getCommentByQuizId(Integer quizId) {
+        return commentQuizRepository.findByQuizId(quizId).stream()
+                .map(commentQuiz -> CommentQuizDto.builder()
+                        .quizId(commentQuiz.getQuizId())
+                        .commentId(commentQuiz.getCommentId())
+                        .build())
+                .collect(Collectors.toList());
+    }
+
+    @Override
     @Transactional
-    public void updateComment(HttpServletRequest httpServletRequest, Integer commentId, CommentUpdateDto commentUpdateDto) {
+    public void updateComment(HttpServletRequest httpServletRequest, Integer commentId, String content) {
         try {
             int userIdx = jwtUtil.getUserIdxFromRequest(httpServletRequest);
 
@@ -105,8 +117,6 @@ public class CommentServiceImpl implements CommentService {
             if (existingComment.getAuthorUserId() != userIdx) {
                 throw new AccessDeniedException("You don't have permission to update.");
             }
-
-            String content = commentUpdateDto.getContent();
 
             for (String profanityWord : profanityWords) {
                 String regex = "(?i)" + String.join("[^\\p{IsHangul}]*", profanityWord.split(""));

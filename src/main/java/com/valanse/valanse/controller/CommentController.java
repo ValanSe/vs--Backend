@@ -1,7 +1,6 @@
 package com.valanse.valanse.controller;
 
 import com.valanse.valanse.dto.CommentRegisterDto;
-import com.valanse.valanse.dto.CommentUpdateDto;
 import com.valanse.valanse.dto.StatusResponseDto;
 import com.valanse.valanse.service.CommentService.CommentService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -56,6 +55,16 @@ public class CommentController {
         return ResponseEntity.ok(StatusResponseDto.success(commentService.getComment(commentId)));
     }
 
+    @Operation(summary = "특정 퀴즈의 댓글을 조회합니다.",
+            description = "지정된 ID의 퀴즈의 댓글 정보를 조회합니다.")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "조회 성공", content = @Content(schema = @Schema(implementation = StatusResponseDto.class)))
+    })
+    @GetMapping("/quiz/{quizId}")
+    public ResponseEntity<StatusResponseDto> getCommentByQuizId(@PathVariable Integer quizId) {
+        return ResponseEntity.ok(StatusResponseDto.success(commentService.getCommentByQuizId(quizId)));
+    }
+
     @Operation(summary = "특정 댓글을 갱신합니다.",
             description = "입력 받은 댓글의 내용으로 댓글을 갱신합니다.")
     @ApiResponses({
@@ -69,10 +78,10 @@ public class CommentController {
             @Parameter(description = "HTTP 요청 객체", hidden = true)
             HttpServletRequest httpServletRequest,
             @PathVariable("commentId") Integer commentId,
-            @Parameter(description = "댓글 갱신에 필요한 데이터", required = true, schema = @Schema(implementation = CommentUpdateDto.class))
-            @RequestBody CommentUpdateDto commentUpdateDto
+            @Parameter(description = "수정할 댓글 내용")
+            @RequestParam String content
     ) {
-        commentService.updateComment(httpServletRequest, commentId, commentUpdateDto);
+        commentService.updateComment(httpServletRequest, commentId, content);
 
         return ResponseEntity.ok(StatusResponseDto.success("comment updated successfully"));
     }
