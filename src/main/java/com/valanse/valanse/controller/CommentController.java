@@ -60,7 +60,7 @@ public class CommentController {
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "조회 성공", content = @Content(schema = @Schema(implementation = StatusResponseDto.class)))
     })
-    @GetMapping("/quiz/{quizId}")
+    @GetMapping("{quizId}/quiz")
     public ResponseEntity<StatusResponseDto> getCommentByQuizId(@PathVariable Integer quizId) {
         return ResponseEntity.ok(StatusResponseDto.success(commentService.getCommentByQuizId(quizId)));
     }
