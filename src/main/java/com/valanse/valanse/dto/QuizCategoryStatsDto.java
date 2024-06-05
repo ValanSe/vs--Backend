@@ -10,7 +10,7 @@ import lombok.*;
 public class QuizCategoryStatsDto {
     private int quizCount;
 
-    private int viewsCount;
+    private int viewCount;
 
     private double averagePreference;
 }
