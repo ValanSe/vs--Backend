@@ -60,7 +60,7 @@ public class QuizServiceImpl implements QuizService {
                 .descriptionB(quiz.getDescriptionB())
                 .imageA(quiz.getImageA())
                 .imageB(quiz.getImageB())
-                .view(quiz.getViewCount())
+                .viewCount(quiz.getViewCount())
                 .preference(quiz.getPreference())
                 .likeCount(quiz.getLikeCount())
                 .unlikeCount(quiz.getUnlikeCount())
@@ -82,7 +82,7 @@ public class QuizServiceImpl implements QuizService {
                         .descriptionB(quiz.getDescriptionB())
                         .imageA(quiz.getImageA())
                         .imageB(quiz.getImageB())
-                        .view(quiz.getViewCount())
+                        .viewCount(quiz.getViewCount())
                         .preference(quiz.getPreference())
                         .likeCount(quiz.getLikeCount())
                         .unlikeCount(quiz.getUnlikeCount())
@@ -231,118 +231,6 @@ public class QuizServiceImpl implements QuizService {
             log.error("Forbidden to delete quiz with id {}", quizId, e);
             throw e;
         }
-    }
-
-    @Override
-    @Transactional
-    public void increasePreference(HttpServletRequest httpServletRequest, Integer quizId) {
-        int userIdx = jwtUtil.getUserIdxFromRequest(httpServletRequest);
-
-        Quiz quiz = quizRepository.findById(quizId).orElseThrow(EntityNotFoundException::new);
-
-        UserAnswerId userAnswerId = new UserAnswerId(userIdx, quizId);
-
-        UserAnswer userAnswer = userAnswerRepository.findById(userAnswerId).orElseThrow(EntityNotFoundException::new);
-
-        if (userAnswer != null) {
-            if (userAnswer.getPreference() == 1) {
-                quizRepository.decreasePreferenceAndLikeCount(quiz.getQuizId());
-
-                userAnswer = UserAnswer.builder()
-                        .userId(userIdx)
-                        .quizId(quiz.getQuizId())
-                        .answeredAt(LocalDateTime.now())
-                        .preference(0)
-                        .build();
-
-                userAnswerRepository.save(userAnswer);
-
-                return;
-
-            } else if (userAnswer.getPreference() == -1) {
-                quizRepository.increasePreferenceAndDecreaseUnlikeCount(quiz.getQuizId());
-                quizRepository.increasePreferenceAndLikeCount(quiz.getQuizId());
-
-                userAnswer = UserAnswer.builder()
-                        .userId(userIdx)
-                        .quizId(quiz.getQuizId())
-                        .answeredAt(LocalDateTime.now())
-                        .preference(1)
-                        .build();
-
-                userAnswerRepository.save(userAnswer);
-
-                return;
-            }
-        }
-
-        quizRepository.increasePreferenceAndLikeCount(quiz.getQuizId());
-
-        userAnswer = UserAnswer.builder()
-                .userId(userIdx)
-                .quizId(quiz.getQuizId())
-                .answeredAt(LocalDateTime.now())
-                .preference(1)
-                .build();
-
-        userAnswerRepository.save(userAnswer);
-
-    }
-
-    @Override
-    @Transactional
-    public void decreasePreference(HttpServletRequest httpServletRequest, Integer quizId) {
-        int userIdx = jwtUtil.getUserIdxFromRequest(httpServletRequest);
-
-        Quiz quiz = quizRepository.findById(quizId).orElseThrow(EntityNotFoundException::new);
-
-        UserAnswerId userAnswerId = new UserAnswerId(userIdx, quizId);
-
-        UserAnswer userAnswer = userAnswerRepository.findById(userAnswerId).orElseThrow(EntityNotFoundException::new);
-
-        if (userAnswer != null) {
-            if (userAnswer.getPreference() == 1) {
-                quizRepository.decreasePreferenceAndLikeCount(quiz.getQuizId());
-                quizRepository.decreasePreferenceAndIncreaseUnlikeCount(quiz.getQuizId());
-
-                userAnswer = UserAnswer.builder()
-                        .userId(userIdx)
-                        .quizId(quiz.getQuizId())
-                        .answeredAt(LocalDateTime.now())
-                        .preference(-1)
-                        .build();
-
-                userAnswerRepository.save(userAnswer);
-
-                return;
-
-            } else if (userAnswer.getPreference() == -1) {
-                quizRepository.increasePreferenceAndDecreaseUnlikeCount(quiz.getQuizId());
-
-                userAnswer = UserAnswer.builder()
-                        .userId(userIdx)
-                        .quizId(quiz.getQuizId())
-                        .answeredAt(LocalDateTime.now())
-                        .preference(0)
-                        .build();
-
-                userAnswerRepository.save(userAnswer);
-
-                return;
-            }
-        }
-
-        quizRepository.decreasePreferenceAndIncreaseUnlikeCount(quiz.getQuizId());
-
-        userAnswer = UserAnswer.builder()
-                .userId(userIdx)
-                .quizId(quiz.getQuizId())
-                .answeredAt(LocalDateTime.now())
-                .preference(-1)
-                .build();
-
-        userAnswerRepository.save(userAnswer);
-
     }
 
     @Override
