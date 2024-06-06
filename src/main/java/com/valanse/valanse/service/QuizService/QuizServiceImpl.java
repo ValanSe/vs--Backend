@@ -264,7 +264,7 @@ public class QuizServiceImpl implements QuizService {
     }
 
     @Override
-    public List<Quiz> getQuizzesByUserId(HttpServletRequest httpServletRequest) {
+    public List<Quiz> getMyQuizzes(HttpServletRequest httpServletRequest) {
         int userIdx = jwtUtil.getUserIdxFromRequest(httpServletRequest);
 
         return quizRepository.findByAuthorUserId(userIdx);

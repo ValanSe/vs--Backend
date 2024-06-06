@@ -26,7 +26,7 @@ public interface QuizService {
 
     QuizLikeStatsDto getQuizLikeStats(Integer quizId); // 퀴즈의 좋아요, 싫어요 수 조회
 
-    List<Quiz> getQuizzesByUserId(HttpServletRequest httpServletRequest);
+    List<Quiz> getMyQuizzes(HttpServletRequest httpServletRequest);
 
     List<Quiz> sortQuizByCreatedAt(); // 생성 시간에 따른 퀴즈 정렬
 
