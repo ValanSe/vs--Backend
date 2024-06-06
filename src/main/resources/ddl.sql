@@ -61,11 +61,11 @@ CREATE TABLE `quiz`
 
 CREATE TABLE `user_answer`
 (
-    `user_id`          INT      NOT NULL COMMENT '답변한 사용자 식별자',
-    `quiz_id`          INT      NOT NULL COMMENT '답변한 질문 식별자',
-    `selected_option`  VARCHAR(255) COMMENT '선택된 옵션',
-    `answered_at`      DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '답변 시간',
-    `preference`       INT      NOT NULL COMMENT '문제에 대한 사용자의 호감도',
+    `user_id`         INT      NOT NULL COMMENT '답변한 사용자 식별자',
+    `quiz_id`         INT      NOT NULL COMMENT '답변한 질문 식별자',
+    `selected_option` VARCHAR(255) COMMENT '선택된 옵션',
+    `answered_at`     DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '답변 시간',
+    `preference`      INT      NOT NULL COMMENT '문제에 대한 사용자의 호감도',
     PRIMARY KEY (`user_id`, `quiz_id`),
     FOREIGN KEY (`user_id`) REFERENCES `user` (`user_id`),
     FOREIGN KEY (`quiz_id`) REFERENCES `quiz` (`quiz_id`)
@@ -83,35 +83,76 @@ CREATE TABLE `quiz_category`
   DEFAULT CHARSET = utf8mb4
   COLLATE = utf8mb4_general_ci;
 
-CREATE TABLE `notice` (
-    notice_id INT AUTO_INCREMENT PRIMARY KEY COMMENT '공지사항 식별자',
-    title VARCHAR(255) NOT NULL COMMENT '제목',
-    content TEXT NOT NULL COMMENT '내용',
-    author_id INT NOT NULL COMMENT '공지사항을 등록한 관리자 식별자',
+CREATE TABLE `notice`
+(
+    notice_id  INT AUTO_INCREMENT PRIMARY KEY COMMENT '공지사항 식별자',
+    title      VARCHAR(255) NOT NULL COMMENT '제목',
+    content    TEXT         NOT NULL COMMENT '내용',
+    author_id  INT          NOT NULL COMMENT '공지사항을 등록한 관리자 식별자',
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP COMMENT '공지사항 생성 시간',
     updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '공지사항 수정 시간',
-    views INT DEFAULT 0 COMMENT '조회수',
+    views      INT      DEFAULT 0 COMMENT '조회수',
     FOREIGN KEY (author_id) REFERENCES `user` (user_id) ON DELETE CASCADE
 ) ENGINE = InnoDB
   DEFAULT CHARSET = utf8mb4
   COLLATE = utf8mb4_general_ci;
 
-CREATE TABLE comment (
-    comment_id INT AUTO_INCREMENT PRIMARY KEY COMMENT '댓글 식별자',
-    author_user_id INT NOT NULL COMMENT '댓글 작성 식별자',
-    content VARCHAR(255) NOT NULL COMMENT '댓글 내용',
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP COMMENT '댓글 생성 시간',
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '댓글 수정 시간'
+CREATE TABLE comment
+(
+    comment_id     INT AUTO_INCREMENT PRIMARY KEY COMMENT '댓글 식별자',
+    author_user_id INT          NOT NULL COMMENT '댓글 작성 식별자',
+    content        VARCHAR(255) NOT NULL COMMENT '댓글 내용',
+    created_at     TIMESTAMP DEFAULT CURRENT_TIMESTAMP COMMENT '댓글 생성 시간',
+    updated_at     TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '댓글 수정 시간'
 ) ENGINE = InnoDB
   DEFAULT CHARSET = utf8mb4
   COLLATE = utf8mb4_general_ci;
 
-CREATE TABLE `comment_quiz` (
-    `quiz_id` INT NOT NULL COMMENT '퀴즈 식별자',
-    `comment_id`  INT NOT NULL COMMENT '댓글 식별자',
+CREATE TABLE `comment_quiz`
+(
+    `quiz_id`    INT NOT NULL COMMENT '퀴즈 식별자',
+    `comment_id` INT NOT NULL COMMENT '댓글 식별자',
     PRIMARY KEY (`quiz_id`, `comment_id`),
     FOREIGN KEY (`quiz_id`) REFERENCES `quiz` (`quiz_id`) ON DELETE CASCADE,
     FOREIGN KEY (`comment_id`) REFERENCES `comment` (`comment_id`) ON DELETE CASCADE
 ) ENGINE = InnoDB
-  DEFAULT CHARSET = utf8mb4
-  COLLATE = utf8mb4_general_ci;
+DEFAULT CHARSET = utf8mb4
+COLLATE = utf8mb4_general_ci;
+
+CREATE TABLE user_category_preference
+(
+    user_id            INT          NOT NULL COMMENT '사용자 식별자',
+    category           VARCHAR(100) NOT NULL COMMENT '카테고리 식별자',
+    answer_count       INT          NOT NULL DEFAULT 0 COMMENT '해당 카테고리에서 사용자가 푼 문제 수',
+    total_preference   INT          NOT NULL DEFAULT 0 COMMENT '해당 카테고리에서 사용자의 푼 문제의 선호도 합',
+    comment_count      INT          NOT NULL DEFAULT 0 COMMENT '해당 카테고리에서 사용자가 등록한 댓글 수',
+    registration_count INT          NOT NULL DEFAULT 0 COMMENT '해당 카테고리에서 사용자가 등록한 문제 수',
+    recommend_score    INT          NOT NULL DEFAULT 0 COMMENT '해당 카테고리 추천 점수',
+    PRIMARY KEY (user_id, category),
+    FOREIGN KEY (user_id) REFERENCES user (user_id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+CREATE TABLE category_statistics
+(
+    category       VARCHAR(100) NOT NULL COMMENT '카테고리 식별자',
+    total_answers  INT          NOT NULL DEFAULT 0 COMMENT '해당 카테고리에서 전체 사용자가 푼 문제 수',
+    total_score    INT          NOT NULL DEFAULT 0 COMMENT '해당 카테고리에서 전체 사용자의 총 선호도 점수',
+    avg_preference FLOAT AS (total_score / total_answers) STORED COMMENT '해당 카테고리에서 전체 사용자의 평균 선호도',
+    PRIMARY KEY (category)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+CREATE TABLE favorite_category
+(
+    user_id  INT          NOT NULL COMMENT '사용자 식별자',
+    category VARCHAR(100) NOT NULL COMMENT '카테고리 식별자',
+    PRIMARY KEY (user_id),
+    FOREIGN KEY (user_id) REFERENCES user (user_id) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+CREATE TABLE recommend_quiz
+(
+    user_id            INT          NOT NULL COMMENT '사용자 식별자',
+    recommend_quiz_list VARCHAR(100) NOT NULL COMMENT '카테고리 식별자',
+    PRIMARY KEY (user_id),
+    FOREIGN KEY (user_id) REFERENCES user (user_id) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;

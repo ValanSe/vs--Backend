@@ -1,6 +1,5 @@
 package com.valanse.valanse.entity;
 
-import jakarta.persistence.Id;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
