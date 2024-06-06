@@ -14,19 +14,23 @@ public interface QuizService {
 
     QuizDto getQuiz(int quizId);
 
+    List<QuizDto> getAllQuiz();
+
     void registerQuiz(HttpServletRequest httpServletRequest, QuizRegisterDto quizRegisterDto, MultipartFile image_A, MultipartFile image_B) throws IOException;
 
     void updateQuiz(HttpServletRequest httpServletRequest, Integer quizId, QuizRegisterDto quizRegisterDto, MultipartFile image_A, MultipartFile image_B) throws IOException;
 
     void deleteQuiz(HttpServletRequest httpServletRequest, Integer quizId);
 
-    void increasePreference(Integer quizId); // 퀴즈의 선호도, 좋아요 수 증가
+    void increasePreference(HttpServletRequest httpServletRequest, Integer quizId); // 퀴즈의 선호도, 좋아요 수 증가
 
-    void decreasePreference(Integer quizId); // 퀴즈의 선호도 감소, 싫어요 수 증가
+    void decreasePreference(HttpServletRequest httpServletRequest, Integer quizId); // 퀴즈의 선호도 감소, 싫어요 수 증가
 
     QuizStatsDto getQuizStats(Integer quizId); // 퀴즈의 조회수, 선호도 조회
 
     QuizLikeStatsDto getQuizLikeStats(Integer quizId); // 퀴즈의 좋아요, 싫어요 수 조회
+
+    List<Quiz> getQuizzesByUserId(HttpServletRequest httpServletRequest);
 
     List<Quiz> sortQuizByCreatedAt(); // 생성 시간에 따른 퀴즈 정렬
 

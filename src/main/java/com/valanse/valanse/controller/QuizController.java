@@ -40,6 +40,16 @@ public class QuizController {
         return ResponseEntity.ok(StatusResponseDto.success(quizService.getQuiz(quizId)));
     }
 
+    @Operation(summary = "모든 퀴즈를 조회합니다.",
+            description = "모든 퀴즈 정보를 조회합니다.")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "조회 성공", content = @Content(schema = @Schema(implementation = StatusResponseDto.class)))
+    })
+    @GetMapping("/all")
+    public ResponseEntity<StatusResponseDto> getAllQuiz() {
+        return ResponseEntity.ok(StatusResponseDto.success(quizService.getAllQuiz()));
+    }
+
     @Operation(summary = "새로운 퀴즈를 등록합니다.",
             description = "퀴즈의 내용, 옵션, 이미지를 등록하여 새로운 퀴즈를 생성합니다.")
     @ApiResponses({
@@ -114,8 +124,12 @@ public class QuizController {
             @ApiResponse(responseCode = "404", description = "해당 ID로 퀴즈를 찾을 수 없음")
     })
     @PostMapping("/{quizId}/increase-preference")
-    public ResponseEntity<StatusResponseDto> increasePreference(@PathVariable Integer quizId) {
-        quizService.increasePreference(quizId);
+    public ResponseEntity<StatusResponseDto> increasePreference(
+            @Parameter(description = "HTTP 요청 객체", hidden = true)
+            HttpServletRequest httpServletRequest,
+            @PathVariable Integer quizId
+    ) {
+        quizService.increasePreference(httpServletRequest, quizId);
 
         return ResponseEntity.ok(StatusResponseDto.success("Preference increased successfully"));
     }
@@ -127,8 +141,12 @@ public class QuizController {
             @ApiResponse(responseCode = "404", description = "해당 ID로 퀴즈를 찾을 수 없음")
     })
     @PostMapping("/{quizId}/decrease-preference")
-    public ResponseEntity<StatusResponseDto> decreasePreference(@PathVariable Integer quizId) {
-        quizService.decreasePreference(quizId);
+    public ResponseEntity<StatusResponseDto> decreasePreference(
+            @Parameter(description = "HTTP 요청 객체", hidden = true)
+            HttpServletRequest httpServletRequest,
+            @PathVariable Integer quizId
+    ) {
+        quizService.decreasePreference(httpServletRequest, quizId);
 
         return ResponseEntity.ok(StatusResponseDto.success("Preference decreased successfully"));
     }
@@ -153,6 +171,19 @@ public class QuizController {
     @GetMapping("/{quizId}/like-stats")
     public ResponseEntity<StatusResponseDto> getQuizLikeStats(@PathVariable Integer quizId) {
         return ResponseEntity.ok(StatusResponseDto.success(quizService.getQuizLikeStats(quizId)));
+    }
+
+    @Operation(summary = "특정 사용자가 작성한 퀴즈 목록 조회",
+            description = "특정 사용자가 작성한 퀴즈 목록을 조회합니다.")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "퀴즈 목록 조회 성공", content = @Content(schema = @Schema(implementation = StatusResponseDto.class)))
+    })
+    @GetMapping("/user")
+    public ResponseEntity<StatusResponseDto> getQuizzesByUserId(
+            @Parameter(description = "HTTP 요청 객체", hidden = true)
+            HttpServletRequest httpServletRequest
+    ) {
+        return ResponseEntity.ok(StatusResponseDto.success(quizService.getQuizzesByUserId(httpServletRequest)));
     }
 
     @Operation(summary = "퀴즈 생성 시간 순 정렬",

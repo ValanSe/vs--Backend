@@ -1,10 +1,7 @@
 package com.valanse.valanse.service.QuizService;
 
 import com.valanse.valanse.dto.*;
-import com.valanse.valanse.entity.OptionAB;
-import com.valanse.valanse.entity.Quiz;
-import com.valanse.valanse.entity.QuizCategory;
-import com.valanse.valanse.entity.UserAnswer;
+import com.valanse.valanse.entity.*;
 import com.valanse.valanse.repository.jpa.QuizCategoryRepository;
 import com.valanse.valanse.repository.jpa.QuizRepository;
 import com.valanse.valanse.repository.jpa.UserAnswerRepository;
@@ -24,6 +21,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -69,6 +67,29 @@ public class QuizServiceImpl implements QuizService {
                 .createdAt(quiz.getCreatedAt())
                 .updatedAt(quiz.getUpdatedAt())
                 .build();
+    }
+
+    @Override
+    public List<QuizDto> getAllQuiz() {
+        return quizRepository.findAll().stream()
+                .map(quiz -> QuizDto.builder()
+                        .quizId(quiz.getQuizId())
+                        .authorUserId(quiz.getAuthorUserId())
+                        .content(quiz.getContent())
+                        .optionA(quiz.getOptionA())
+                        .optionB(quiz.getOptionB())
+                        .descriptionA(quiz.getDescriptionA())
+                        .descriptionB(quiz.getDescriptionB())
+                        .imageA(quiz.getImageA())
+                        .imageB(quiz.getImageB())
+                        .view(quiz.getViewCount())
+                        .preference(quiz.getPreference())
+                        .likeCount(quiz.getLikeCount())
+                        .unlikeCount(quiz.getUnlikeCount())
+                        .createdAt(quiz.getCreatedAt())
+                        .updatedAt(quiz.getUpdatedAt())
+                        .build())
+                .collect(Collectors.toList());
     }
 
     @Override
@@ -214,28 +235,114 @@ public class QuizServiceImpl implements QuizService {
 
     @Override
     @Transactional
-    public void increasePreference(Integer quizId) {
-        try {
-            Quiz quiz = quizRepository.findById(quizId).orElseThrow(EntityNotFoundException::new);
+    public void increasePreference(HttpServletRequest httpServletRequest, Integer quizId) {
+        int userIdx = jwtUtil.getUserIdxFromRequest(httpServletRequest);
 
-            quizRepository.increasePreference(quiz.getQuizId());
-        } catch (EntityNotFoundException e) {
-            log.error("Quiz not found with id {}", quizId, e);
-            throw e;
+        Quiz quiz = quizRepository.findById(quizId).orElseThrow(EntityNotFoundException::new);
+
+        UserAnswerId userAnswerId = new UserAnswerId(userIdx, quizId);
+
+        UserAnswer userAnswer = userAnswerRepository.findById(userAnswerId).orElseThrow(EntityNotFoundException::new);
+
+        if (userAnswer != null) {
+            if (userAnswer.getPreference() == 1) {
+                quizRepository.decreasePreferenceAndLikeCount(quiz.getQuizId());
+
+                userAnswer = UserAnswer.builder()
+                        .userId(userIdx)
+                        .quizId(quiz.getQuizId())
+                        .answeredAt(LocalDateTime.now())
+                        .preference(0)
+                        .build();
+
+                userAnswerRepository.save(userAnswer);
+
+                return;
+
+            } else if (userAnswer.getPreference() == -1) {
+                quizRepository.increasePreferenceAndDecreaseUnlikeCount(quiz.getQuizId());
+                quizRepository.increasePreferenceAndLikeCount(quiz.getQuizId());
+
+                userAnswer = UserAnswer.builder()
+                        .userId(userIdx)
+                        .quizId(quiz.getQuizId())
+                        .answeredAt(LocalDateTime.now())
+                        .preference(1)
+                        .build();
+
+                userAnswerRepository.save(userAnswer);
+
+                return;
+            }
         }
+
+        quizRepository.increasePreferenceAndLikeCount(quiz.getQuizId());
+
+        userAnswer = UserAnswer.builder()
+                .userId(userIdx)
+                .quizId(quiz.getQuizId())
+                .answeredAt(LocalDateTime.now())
+                .preference(1)
+                .build();
+
+        userAnswerRepository.save(userAnswer);
+
     }
 
     @Override
     @Transactional
-    public void decreasePreference(Integer quizId) {
-        try {
-            Quiz quiz = quizRepository.findById(quizId).orElseThrow(EntityNotFoundException::new);
+    public void decreasePreference(HttpServletRequest httpServletRequest, Integer quizId) {
+        int userIdx = jwtUtil.getUserIdxFromRequest(httpServletRequest);
 
-            quizRepository.decreasePreference(quiz.getQuizId());
-        } catch (EntityNotFoundException e) {
-            log.error("Quiz not found with id {}", quizId, e);
-            throw e;
+        Quiz quiz = quizRepository.findById(quizId).orElseThrow(EntityNotFoundException::new);
+
+        UserAnswerId userAnswerId = new UserAnswerId(userIdx, quizId);
+
+        UserAnswer userAnswer = userAnswerRepository.findById(userAnswerId).orElseThrow(EntityNotFoundException::new);
+
+        if (userAnswer != null) {
+            if (userAnswer.getPreference() == 1) {
+                quizRepository.decreasePreferenceAndLikeCount(quiz.getQuizId());
+                quizRepository.decreasePreferenceAndIncreaseUnlikeCount(quiz.getQuizId());
+
+                userAnswer = UserAnswer.builder()
+                        .userId(userIdx)
+                        .quizId(quiz.getQuizId())
+                        .answeredAt(LocalDateTime.now())
+                        .preference(-1)
+                        .build();
+
+                userAnswerRepository.save(userAnswer);
+
+                return;
+
+            } else if (userAnswer.getPreference() == -1) {
+                quizRepository.increasePreferenceAndDecreaseUnlikeCount(quiz.getQuizId());
+
+                userAnswer = UserAnswer.builder()
+                        .userId(userIdx)
+                        .quizId(quiz.getQuizId())
+                        .answeredAt(LocalDateTime.now())
+                        .preference(0)
+                        .build();
+
+                userAnswerRepository.save(userAnswer);
+
+                return;
+            }
         }
+
+        quizRepository.decreasePreferenceAndIncreaseUnlikeCount(quiz.getQuizId());
+
+        userAnswer = UserAnswer.builder()
+                .userId(userIdx)
+                .quizId(quiz.getQuizId())
+                .answeredAt(LocalDateTime.now())
+                .preference(-1)
+                .build();
+
+        userAnswerRepository.save(userAnswer);
+
     }
 
     @Override
@@ -269,6 +376,13 @@ public class QuizServiceImpl implements QuizService {
     }
 
     @Override
+    public List<Quiz> getQuizzesByUserId(HttpServletRequest httpServletRequest) {
+        int userIdx = jwtUtil.getUserIdxFromRequest(httpServletRequest);
+
+        return quizRepository.findByAuthorUserId(userIdx);
+    }
+
+    @Override
     public List<Quiz> sortQuizByCreatedAt() {
         return quizRepository.findAllByOrderByCreatedAtDesc();
     }
@@ -288,14 +402,11 @@ public class QuizServiceImpl implements QuizService {
         UserAnswer userAnswer = null;
         try {
             userAnswer = UserAnswer.builder()
-                    .answerId(userAnswerDto.getAnswerId())
                     .userId(userAnswerDto.getUserId())
                     .quizId(userAnswerDto.getQuizId())
                     .selectedOption(OptionAB.valueOf(userAnswerDto.getSelectedOption().toUpperCase())) // 입력 값이 대소문자에 관계없이 처리되도록 변환
                     .answeredAt(userAnswerDto.getAnsweredAt())
-                    .timeSpent(userAnswerDto.getTimeSpent())
                     .preference(userAnswerDto.getPreference())
-                    .difficultyLevel(userAnswerDto.getDifficultyLevel())
                     .build();
         } catch (IllegalArgumentException e) {
             // 유효하지 않은 옵션 값에 대한 상세한 예외 메시지

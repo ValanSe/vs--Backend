@@ -1,5 +1,6 @@
 package com.valanse.valanse.service.QuizCategoryService;
 
+import com.valanse.valanse.dto.QuizCategoryDto;
 import com.valanse.valanse.dto.QuizCategoryStatsDto;
 import com.valanse.valanse.entity.QuizCategory;
 
@@ -7,6 +8,8 @@ import java.util.List;
 import java.util.Optional;
 
 public interface QuizCategoryService {
+
+    List<QuizCategoryDto> getAllQuizByCategory(String category);
 
     List<QuizCategory> searchCategory(String keyword); // 카테고리 검색
 

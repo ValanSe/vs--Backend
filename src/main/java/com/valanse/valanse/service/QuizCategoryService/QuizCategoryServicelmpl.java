@@ -1,5 +1,6 @@
 package com.valanse.valanse.service.QuizCategoryService;
 
+import com.valanse.valanse.dto.QuizCategoryDto;
 import com.valanse.valanse.dto.QuizCategoryStatsDto;
 import com.valanse.valanse.entity.Quiz;
 import com.valanse.valanse.entity.QuizCategory;
@@ -11,6 +12,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @Slf4j
@@ -19,6 +21,16 @@ public class QuizCategoryServicelmpl implements QuizCategoryService {
 
     private final QuizCategoryRepository quizCategoryRepository;
     private final QuizRepository quizRepository;
+
+    @Override
+    public List<QuizCategoryDto> getAllQuizByCategory(String category) {
+        return quizCategoryRepository.findByCategory(category).stream()
+                .map(quizCategory -> QuizCategoryDto.builder()
+                        .category(quizCategory.getCategory())
+                        .quizId(quizCategory.getQuizId())
+                        .build())
+                .collect(Collectors.toList());
+    }
 
     @Override
     public List<QuizCategory> searchCategory(String keyword) {

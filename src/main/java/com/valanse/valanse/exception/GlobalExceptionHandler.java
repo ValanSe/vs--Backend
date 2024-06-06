@@ -5,6 +5,7 @@ import com.valanse.valanse.exception.CustomOAuth2AuthenticationException;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.dao.InvalidDataAccessApiUsageException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
@@ -232,6 +233,20 @@ public class GlobalExceptionHandler {
                 "Failed to process multipart request",
                 e.getMessage(),
                 request.getDescription(false));
+        return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(InvalidDataAccessApiUsageException.class)
+    public ResponseEntity<ErrorResponse> handleInvalidDataAccessApiUsageException(InvalidDataAccessApiUsageException e, WebRequest request) {
+        log.error("Invalid data access API usage", e);
+
+        ErrorResponse errorResponse = new ErrorResponse(
+                LocalDateTime.now(),
+                HttpStatus.BAD_REQUEST.value(),
+                "Invalid data access API usage",
+                e.getMessage(),
+                request.getDescription(false));
+
         return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
     }
 }

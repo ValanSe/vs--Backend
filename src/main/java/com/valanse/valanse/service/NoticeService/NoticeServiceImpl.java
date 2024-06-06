@@ -14,6 +14,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -65,6 +67,21 @@ public class NoticeServiceImpl implements NoticeService {
                 .updatedAt(notice.getUpdatedAt())
                 .views(notice.getViews())
                 .build();
+    }
+
+    @Override
+    public List<NoticeDto> getAllNotice() {
+        return noticeRepository.findAll().stream()
+                .map(notice -> NoticeDto.builder()
+                        .noticeId(notice.getNoticeId())
+                        .title(notice.getTitle())
+                        .content(notice.getContent())
+                        .authorId(notice.getAuthorId())
+                        .createdAt(notice.getCreatedAt())
+                        .updatedAt(notice.getUpdatedAt())
+                        .views(notice.getViews())
+                        .build())
+                .collect(Collectors.toList());
     }
 
     @Override
