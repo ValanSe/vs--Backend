@@ -21,7 +21,13 @@ jobs:
     - name: Create directory and file if not exist
       run: |
         mkdir -p ./src/main/resources
-        echo "${{ secrets.APPLICATION }}" > ./src/main/resources/application.yml
+        echo "${{ secrets.APPLICATION_COMMON }}" > ./src/main/resources/application.yml
+
+    - name: Create application-dev.yml
+      run: echo "${{ secrets.APPLICATION_DEV }}" > ./src/main/resources/application-dev.yml
+
+    - name: Create application-prod.yml
+      run: echo "${{ secrets.APPLICATION_PROD }}" > ./src/main/resources/application-prod.yml
 
     - name: Create docker-compose.yml
       run: echo "${{ secrets.DOCKER_COMPOSE_YML }}" > compose.yml
@@ -30,7 +36,7 @@ jobs:
       run: chmod +x ./gradlew
 
     - name: Build with Gradle
-      run: ./gradlew build
+      run: ./gradlew build -Dspring.profiles.active=dev
 
     - name: Build Docker image using Docker Compose
       run: docker-compose build
@@ -53,6 +59,9 @@ jobs:
         script: |
           cd valanse-project/apiServer
           CURRENT_DIR=$(pwd)
+          echo "Creating production application.yml"
+          echo "${{ secrets.APPLICATION_COMMON }}" > ./src/main/resources/application.yml
+          echo "${{ secrets.APPLICATION_PROD }}" >> ./src/main/resources/application.yml
           echo "IMAGE_TAG=${{ github.sha }}" > .env
           docker pull ${{ secrets.DOCKER_USERNAME }}/valanse-api-server:${{ github.sha }}
           docker-compose -f $CURRENT_DIR/docker-compose.yml stop apiserver
