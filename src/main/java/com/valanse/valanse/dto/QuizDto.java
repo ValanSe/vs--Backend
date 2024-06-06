@@ -20,7 +20,7 @@ public class QuizDto {
     private String descriptionB; // 선택지 B 설명
     private String imageA; // 선택지 A 이미지 URL
     private String imageB; // 선택지 B 이미지 URL
-    private Integer view; // 퀴즈의 조회수
+    private Integer viewCount; // 퀴즈의 조회수
     private Integer preference; // 퀴즈의 선호도 수
     private Integer likeCount; // 좋아요 수
     private Integer unlikeCount; // 싫어요 수

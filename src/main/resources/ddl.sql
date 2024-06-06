@@ -143,7 +143,7 @@ CREATE TABLE category_statistics
 
 CREATE TABLE favorite_category
 (
-    user_id  INT          NOT NULL COMMENT '사용자 식별자',
+    user_id  INT AUTO_INCREMENT NOT NULL COMMENT '사용자 식별자',
     category VARCHAR(100) NOT NULL COMMENT '카테고리 식별자',
     PRIMARY KEY (user_id),
     FOREIGN KEY (user_id) REFERENCES user (user_id) ON DELETE CASCADE
