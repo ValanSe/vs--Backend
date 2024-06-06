@@ -21,7 +21,7 @@ jobs:
     - name: Create directory and file if not exist
       run: |
         mkdir -p ./src/main/resources
-        echo "${{ secrets.APPLICATION_COMMON }}" > ./src/main/resources/application.yml
+        echo "${{ secrets.APPLICATION }}" > ./src/main/resources/application.yml
 
     - name: Create docker-compose.yml
       run: echo "${{ secrets.DOCKER_COMPOSE_YML }}" > compose.yml
