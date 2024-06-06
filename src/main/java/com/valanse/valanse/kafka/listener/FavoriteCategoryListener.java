@@ -11,17 +11,16 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class FavoriteCategoryListener {
 
-    // JPA 엔티티 리스너 -> 스프링 컨텍스트 외부 -> Spring Bean으로 직접 등록될 수 없음
     private KafkaProducerService kafkaProducerService;
-
-    public FavoriteCategoryListener() {
-        // 보관해둔 SpringContext -> KafkaProducerService Bean 주입
-        this.kafkaProducerService = SpringContext.getBean(KafkaProducerService.class);
-    }
 
     @PostPersist
     @PostUpdate
     private void handleFavoriteCategoryChange(FavoriteCategory favoriteCategory) {
+        // getBean을 사용하는 시점에 kafkaProducerService를 초기화합니다.
+        if (kafkaProducerService == null) {
+            kafkaProducerService = SpringContext.getBean(KafkaProducerService.class);
+        }
+
         try {
             String data = String.format(
                     "userId:%d,category:%s",

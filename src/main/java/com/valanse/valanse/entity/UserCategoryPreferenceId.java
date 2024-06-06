@@ -10,7 +10,7 @@ import java.io.Serializable;
 @NoArgsConstructor
 @EqualsAndHashCode
 public class UserCategoryPreferenceId implements Serializable {
-    private Integer user_id;
+    private Integer userId;
     private String category;
 
 
