@@ -52,8 +52,8 @@ CREATE TABLE `quiz`
     `preference`     INT          NOT NULL COMMENT '선호도',
     `like_count`     INT          NOT NULL COMMENT '좋아요 수',
     `unlike_count`   INT          NOT NULL COMMENT '싫어요 수',
-    `created_at`     DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '질문 생성 시간',
-    `updated_at`     DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '질문 수정 시간',
+    `created_at`     DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '퀴즈 생성 시간',
+    `updated_at`     DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '퀴즈 수정 시간',
     FOREIGN KEY (`author_user_id`) REFERENCES `user` (`user_id`)
 ) ENGINE = InnoDB
   DEFAULT CHARSET = utf8mb4
@@ -62,7 +62,7 @@ CREATE TABLE `quiz`
 CREATE TABLE `user_answer`
 (
     `user_id`         INT      NOT NULL COMMENT '답변한 사용자 식별자',
-    `quiz_id`         INT      NOT NULL COMMENT '답변한 질문 식별자',
+    `quiz_id`         INT      NOT NULL COMMENT '답변한 퀴즈 식별자',
     `selected_option` VARCHAR(255) COMMENT '선택된 옵션',
     `answered_at`     DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '답변 시간',
     `preference`      INT      NOT NULL COMMENT '문제에 대한 사용자의 호감도',
@@ -75,7 +75,7 @@ CREATE TABLE `user_answer`
 
 CREATE TABLE `quiz_category`
 (
-    `quiz_id`  INT          NOT NULL COMMENT '질문 식별자',
+    `quiz_id`  INT          NOT NULL COMMENT '퀴즈 식별자',
     `category` VARCHAR(100) NOT NULL COMMENT '카테고리 식별자',
     PRIMARY KEY (`quiz_id`, `category`),
     FOREIGN KEY (`quiz_id`) REFERENCES `quiz` (`quiz_id`) ON DELETE CASCADE
@@ -151,8 +151,9 @@ CREATE TABLE favorite_category
 
 CREATE TABLE recommend_quiz
 (
-    user_id            INT          NOT NULL COMMENT '사용자 식별자',
-    recommend_quiz_list VARCHAR(100) NOT NULL COMMENT '카테고리 식별자',
-    PRIMARY KEY (user_id),
-    FOREIGN KEY (user_id) REFERENCES user (user_id) ON DELETE CASCADE
+    user_id INT NOT NULL COMMENT '사용자 식별자',
+    quiz_id INT NOT NULL COMMENT '퀴즈 식별자',
+    PRIMARY KEY (user_id, quiz_id),
+    FOREIGN KEY (user_id) REFERENCES user (user_id) ON DELETE CASCADE,
+    FOREIGN KEY (quiz_id) REFERENCES quiz (quiz_id) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
