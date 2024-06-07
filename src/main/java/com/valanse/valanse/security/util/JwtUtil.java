@@ -133,7 +133,7 @@ public class JwtUtil {
         return accessToken; // AccessToken 객체에서 액세스 토큰 문자열 반환
     }
 
-    // 토큰에서 USERIDX(유저 식별자)만 추출한다.
+    // 토큰에서 USERID(유저 식별자)만 추출한다.
     public int getUserIdx(String token) {
         return Jwts.parserBuilder()
                 .setSigningKey(secretKey)

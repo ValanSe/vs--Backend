@@ -1,5 +1,6 @@
 package com.valanse.valanse.entity;
 
+
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
@@ -9,7 +10,7 @@ import java.io.Serializable;
 @AllArgsConstructor
 @NoArgsConstructor
 @EqualsAndHashCode
-public class QuizCategoryId implements Serializable {
-    private String category;
+public class RecommendQuizId implements Serializable{
+    private Integer userId;
     private Integer quizId;
 }

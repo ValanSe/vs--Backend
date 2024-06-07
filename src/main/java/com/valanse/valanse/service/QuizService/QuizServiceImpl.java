@@ -5,6 +5,7 @@ import com.valanse.valanse.entity.*;
 import com.valanse.valanse.repository.jpa.CategoryStatisticsRepository;
 import com.valanse.valanse.repository.jpa.QuizCategoryRepository;
 import com.valanse.valanse.repository.jpa.QuizRepository;
+import com.valanse.valanse.repository.jpa.RecommendQuizRepository;
 import com.valanse.valanse.repository.jpa.UserAnswerRepository;
 import com.valanse.valanse.security.util.JwtUtil;
 import com.valanse.valanse.service.ImageService.S3ImageService;
@@ -19,9 +20,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -35,6 +34,7 @@ public class QuizServiceImpl implements QuizService {
     private final CategoryStatisticsRepository categoryStatisticsRepository;
     private final S3ImageService s3ImageService;
     private final JwtUtil jwtUtil;
+    private final RecommendQuizRepository recommendQuizRepository;
 
     // 올바르지 못한 리턴 예시
     @Override
@@ -92,6 +92,50 @@ public class QuizServiceImpl implements QuizService {
                         .updatedAt(quiz.getUpdatedAt())
                         .build())
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<QuizDto> getRecommendQuizzes(HttpServletRequest httpServletRequest) {
+        try {
+            int userIdx = jwtUtil.getUserIdxFromRequest(httpServletRequest);
+
+            List<RecommendQuiz> recommendQuizList = recommendQuizRepository.findByUserId(userIdx);
+            if (recommendQuizList == null || recommendQuizList.isEmpty()) {
+                log.warn("No recommended quizzes found for user ID: {}", userIdx);
+                return Collections.emptyList();
+            }
+
+            List<Integer> recommendQuizIds = recommendQuizList.stream()
+                    .map(RecommendQuiz::getQuizId)
+                    .collect(Collectors.toList());
+
+            List<Quiz> recommendQuizzes = quizRepository.findAllByIdInAndNotAnswered(recommendQuizIds, userIdx);
+            log.info("Number of recommended quizzes found: {}", recommendQuizzes.size());
+            
+            return recommendQuizzes.stream()
+                    .map(quiz -> QuizDto.builder()
+                            .quizId(quiz.getQuizId())
+                            .authorUserId(quiz.getAuthorUserId())
+                            .content(quiz.getContent())
+                            .optionA(quiz.getOptionA())
+                            .optionB(quiz.getOptionB())
+                            .descriptionA(quiz.getDescriptionA())
+                            .descriptionB(quiz.getDescriptionB())
+                            .imageA(quiz.getImageA())
+                            .imageB(quiz.getImageB())
+                            .viewCount(quiz.getViewCount())
+                            .preference(quiz.getPreference())
+                            .likeCount(quiz.getLikeCount())
+                            .unlikeCount(quiz.getUnlikeCount())
+                            .createdAt(quiz.getCreatedAt())
+                            .updatedAt(quiz.getUpdatedAt())
+                            .build())
+                    .collect(Collectors.toList());
+
+        } catch (Exception e) {
+            log.error("Error occurred while getting recommended quizzes: ", e);
+            return Collections.emptyList();
+        }
     }
 
     @Override

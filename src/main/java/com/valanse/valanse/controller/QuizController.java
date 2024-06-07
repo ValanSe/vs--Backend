@@ -204,4 +204,20 @@ public class QuizController {
 
         return ResponseEntity.ok(StatusResponseDto.success("User answer and category statistics saved successfully"));
     }
+
+    @Operation(summary = "추천 퀴즈 조회",
+            description = "여러 가중치를 기반으로 저장되어있던 추천도가 높은 문제를 제공")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "조회", content = @Content(schema = @Schema(implementation = StatusResponseDto.class))),
+            @ApiResponse(responseCode = "400", description = "잘못된 요청 형식"),
+    })
+    @GetMapping("/recommend")
+    public ResponseEntity<StatusResponseDto> getRecommendQuiz(
+            @Parameter(description = "HTTP 요청 객체", hidden = true)
+            HttpServletRequest httpServletRequest
+    ) {
+
+
+        return ResponseEntity.ok(StatusResponseDto.success(quizService.getRecommendQuizzes(httpServletRequest)));
+    }
 }

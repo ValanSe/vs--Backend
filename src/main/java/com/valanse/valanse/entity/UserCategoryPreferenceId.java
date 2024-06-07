@@ -9,7 +9,9 @@ import java.io.Serializable;
 @AllArgsConstructor
 @NoArgsConstructor
 @EqualsAndHashCode
-public class QuizCategoryId implements Serializable {
+public class UserCategoryPreferenceId implements Serializable {
+    private Integer userId;
     private String category;
-    private Integer quizId;
+
+
 }
