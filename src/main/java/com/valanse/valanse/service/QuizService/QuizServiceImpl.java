@@ -2,6 +2,7 @@ package com.valanse.valanse.service.QuizService;
 
 import com.valanse.valanse.dto.*;
 import com.valanse.valanse.entity.*;
+import com.valanse.valanse.repository.jpa.CategoryStatisticsRepository;
 import com.valanse.valanse.repository.jpa.QuizCategoryRepository;
 import com.valanse.valanse.repository.jpa.QuizRepository;
 import com.valanse.valanse.repository.jpa.UserAnswerRepository;
@@ -31,6 +32,7 @@ public class QuizServiceImpl implements QuizService {
     private final QuizRepository quizRepository;
     private final QuizCategoryRepository quizCategoryRepository;
     private final UserAnswerRepository userAnswerRepository;
+    private final CategoryStatisticsRepository categoryStatisticsRepository;
     private final S3ImageService s3ImageService;
     private final JwtUtil jwtUtil;
 
@@ -286,8 +288,10 @@ public class QuizServiceImpl implements QuizService {
     }
 
     @Override
-    public void saveUserAnswer(UserAnswerDto userAnswerDto) {
+    public void saveUserAnswer(UserAnswerDto userAnswerDto, String category) {
+
         UserAnswer userAnswer = null;
+
         try {
             userAnswer = UserAnswer.builder()
                     .userId(userAnswerDto.getUserId())
@@ -303,5 +307,24 @@ public class QuizServiceImpl implements QuizService {
         }
 
         userAnswerRepository.save(userAnswer);
+
+        CategoryStatistics categoryStatistics = categoryStatisticsRepository.findById(category)
+                .orElse(CategoryStatistics.builder()
+                        .category(category)
+                        .totalAnswers(0)
+                        .totalScore(0)
+                        .build());
+
+        int totalAnswers = categoryStatistics.getTotalAnswers() + 1;
+        int totalScore = categoryStatistics.getTotalScore() + userAnswerDto.getPreference();
+
+        categoryStatistics = CategoryStatistics.builder()
+                .category(categoryStatistics.getCategory())
+                .totalAnswers(totalAnswers)
+                .totalScore(totalScore)
+                .build();
+
+        categoryStatisticsRepository.save(categoryStatistics);
+
     }
 }

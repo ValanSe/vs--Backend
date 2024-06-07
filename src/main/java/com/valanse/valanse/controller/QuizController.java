@@ -186,8 +186,8 @@ public class QuizController {
         return ResponseEntity.ok(StatusResponseDto.success(quizService.searchQuiz(keyword)));
     }
 
-    @Operation(summary = "사용자의 답변 저장",
-            description = "사용자의 답변을 데이터베이스에 저장")
+    @Operation(summary = "사용자의 답변과 카테고리 통계 저장",
+            description = "사용자의 답변과 카테고리 통계를 데이터베이스에 저장")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "저장 성공", content = @Content(schema = @Schema(implementation = StatusResponseDto.class))),
             @ApiResponse(responseCode = "400", description = "잘못된 요청 형식"),
@@ -196,10 +196,12 @@ public class QuizController {
     @PostMapping("/save-user-answer")
     public ResponseEntity<StatusResponseDto> saveUserAnswer(
             @Parameter(description = "사용자의 답변", required = true, schema = @Schema(implementation = UserAnswerDto.class))
-            @RequestBody UserAnswerDto userAnswerDto
+            @RequestBody UserAnswerDto userAnswerDto,
+            @Parameter(description = "카테고리 통계를 저장할 카테고리")
+            @RequestParam String category
     ) {
-        quizService.saveUserAnswer(userAnswerDto);
+        quizService.saveUserAnswer(userAnswerDto, category);
 
-        return ResponseEntity.ok(StatusResponseDto.success("User answer saved successfully"));
+        return ResponseEntity.ok(StatusResponseDto.success("User answer and category statistics saved successfully"));
     }
 }
