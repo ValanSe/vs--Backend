@@ -66,9 +66,11 @@ CREATE TABLE `user_answer`
     `selected_option` VARCHAR(255) COMMENT '선택된 옵션',
     `answered_at`     DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '답변 시간',
     `preference`      INT      NOT NULL COMMENT '문제에 대한 사용자의 호감도',
+    `like_count`      INT      NOT NULL COMMENT '퀴즈의 좋아요 수',
+    `unlike_count`    INT      NOT NULL COMMENT '퀴즈의 싫어요 수',
     PRIMARY KEY (`user_id`, `quiz_id`),
     FOREIGN KEY (`user_id`) REFERENCES `user` (`user_id`),
-    FOREIGN KEY (`quiz_id`) REFERENCES `quiz` (`quiz_id`)
+    FOREIGN KEY (`quiz_id`) REFERENCES `quiz` (`quiz_id`) ON DELETE CASCADE
 ) ENGINE = InnoDB
   DEFAULT CHARSET = utf8mb4
   COLLATE = utf8mb4_general_ci;
