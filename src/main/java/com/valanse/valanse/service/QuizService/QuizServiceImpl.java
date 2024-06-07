@@ -341,8 +341,10 @@ public class QuizServiceImpl implements QuizService {
                     .userId(userAnswerDto.getUserId())
                     .quizId(userAnswerDto.getQuizId())
                     .selectedOption(OptionAB.valueOf(userAnswerDto.getSelectedOption().toUpperCase())) // 입력 값이 대소문자에 관계없이 처리되도록 변환
-                    .answeredAt(userAnswerDto.getAnsweredAt())
+                    .answeredAt(LocalDateTime.now())
                     .preference(userAnswerDto.getPreference())
+                    .likeCount(userAnswerDto.getLikeCount())
+                    .unlikeCount(userAnswerDto.getUnlikeCount())
                     .build();
         } catch (IllegalArgumentException e) {
             // 유효하지 않은 옵션 값에 대한 상세한 예외 메시지
@@ -351,6 +353,28 @@ public class QuizServiceImpl implements QuizService {
         }
 
         userAnswerRepository.save(userAnswer);
+
+        Quiz existingQuiz = quizRepository.findById(userAnswerDto.getQuizId()).orElseThrow(EntityNotFoundException::new);
+
+        existingQuiz = Quiz.builder()
+                .quizId(existingQuiz.getQuizId())
+                .authorUserId(existingQuiz.getAuthorUserId())
+                .content(existingQuiz.getContent())
+                .optionA(existingQuiz.getOptionA())
+                .optionB(existingQuiz.getOptionB())
+                .descriptionA(existingQuiz.getDescriptionA())
+                .descriptionB(existingQuiz.getDescriptionB())
+                .imageA(existingQuiz.getImageA())
+                .imageB(existingQuiz.getImageB())
+                .viewCount(existingQuiz.getViewCount())
+                .preference(existingQuiz.getPreference() + userAnswerDto.getPreference())
+                .likeCount(existingQuiz.getLikeCount() + userAnswerDto.getLikeCount())
+                .unlikeCount(existingQuiz.getUnlikeCount() + userAnswerDto.getUnlikeCount())
+                .createdAt(existingQuiz.getCreatedAt())
+                .updatedAt(LocalDateTime.now())
+                .build();
+
+        quizRepository.save(existingQuiz);
 
         CategoryStatistics categoryStatistics = categoryStatisticsRepository.findById(category)
                 .orElse(CategoryStatistics.builder()
