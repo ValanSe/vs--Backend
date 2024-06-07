@@ -115,3 +115,12 @@ CREATE TABLE `comment_quiz` (
 ) ENGINE = InnoDB
   DEFAULT CHARSET = utf8mb4
   COLLATE = utf8mb4_general_ci;
+
+CREATE TABLE category_statistics
+(
+    category       VARCHAR(100) NOT NULL COMMENT '카테고리 식별자',
+    total_answers  INT          NOT NULL DEFAULT 0 COMMENT '해당 카테고리에서 전체 사용자가 푼 문제 수',
+    total_score    INT          NOT NULL DEFAULT 0 COMMENT '해당 카테고리에서 전체 사용자의 총 선호도 점수',
+    avg_preference FLOAT AS (total_score / total_answers) STORED COMMENT '해당 카테고리에서 전체 사용자의 평균 선호도',
+    PRIMARY KEY (category)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
