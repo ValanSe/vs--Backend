@@ -20,11 +20,11 @@ import org.springframework.web.servlet.view.RedirectView;
 @Tag(name = "OAuth Controller", description = "OAuth 로그인 관련 엔드포인트를 관리합니다.")
 public class OAuthController {
 
-    @Value("${spring.security.oauth2.client.registration.naver.redirect-uri}")
+    @Value("${spring.security.oauth2.client.registration.naver.redirectUri}")
     private String naverUri;
-    @Value("${spring.security.oauth2.client.registration.kakao.redirect-uri}")
+    @Value("${spring.security.oauth2.client.registration.kakao.redirectUri}")
     private String kakaoUri;
-    @Value("${spring.security.oauth2.client.registration.google.redirect-uri}")
+    @Value("${spring.security.oauth2.client.registration.google.redirectUri}")
     private String googleUri;
 
     @Operation(summary = "OAuth 제공자에 따라 로그인 리디렉션 수행",
