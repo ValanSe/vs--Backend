@@ -285,25 +285,89 @@ public class QuizServiceImpl implements QuizService {
     }
 
     @Override
-    public List<Quiz> getMyQuizzes(HttpServletRequest httpServletRequest) {
+    public List<QuizDto> getMyQuizzes(HttpServletRequest httpServletRequest) {
         int userIdx = jwtUtil.getUserIdxFromRequest(httpServletRequest);
 
-        return quizRepository.findByAuthorUserId(userIdx);
+        return quizRepository.findByAuthorUserId(userIdx).stream()
+                .map(quiz -> QuizDto.builder()
+                        .quizId(quiz.getQuizId())
+                        .authorUserId(quiz.getAuthorUserId())
+                        .content(quiz.getContent())
+                        .optionA(quiz.getOptionA())
+                        .optionB(quiz.getOptionB())
+                        .descriptionA(quiz.getDescriptionA())
+                        .descriptionB(quiz.getDescriptionB())
+                        .imageA(quiz.getImageA())
+                        .imageB(quiz.getImageB())
+                        .viewCount(quiz.getViewCount())
+                        .preference(quiz.getPreference())
+                        .createdAt(quiz.getCreatedAt())
+                        .updatedAt(quiz.getUpdatedAt())
+                        .build())
+                .collect(Collectors.toList());
     }
 
     @Override
-    public List<Quiz> sortQuizByCreatedAt() {
-        return quizRepository.findAllByOrderByCreatedAtDesc();
+    public List<QuizDto> sortQuizByCreatedAt() {
+        return quizRepository.findAllByOrderByCreatedAtDesc().stream()
+                .map(quiz -> QuizDto.builder()
+                        .quizId(quiz.getQuizId())
+                        .authorUserId(quiz.getAuthorUserId())
+                        .content(quiz.getContent())
+                        .optionA(quiz.getOptionA())
+                        .optionB(quiz.getOptionB())
+                        .descriptionA(quiz.getDescriptionA())
+                        .descriptionB(quiz.getDescriptionB())
+                        .imageA(quiz.getImageA())
+                        .imageB(quiz.getImageB())
+                        .viewCount(quiz.getViewCount())
+                        .preference(quiz.getPreference())
+                        .createdAt(quiz.getCreatedAt())
+                        .updatedAt(quiz.getUpdatedAt())
+                        .build())
+                .collect(Collectors.toList());
     }
 
     @Override
-    public List<Quiz> sortQuizByPreference() {
-        return quizRepository.findAllByOrderByPreferenceDesc();
+    public List<QuizDto> sortQuizByPreference() {
+        return quizRepository.findAllByOrderByPreferenceDesc().stream()
+                .map(quiz -> QuizDto.builder()
+                        .quizId(quiz.getQuizId())
+                        .authorUserId(quiz.getAuthorUserId())
+                        .content(quiz.getContent())
+                        .optionA(quiz.getOptionA())
+                        .optionB(quiz.getOptionB())
+                        .descriptionA(quiz.getDescriptionA())
+                        .descriptionB(quiz.getDescriptionB())
+                        .imageA(quiz.getImageA())
+                        .imageB(quiz.getImageB())
+                        .viewCount(quiz.getViewCount())
+                        .preference(quiz.getPreference())
+                        .createdAt(quiz.getCreatedAt())
+                        .updatedAt(quiz.getUpdatedAt())
+                        .build())
+                .collect(Collectors.toList());
     }
 
     @Override
-    public List<Quiz> searchQuiz(String keyword) {
-        return quizRepository.findByContentContaining(keyword);
+    public List<QuizDto> searchQuiz(String keyword) {
+        return quizRepository.findByContentContaining(keyword).stream()
+                .map(quiz -> QuizDto.builder()
+                        .quizId(quiz.getQuizId())
+                        .authorUserId(quiz.getAuthorUserId())
+                        .content(quiz.getContent())
+                        .optionA(quiz.getOptionA())
+                        .optionB(quiz.getOptionB())
+                        .descriptionA(quiz.getDescriptionA())
+                        .descriptionB(quiz.getDescriptionB())
+                        .imageA(quiz.getImageA())
+                        .imageB(quiz.getImageB())
+                        .viewCount(quiz.getViewCount())
+                        .preference(quiz.getPreference())
+                        .createdAt(quiz.getCreatedAt())
+                        .updatedAt(quiz.getUpdatedAt())
+                        .build())
+                .collect(Collectors.toList());
     }
 
     @Override

@@ -25,13 +25,13 @@ public interface QuizService {
 
     QuizStatsDto getQuizStats(Integer quizId); // 퀴즈의 조회수, 선호도 조회
 
-    List<Quiz> getMyQuizzes(HttpServletRequest httpServletRequest);
+    List<QuizDto> getMyQuizzes(HttpServletRequest httpServletRequest);
 
-    List<Quiz> sortQuizByCreatedAt(); // 생성 시간에 따른 퀴즈 정렬
+    List<QuizDto> sortQuizByCreatedAt(); // 생성 시간에 따른 퀴즈 정렬
 
-    List<Quiz> sortQuizByPreference(); // 선호도에 따른 퀴즈 정렬
+    List<QuizDto> sortQuizByPreference(); // 선호도에 따른 퀴즈 정렬
 
-    List<Quiz> searchQuiz(String keyword); // 퀴즈 검색
+    List<QuizDto> searchQuiz(String keyword); // 퀴즈 검색
 
     void saveUserAnswer(UserAnswerDto userAnswer, String category) throws InvalidOptionException; // 클라이언트의 답변을 데이터베이스에 저장
 }
