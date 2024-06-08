@@ -2,6 +2,7 @@ package com.valanse.valanse.service.QuizService;
 
 import com.valanse.valanse.dto.*;
 import com.valanse.valanse.entity.*;
+import com.valanse.valanse.repository.jpa.CategoryStatisticsRepository;
 import com.valanse.valanse.repository.jpa.QuizCategoryRepository;
 import com.valanse.valanse.repository.jpa.QuizRepository;
 import com.valanse.valanse.repository.jpa.RecommendQuizRepository;
@@ -30,6 +31,7 @@ public class QuizServiceImpl implements QuizService {
     private final QuizRepository quizRepository;
     private final QuizCategoryRepository quizCategoryRepository;
     private final UserAnswerRepository userAnswerRepository;
+    private final CategoryStatisticsRepository categoryStatisticsRepository;
     private final S3ImageService s3ImageService;
     private final JwtUtil jwtUtil;
     private final RecommendQuizRepository recommendQuizRepository;
@@ -278,118 +280,6 @@ public class QuizServiceImpl implements QuizService {
     }
 
     @Override
-    @Transactional
-    public void increasePreference(HttpServletRequest httpServletRequest, Integer quizId) {
-        int userIdx = jwtUtil.getUserIdxFromRequest(httpServletRequest);
-
-        Quiz quiz = quizRepository.findById(quizId).orElseThrow(EntityNotFoundException::new);
-
-        UserAnswerId userAnswerId = new UserAnswerId(userIdx, quizId);
-
-        UserAnswer userAnswer = userAnswerRepository.findById(userAnswerId).orElseThrow(EntityNotFoundException::new);
-
-        if (userAnswer != null) {
-            if (userAnswer.getPreference() == 1) {
-                quizRepository.decreasePreferenceAndLikeCount(quiz.getQuizId());
-
-                userAnswer = UserAnswer.builder()
-                        .userId(userIdx)
-                        .quizId(quiz.getQuizId())
-                        .answeredAt(LocalDateTime.now())
-                        .preference(0)
-                        .build();
-
-                userAnswerRepository.save(userAnswer);
-
-                return;
-
-            } else if (userAnswer.getPreference() == -1) {
-                quizRepository.increasePreferenceAndDecreaseUnlikeCount(quiz.getQuizId());
-                quizRepository.increasePreferenceAndLikeCount(quiz.getQuizId());
-
-                userAnswer = UserAnswer.builder()
-                        .userId(userIdx)
-                        .quizId(quiz.getQuizId())
-                        .answeredAt(LocalDateTime.now())
-                        .preference(1)
-                        .build();
-
-                userAnswerRepository.save(userAnswer);
-
-                return;
-            }
-        }
-
-        quizRepository.increasePreferenceAndLikeCount(quiz.getQuizId());
-
-        userAnswer = UserAnswer.builder()
-                .userId(userIdx)
-                .quizId(quiz.getQuizId())
-                .answeredAt(LocalDateTime.now())
-                .preference(1)
-                .build();
-
-        userAnswerRepository.save(userAnswer);
-
-    }
-
-    @Override
-    @Transactional
-    public void decreasePreference(HttpServletRequest httpServletRequest, Integer quizId) {
-        int userIdx = jwtUtil.getUserIdxFromRequest(httpServletRequest);
-
-        Quiz quiz = quizRepository.findById(quizId).orElseThrow(EntityNotFoundException::new);
-
-        UserAnswerId userAnswerId = new UserAnswerId(userIdx, quizId);
-
-        UserAnswer userAnswer = userAnswerRepository.findById(userAnswerId).orElseThrow(EntityNotFoundException::new);
-
-        if (userAnswer != null) {
-            if (userAnswer.getPreference() == 1) {
-                quizRepository.decreasePreferenceAndLikeCount(quiz.getQuizId());
-                quizRepository.decreasePreferenceAndIncreaseUnlikeCount(quiz.getQuizId());
-
-                userAnswer = UserAnswer.builder()
-                        .userId(userIdx)
-                        .quizId(quiz.getQuizId())
-                        .answeredAt(LocalDateTime.now())
-                        .preference(-1)
-                        .build();
-
-                userAnswerRepository.save(userAnswer);
-
-                return;
-
-            } else if (userAnswer.getPreference() == -1) {
-                quizRepository.increasePreferenceAndDecreaseUnlikeCount(quiz.getQuizId());
-
-                userAnswer = UserAnswer.builder()
-                        .userId(userIdx)
-                        .quizId(quiz.getQuizId())
-                        .answeredAt(LocalDateTime.now())
-                        .preference(0)
-                        .build();
-
-                userAnswerRepository.save(userAnswer);
-
-                return;
-            }
-        }
-
-        quizRepository.decreasePreferenceAndIncreaseUnlikeCount(quiz.getQuizId());
-
-        userAnswer = UserAnswer.builder()
-                .userId(userIdx)
-                .quizId(quiz.getQuizId())
-                .answeredAt(LocalDateTime.now())
-                .preference(-1)
-                .build();
-
-        userAnswerRepository.save(userAnswer);
-
-    }
-
-    @Override
     public QuizStatsDto getQuizStats(Integer quizId) {
         try {
             Quiz quiz = quizRepository.findById(quizId).orElseThrow(EntityNotFoundException::new);
@@ -420,7 +310,7 @@ public class QuizServiceImpl implements QuizService {
     }
 
     @Override
-    public List<Quiz> getQuizzesByUserId(HttpServletRequest httpServletRequest) {
+    public List<Quiz> getMyQuizzes(HttpServletRequest httpServletRequest) {
         int userIdx = jwtUtil.getUserIdxFromRequest(httpServletRequest);
 
         return quizRepository.findByAuthorUserId(userIdx);
@@ -442,15 +332,19 @@ public class QuizServiceImpl implements QuizService {
     }
 
     @Override
-    public void saveUserAnswer(UserAnswerDto userAnswerDto) {
+    public void saveUserAnswer(UserAnswerDto userAnswerDto, String category) {
+
         UserAnswer userAnswer = null;
+
         try {
             userAnswer = UserAnswer.builder()
                     .userId(userAnswerDto.getUserId())
                     .quizId(userAnswerDto.getQuizId())
                     .selectedOption(OptionAB.valueOf(userAnswerDto.getSelectedOption().toUpperCase())) // 입력 값이 대소문자에 관계없이 처리되도록 변환
-                    .answeredAt(userAnswerDto.getAnsweredAt())
+                    .answeredAt(LocalDateTime.now())
                     .preference(userAnswerDto.getPreference())
+                    .likeCount(userAnswerDto.getLikeCount())
+                    .unlikeCount(userAnswerDto.getUnlikeCount())
                     .build();
         } catch (IllegalArgumentException e) {
             // 유효하지 않은 옵션 값에 대한 상세한 예외 메시지
@@ -459,5 +353,46 @@ public class QuizServiceImpl implements QuizService {
         }
 
         userAnswerRepository.save(userAnswer);
+
+        Quiz existingQuiz = quizRepository.findById(userAnswerDto.getQuizId()).orElseThrow(EntityNotFoundException::new);
+
+        existingQuiz = Quiz.builder()
+                .quizId(existingQuiz.getQuizId())
+                .authorUserId(existingQuiz.getAuthorUserId())
+                .content(existingQuiz.getContent())
+                .optionA(existingQuiz.getOptionA())
+                .optionB(existingQuiz.getOptionB())
+                .descriptionA(existingQuiz.getDescriptionA())
+                .descriptionB(existingQuiz.getDescriptionB())
+                .imageA(existingQuiz.getImageA())
+                .imageB(existingQuiz.getImageB())
+                .viewCount(existingQuiz.getViewCount())
+                .preference(existingQuiz.getPreference() + userAnswerDto.getPreference())
+                .likeCount(existingQuiz.getLikeCount() + userAnswerDto.getLikeCount())
+                .unlikeCount(existingQuiz.getUnlikeCount() + userAnswerDto.getUnlikeCount())
+                .createdAt(existingQuiz.getCreatedAt())
+                .updatedAt(LocalDateTime.now())
+                .build();
+
+        quizRepository.save(existingQuiz);
+
+        CategoryStatistics categoryStatistics = categoryStatisticsRepository.findById(category)
+                .orElse(CategoryStatistics.builder()
+                        .category(category)
+                        .totalAnswers(0)
+                        .totalScore(0)
+                        .build());
+
+        int totalAnswers = categoryStatistics.getTotalAnswers() + 1;
+        int totalScore = categoryStatistics.getTotalScore() + userAnswerDto.getPreference();
+
+        categoryStatistics = CategoryStatistics.builder()
+                .category(categoryStatistics.getCategory())
+                .totalAnswers(totalAnswers)
+                .totalScore(totalScore)
+                .build();
+
+        categoryStatisticsRepository.save(categoryStatistics);
+
     }
 }

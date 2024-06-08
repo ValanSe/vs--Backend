@@ -58,7 +58,7 @@ public class QuizCategoryServicelmpl implements QuizCategoryService {
 
             return QuizCategoryStatsDto.builder()
                     .quizCount(quizzesInCategory.size())
-                    .viewsCount(totalView)
+                    .viewCount(totalView)
                     .averagePreference(totalPreference / quizzesInCategory.size())
                     .build();
 

@@ -1,5 +1,6 @@
 package com.valanse.valanse.config;
 
+import com.valanse.valanse.repository.jpa.CategoryStatisticsRepository;
 import com.valanse.valanse.repository.jpa.QuizCategoryRepository;
 import com.valanse.valanse.repository.jpa.QuizRepository;
 import com.valanse.valanse.repository.jpa.RecommendQuizRepository;
@@ -20,6 +21,7 @@ public class ProfileConfig {
     public QuizService quizService(QuizRepository quizRepository,
                                    QuizCategoryRepository quizCategoryRepository,
                                    UserAnswerRepository userAnswerRepository,
+                                   CategoryStatisticsRepository categoryStatisticsRepository,
                                    S3ImageService s3ImageService,
                                    JwtUtil jwtUtil,
                                    RecommendQuizRepository recommendQuizRepository) {
@@ -27,6 +29,7 @@ public class ProfileConfig {
         return new QuizServiceImpl(quizRepository,
                 quizCategoryRepository,
                 userAnswerRepository,
+                categoryStatisticsRepository,
                 s3ImageService,
                 jwtUtil,
                 recommendQuizRepository);
