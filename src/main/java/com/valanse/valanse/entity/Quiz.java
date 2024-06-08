@@ -32,8 +32,6 @@ public class Quiz {
 
     private Integer viewCount; // 조회수
     private Integer preference; // 선호도 수
-    private Integer likeCount; // 좋아요 수
-    private Integer unlikeCount; // 싫어요 수
 
     private LocalDateTime createdAt; // 퀴즈 생성 시간
     private LocalDateTime updatedAt; // 퀴즈 수정 시간
