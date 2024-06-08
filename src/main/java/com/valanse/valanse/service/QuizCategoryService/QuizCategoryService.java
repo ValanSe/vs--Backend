@@ -11,7 +11,7 @@ public interface QuizCategoryService {
 
     List<QuizCategoryDto> getAllQuizByCategory(String category);
 
-    List<QuizCategory> searchCategory(String keyword); // 카테고리 검색
+    List<QuizCategoryDto> searchCategory(String keyword); // 카테고리 검색
 
     QuizCategoryStatsDto getStatsByCategory(String category); // 카테고리에 속한 퀴즈 수, 카테고리에 속한 퀴즈의 조회수 합, 평균 선호도 수 조회
 }

@@ -33,8 +33,13 @@ public class QuizCategoryServicelmpl implements QuizCategoryService {
     }
 
     @Override
-    public List<QuizCategory> searchCategory(String keyword) {
-        return quizCategoryRepository.findByCategoryContaining(keyword);
+    public List<QuizCategoryDto> searchCategory(String keyword) {
+        return quizCategoryRepository.findByCategoryContaining(keyword).stream()
+                .map(quizCategory -> QuizCategoryDto.builder()
+                        .category(quizCategory.getCategory())
+                        .quizId(quizCategory.getQuizId())
+                        .build())
+                .collect(Collectors.toList());
     }
 
     @Override
