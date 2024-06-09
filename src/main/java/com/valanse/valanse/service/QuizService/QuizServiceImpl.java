@@ -64,8 +64,6 @@ public class QuizServiceImpl implements QuizService {
                 .imageB(quiz.getImageB())
                 .viewCount(quiz.getViewCount())
                 .preference(quiz.getPreference())
-                .likeCount(quiz.getLikeCount())
-                .unlikeCount(quiz.getUnlikeCount())
                 .createdAt(quiz.getCreatedAt())
                 .updatedAt(quiz.getUpdatedAt())
                 .build();
@@ -86,8 +84,6 @@ public class QuizServiceImpl implements QuizService {
                         .imageB(quiz.getImageB())
                         .viewCount(quiz.getViewCount())
                         .preference(quiz.getPreference())
-                        .likeCount(quiz.getLikeCount())
-                        .unlikeCount(quiz.getUnlikeCount())
                         .createdAt(quiz.getCreatedAt())
                         .updatedAt(quiz.getUpdatedAt())
                         .build())
@@ -125,8 +121,6 @@ public class QuizServiceImpl implements QuizService {
                             .imageB(quiz.getImageB())
                             .viewCount(quiz.getViewCount())
                             .preference(quiz.getPreference())
-                            .likeCount(quiz.getLikeCount())
-                            .unlikeCount(quiz.getUnlikeCount())
                             .createdAt(quiz.getCreatedAt())
                             .updatedAt(quiz.getUpdatedAt())
                             .build())
@@ -169,8 +163,6 @@ public class QuizServiceImpl implements QuizService {
                 .imageB(path_B)
                 .viewCount(0)
                 .preference(0)
-                .likeCount(0)
-                .unlikeCount(0)
                 .createdAt(LocalDateTime.now())
                 .build();
 
@@ -230,8 +222,6 @@ public class QuizServiceImpl implements QuizService {
                     .imageB(imagePathB)
                     .viewCount(existingQuiz.getViewCount())
                     .preference(existingQuiz.getPreference())
-                    .likeCount(existingQuiz.getLikeCount())
-                    .unlikeCount(existingQuiz.getUnlikeCount())
                     .createdAt(existingQuiz.getCreatedAt())
                     .updatedAt(LocalDateTime.now())
                     .build();
@@ -295,40 +285,89 @@ public class QuizServiceImpl implements QuizService {
     }
 
     @Override
-    public QuizLikeStatsDto getQuizLikeStats(Integer quizId) {
-        try {
-            Quiz quiz = quizRepository.findById(quizId).orElseThrow(EntityNotFoundException::new);
-
-            return QuizLikeStatsDto.builder()
-                    .likeCount(quiz.getLikeCount())
-                    .unlikeCount(quiz.getUnlikeCount())
-                    .build();
-        } catch (EntityNotFoundException e) {
-            log.error("Quiz not found with id {}", quizId, e);
-            throw e;
-        }
-    }
-
-    @Override
-    public List<Quiz> getMyQuizzes(HttpServletRequest httpServletRequest) {
+    public List<QuizDto> getMyQuizzes(HttpServletRequest httpServletRequest) {
         int userIdx = jwtUtil.getUserIdxFromRequest(httpServletRequest);
 
-        return quizRepository.findByAuthorUserId(userIdx);
+        return quizRepository.findByAuthorUserId(userIdx).stream()
+                .map(quiz -> QuizDto.builder()
+                        .quizId(quiz.getQuizId())
+                        .authorUserId(quiz.getAuthorUserId())
+                        .content(quiz.getContent())
+                        .optionA(quiz.getOptionA())
+                        .optionB(quiz.getOptionB())
+                        .descriptionA(quiz.getDescriptionA())
+                        .descriptionB(quiz.getDescriptionB())
+                        .imageA(quiz.getImageA())
+                        .imageB(quiz.getImageB())
+                        .viewCount(quiz.getViewCount())
+                        .preference(quiz.getPreference())
+                        .createdAt(quiz.getCreatedAt())
+                        .updatedAt(quiz.getUpdatedAt())
+                        .build())
+                .collect(Collectors.toList());
     }
 
     @Override
-    public List<Quiz> sortQuizByCreatedAt() {
-        return quizRepository.findAllByOrderByCreatedAtDesc();
+    public List<QuizDto> sortQuizByCreatedAt() {
+        return quizRepository.findAllByOrderByCreatedAtDesc().stream()
+                .map(quiz -> QuizDto.builder()
+                        .quizId(quiz.getQuizId())
+                        .authorUserId(quiz.getAuthorUserId())
+                        .content(quiz.getContent())
+                        .optionA(quiz.getOptionA())
+                        .optionB(quiz.getOptionB())
+                        .descriptionA(quiz.getDescriptionA())
+                        .descriptionB(quiz.getDescriptionB())
+                        .imageA(quiz.getImageA())
+                        .imageB(quiz.getImageB())
+                        .viewCount(quiz.getViewCount())
+                        .preference(quiz.getPreference())
+                        .createdAt(quiz.getCreatedAt())
+                        .updatedAt(quiz.getUpdatedAt())
+                        .build())
+                .collect(Collectors.toList());
     }
 
     @Override
-    public List<Quiz> sortQuizByPreference() {
-        return quizRepository.findAllByOrderByPreferenceDesc();
+    public List<QuizDto> sortQuizByPreference() {
+        return quizRepository.findAllByOrderByPreferenceDesc().stream()
+                .map(quiz -> QuizDto.builder()
+                        .quizId(quiz.getQuizId())
+                        .authorUserId(quiz.getAuthorUserId())
+                        .content(quiz.getContent())
+                        .optionA(quiz.getOptionA())
+                        .optionB(quiz.getOptionB())
+                        .descriptionA(quiz.getDescriptionA())
+                        .descriptionB(quiz.getDescriptionB())
+                        .imageA(quiz.getImageA())
+                        .imageB(quiz.getImageB())
+                        .viewCount(quiz.getViewCount())
+                        .preference(quiz.getPreference())
+                        .createdAt(quiz.getCreatedAt())
+                        .updatedAt(quiz.getUpdatedAt())
+                        .build())
+                .collect(Collectors.toList());
     }
 
     @Override
-    public List<Quiz> searchQuiz(String keyword) {
-        return quizRepository.findByContentContaining(keyword);
+    public List<QuizDto> searchQuiz(String keyword) {
+        return quizRepository.findByContentContaining(keyword).stream()
+                .map(quiz -> QuizDto.builder()
+                        .quizId(quiz.getQuizId())
+                        .authorUserId(quiz.getAuthorUserId())
+                        .content(quiz.getContent())
+                        .optionA(quiz.getOptionA())
+                        .optionB(quiz.getOptionB())
+                        .descriptionA(quiz.getDescriptionA())
+                        .descriptionB(quiz.getDescriptionB())
+                        .imageA(quiz.getImageA())
+                        .imageB(quiz.getImageB())
+                        .viewCount(quiz.getViewCount())
+                        .preference(quiz.getPreference())
+                        .createdAt(quiz.getCreatedAt())
+                        .updatedAt(quiz.getUpdatedAt())
+                        .build())
+                .collect(Collectors.toList());
     }
 
     @Override
@@ -343,8 +382,6 @@ public class QuizServiceImpl implements QuizService {
                     .selectedOption(OptionAB.valueOf(userAnswerDto.getSelectedOption().toUpperCase())) // 입력 값이 대소문자에 관계없이 처리되도록 변환
                     .answeredAt(LocalDateTime.now())
                     .preference(userAnswerDto.getPreference())
-                    .likeCount(userAnswerDto.getLikeCount())
-                    .unlikeCount(userAnswerDto.getUnlikeCount())
                     .build();
         } catch (IllegalArgumentException e) {
             // 유효하지 않은 옵션 값에 대한 상세한 예외 메시지
@@ -368,8 +405,6 @@ public class QuizServiceImpl implements QuizService {
                 .imageB(existingQuiz.getImageB())
                 .viewCount(existingQuiz.getViewCount())
                 .preference(existingQuiz.getPreference() + userAnswerDto.getPreference())
-                .likeCount(existingQuiz.getLikeCount() + userAnswerDto.getLikeCount())
-                .unlikeCount(existingQuiz.getUnlikeCount() + userAnswerDto.getUnlikeCount())
                 .createdAt(existingQuiz.getCreatedAt())
                 .updatedAt(LocalDateTime.now())
                 .build();

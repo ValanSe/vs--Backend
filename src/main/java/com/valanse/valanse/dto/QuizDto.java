@@ -22,8 +22,6 @@ public class QuizDto {
     private String imageB; // 선택지 B 이미지 URL
     private Integer viewCount; // 퀴즈의 조회수
     private Integer preference; // 퀴즈의 선호도 수
-    private Integer likeCount; // 좋아요 수
-    private Integer unlikeCount; // 싫어요 수
     private LocalDateTime createdAt; // 문제 생성 시간
     private LocalDateTime updatedAt; // 문제 수정 시간
 }

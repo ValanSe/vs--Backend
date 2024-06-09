@@ -1,6 +1,5 @@
 package com.valanse.valanse.controller;
 
-import com.valanse.valanse.dto.QuizCategoryDto;
 import com.valanse.valanse.dto.StatusResponseDto;
 import com.valanse.valanse.service.QuizCategoryService.QuizCategoryService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -14,8 +13,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @Slf4j
 @RestController
@@ -48,16 +45,5 @@ public class QuizCategoryController {
             @RequestParam String keyword
     ) {
         return ResponseEntity.ok(StatusResponseDto.success(quizCategoryService.searchCategory(keyword)));
-    }
-
-    @Operation(summary = "카테고리의 퀴즈 통계 조회",
-            description = "지정된 카테고리의 퀴즈 수, 카테고리에 속한 퀴즈의 조회수 합 및 평균 선호도 수를 조회합니다.")
-    @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "조회 성공", content = @Content(schema = @Schema(implementation = StatusResponseDto.class))),
-            @ApiResponse(responseCode = "404", description = "해당 카테고리를 찾을 수 없음")
-    })
-    @GetMapping("/{category}/stats")
-    public ResponseEntity<StatusResponseDto> getStatsByCategory(@PathVariable String category) {
-        return ResponseEntity.ok(StatusResponseDto.success(quizCategoryService.getStatsByCategory(category)));
     }
 }

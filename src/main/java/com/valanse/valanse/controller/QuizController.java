@@ -128,17 +128,6 @@ public class QuizController {
         return ResponseEntity.ok(StatusResponseDto.success(quizService.getQuizStats(quizId)));
     }
 
-    @Operation(summary = "특정 퀴즈 좋아요 수 및 싫어요 수 조회",
-            description = "지정된 ID의 퀴즈의 좋아요 수와 싫어요 수를 조회합니다.")
-    @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "좋아요 수 및 싫어요 수 조회 성공", content = @Content(schema = @Schema(implementation = StatusResponseDto.class))),
-            @ApiResponse(responseCode = "404", description = "해당 ID로 퀴즈를 찾을 수 없음")
-    })
-    @GetMapping("/{quizId}/like-stats")
-    public ResponseEntity<StatusResponseDto> getQuizLikeStats(@PathVariable Integer quizId) {
-        return ResponseEntity.ok(StatusResponseDto.success(quizService.getQuizLikeStats(quizId)));
-    }
-
     @Operation(summary = "자신이 작성한 퀴즈 목록 조회",
             description = "자신이 작성한 퀴즈 목록을 조회합니다.")
     @ApiResponses({
