@@ -143,7 +143,7 @@ public class CommentServiceImpl implements CommentService {
             commentRepository.save(existingComment);
 
         } catch (AccessDeniedException e) {
-            log.error("You don't have permission to update.");
+            log.error("Forbidden to update comment with id {}", commentId, e);
             throw e;
         }
     }
@@ -163,7 +163,7 @@ public class CommentServiceImpl implements CommentService {
             commentRepository.delete(comment);
 
         } catch (AccessDeniedException e) {
-            log.error("You don't have permission to delete");
+            log.error("Forbidden to delete comment with id {}", commentId, e);
             throw e;
         }
     }

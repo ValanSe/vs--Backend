@@ -35,7 +35,7 @@ public class NoticeServiceImpl implements NoticeService {
 
             // 'role' 이 'admin' 이 아니면 예외 처리
             if (!"admin".equals(userRole)) {
-                throw new AccessDeniedException("User does not have permission to register notices.");
+                throw new AccessDeniedException("You don't have permission to register");
             }
 
             Notice notice = Notice.builder()
@@ -48,7 +48,7 @@ public class NoticeServiceImpl implements NoticeService {
 
             noticeRepository.save(notice);
         } catch (AccessDeniedException e) {
-            log.error("User does not have permission to register notices.", e);
+            log.error("Forbidden to register notice", e);
             throw e;
         }
     }
@@ -94,7 +94,7 @@ public class NoticeServiceImpl implements NoticeService {
             Notice existingNotice = noticeRepository.findById(noticeId).orElseThrow(EntityNotFoundException::new);
 
             if (!"admin".equals(userRole)) {
-                throw new AccessDeniedException("User does not have permission to update notices.");
+                throw new AccessDeniedException("You don't have permission to update");
             }
 
             existingNotice = Notice.builder()
@@ -109,7 +109,7 @@ public class NoticeServiceImpl implements NoticeService {
 
             noticeRepository.save(existingNotice);
         } catch (AccessDeniedException e) {
-            log.error("User does not have permission to update notices.", e);
+            log.error("Forbidden to update notice with id {}", noticeId, e);
             throw e;
         }
     }
@@ -124,12 +124,12 @@ public class NoticeServiceImpl implements NoticeService {
             Notice notice = noticeRepository.findById(noticeId).orElseThrow(EntityNotFoundException::new);
 
             if (!"admin".equals(userRole)) {
-                throw new AccessDeniedException("User does not have permission to delete notices.");
+                throw new AccessDeniedException("You don't have permission to delete");
             }
 
             noticeRepository.delete(notice);
         } catch (AccessDeniedException e) {
-            log.error("User does not have permission to delete notices.", e);
+            log.error("Forbidden to delete notice with id {}", noticeId, e);
             throw e;
         }
     }
