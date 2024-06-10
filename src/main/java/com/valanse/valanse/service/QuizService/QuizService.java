@@ -17,9 +17,9 @@ public interface QuizService {
     List<QuizDto> getAllQuiz();
     List<QuizDto> getRecommendQuizzes(HttpServletRequest httpServletRequest);
 
-    void registerQuiz(HttpServletRequest httpServletRequest, QuizRegisterDto quizRegisterDto, MultipartFile image_A, MultipartFile image_B) throws IOException;
+    void registerQuiz(HttpServletRequest httpServletRequest, QuizRegisterDto quizRegisterDto, MultipartFile image_A, MultipartFile image_B);
 
-    void updateQuiz(HttpServletRequest httpServletRequest, Integer quizId, QuizRegisterDto quizRegisterDto, MultipartFile image_A, MultipartFile image_B) throws IOException;
+    void updateQuiz(HttpServletRequest httpServletRequest, Integer quizId, QuizRegisterDto quizRegisterDto, MultipartFile image_A, MultipartFile image_B);
 
     void deleteQuiz(HttpServletRequest httpServletRequest, Integer quizId);
 

@@ -6,15 +6,13 @@ import com.valanse.valanse.dto.CommentRegisterDto;
 import com.valanse.valanse.entity.Comment;
 import com.valanse.valanse.entity.CommentQuiz;
 import com.valanse.valanse.entity.Quiz;
-import com.valanse.valanse.repository.jpa.CommentQuizRepository;
-import com.valanse.valanse.repository.jpa.CommentRepository;
-import com.valanse.valanse.repository.jpa.QuizRepository;
+import com.valanse.valanse.entity.QuizCategory;
+import com.valanse.valanse.repository.jpa.*;
 import com.valanse.valanse.security.util.JwtUtil;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.dao.InvalidDataAccessApiUsageException;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -35,19 +33,23 @@ public class CommentServiceImpl implements CommentService {
     private final CommentQuizRepository commentQuizRepository;
     private final QuizRepository quizRepository;
     private final JwtUtil jwtUtil;
+    private final UserCategoryPreferenceRepository userCategoryPreferenceRepository;
+    private final QuizCategoryRepository quizCategoryRepository;
 
 //    private static final Set<String> profanityWords = Set.of(
 //            "비속어 목록"
 //    );
 
     @Override
+    @Transactional
     public void registerComment(HttpServletRequest httpServletRequest, CommentRegisterDto commentRegisterDto) {
+        try {
+            int userIdx = jwtUtil.getUserIdxFromRequest(httpServletRequest);
 
-        int userIdx = jwtUtil.getUserIdxFromRequest(httpServletRequest);
+            Quiz quiz = quizRepository.findById(commentRegisterDto.getQuizId())
+                    .orElseThrow(() -> new EntityNotFoundException("Quiz not found with id: " + commentRegisterDto.getQuizId()));
 
-        Quiz quiz = quizRepository.findById(commentRegisterDto.getQuizId()).orElseThrow(EntityNotFoundException::new);
-
-        String content = commentRegisterDto.getContent();
+            String content = commentRegisterDto.getContent();
 
 //        for (String profanityWord : profanityWords) {
 //            String regex = "(?i)" + String.join("[^\\p{IsHangul}]*", profanityWord.split("")); // 비속어를 문자 단위로 분할하고 한글 이외의 문자가 있어도 대소문자 무시하고 매칭
@@ -79,7 +81,22 @@ public class CommentServiceImpl implements CommentService {
 
         commentQuizRepository.save(commentQuiz);
 
+            List<QuizCategory> quizCategories = quizCategoryRepository.findByQuizId(quiz.getQuizId());
+            List<String> categories = quizCategories.stream()
+                    .map(QuizCategory::getCategory)
+                    .collect(Collectors.toList());
+
+            userCategoryPreferenceRepository.incrementCommentCounts(userIdx, categories);
+
+        } catch (EntityNotFoundException e) {
+            log.error("Entity not found when registering comment for quiz id: {}", commentRegisterDto.getQuizId(), e);
+            throw e;
+        } catch (Exception e) {
+            log.error("An unexpected error occurred while registering comment for quiz id: {}", commentRegisterDto.getQuizId(), e);
+            throw e;
+        }
     }
+
 
     @Override
     public CommentDto getComment(Integer commentId) {
@@ -97,6 +114,7 @@ public class CommentServiceImpl implements CommentService {
 
     @Override
     public List<CommentQuizDto> getCommentByQuizId(Integer quizId) {
+
         return commentQuizRepository.findByQuizId(quizId).stream()
                 .map(commentQuiz -> CommentQuizDto.builder()
                         .quizId(commentQuiz.getQuizId())
@@ -108,8 +126,10 @@ public class CommentServiceImpl implements CommentService {
     @Override
     @Transactional
     public void updateComment(HttpServletRequest httpServletRequest, Integer commentId, String content) {
+        int userIdx = 0;
+
         try {
-            int userIdx = jwtUtil.getUserIdxFromRequest(httpServletRequest);
+            userIdx = jwtUtil.getUserIdxFromRequest(httpServletRequest);
 
             Comment existingComment = commentRepository.findById(commentId).orElseThrow(EntityNotFoundException::new);
 
@@ -142,7 +162,13 @@ public class CommentServiceImpl implements CommentService {
             commentRepository.save(existingComment);
 
         } catch (AccessDeniedException e) {
-            log.error("Forbidden to update comment with id {}", commentId, e);
+            log.error("Access denied when updating comment with id: {} by user: {}", commentId, userIdx);
+            throw e;
+        } catch (EntityNotFoundException e) {
+            log.error("Entity not found when updating comment with id: {}", commentId);
+            throw e;
+        } catch (Exception e) {
+            log.error("An unexpected error occurred while updating comment with id: {}", commentId, e);
             throw e;
         }
     }
