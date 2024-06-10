@@ -66,20 +66,20 @@ public class CommentServiceImpl implements CommentService {
 //            content = sb.toString(); // 변경된 댓글을 content에 저장
 //        }
 
-        Comment comment = Comment.builder()
+            Comment comment = Comment.builder()
                 .authorUserId(userIdx)
                 .content(content)
                 .createdAt(LocalDateTime.now())
                 .build();
 
-        commentRepository.save(comment);
+            commentRepository.save(comment);
 
-        CommentQuiz commentQuiz = CommentQuiz.builder()
+            CommentQuiz commentQuiz = CommentQuiz.builder()
                 .quizId(quiz.getQuizId())
                 .commentId(comment.getCommentId())
                 .build();
 
-        commentQuizRepository.save(commentQuiz);
+            commentQuizRepository.save(commentQuiz);
 
             List<QuizCategory> quizCategories = quizCategoryRepository.findByQuizId(quiz.getQuizId());
             List<String> categories = quizCategories.stream()
