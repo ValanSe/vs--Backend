@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.util.List;
 
 @Slf4j
 @RestController
@@ -184,12 +185,12 @@ public class QuizController {
     })
     @PostMapping("/save-user-answer")
     public ResponseEntity<StatusResponseDto> saveUserAnswer(
+            @Parameter(description = "HTTP 요청 객체", hidden = true)
+            HttpServletRequest httpServletRequest,
             @Parameter(description = "사용자의 답변", required = true, schema = @Schema(implementation = UserAnswerDto.class))
-            @RequestBody UserAnswerDto userAnswerDto,
-            @Parameter(description = "카테고리 통계를 저장할 카테고리")
-            @RequestParam String category
+            @RequestBody UserAnswerDto userAnswerDto
     ) {
-        quizService.saveUserAnswer(userAnswerDto, category);
+        quizService.saveUserAnswer(httpServletRequest, userAnswerDto);
 
         return ResponseEntity.ok(StatusResponseDto.success("User answer and category statistics saved successfully"));
     }

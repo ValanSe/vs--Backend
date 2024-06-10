@@ -381,13 +381,15 @@ public class QuizServiceImpl implements QuizService {
     }
 
     @Override
-    public void saveUserAnswer(UserAnswerDto userAnswerDto, String category) {
+    public void saveUserAnswer(HttpServletRequest httpServletRequest, UserAnswerDto userAnswerDto) {
 
         UserAnswer userAnswer = null;
 
+        int userIdx = jwtUtil.getUserIdxFromRequest(httpServletRequest);
+
         try {
             userAnswer = UserAnswer.builder()
-                    .userId(userAnswerDto.getUserId())
+                    .userId(userIdx)
                     .quizId(userAnswerDto.getQuizId())
                     .selectedOption(OptionAB.valueOf(userAnswerDto.getSelectedOption().toUpperCase())) // 입력 값이 대소문자에 관계없이 처리되도록 변환
                     .answeredAt(LocalDateTime.now())
@@ -421,23 +423,26 @@ public class QuizServiceImpl implements QuizService {
 
         quizRepository.save(existingQuiz);
 
-        CategoryStatistics categoryStatistics = categoryStatisticsRepository.findById(category)
-                .orElse(CategoryStatistics.builder()
-                        .category(category)
-                        .totalAnswers(0)
-                        .totalScore(0)
-                        .build());
+        List<QuizCategory> quizCategories = quizCategoryRepository.findByQuizId(userAnswerDto.getQuizId());
 
-        int totalAnswers = categoryStatistics.getTotalAnswers() + 1;
-        int totalScore = categoryStatistics.getTotalScore() + userAnswerDto.getPreference();
+        for (QuizCategory quizCategory : quizCategories) {
+            CategoryStatistics categoryStatistics = categoryStatisticsRepository.findById(quizCategory.getCategory())
+                    .orElse(CategoryStatistics.builder()
+                            .category(quizCategory.getCategory())
+                            .totalAnswers(0)
+                            .totalScore(0)
+                            .build());
 
-        categoryStatistics = CategoryStatistics.builder()
-                .category(categoryStatistics.getCategory())
-                .totalAnswers(totalAnswers)
-                .totalScore(totalScore)
-                .build();
+            int totalAnswers = categoryStatistics.getTotalAnswers() + 1;
+            int totalScore = categoryStatistics.getTotalScore() + userAnswerDto.getPreference();
 
-        categoryStatisticsRepository.save(categoryStatistics);
+            categoryStatistics = CategoryStatistics.builder()
+                    .category(categoryStatistics.getCategory())
+                    .totalAnswers(totalAnswers)
+                    .totalScore(totalScore)
+                    .build();
 
+            categoryStatisticsRepository.save(categoryStatistics);
+        }
     }
 }
