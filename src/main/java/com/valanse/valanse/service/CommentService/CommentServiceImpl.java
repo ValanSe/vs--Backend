@@ -45,8 +45,7 @@ public class CommentServiceImpl implements CommentService {
 
         int userIdx = jwtUtil.getUserIdxFromRequest(httpServletRequest);
 
-        Quiz quiz = quizRepository.findById(commentRegisterDto.getQuizId())
-                .orElseThrow(() -> new InvalidDataAccessApiUsageException("Quiz not found with id: " + commentRegisterDto.getQuizId()));
+        Quiz quiz = quizRepository.findById(commentRegisterDto.getQuizId()).orElseThrow(EntityNotFoundException::new);
 
         String content = commentRegisterDto.getContent();
 
@@ -114,7 +113,7 @@ public class CommentServiceImpl implements CommentService {
 
             Comment existingComment = commentRepository.findById(commentId).orElseThrow(EntityNotFoundException::new);
 
-            if (existingComment.getAuthorUserId() != userIdx) {
+            if (!existingComment.getAuthorUserId().equals(userIdx)) {
                 throw new AccessDeniedException("You don't have permission to update.");
             }
 
@@ -156,7 +155,7 @@ public class CommentServiceImpl implements CommentService {
 
             Comment comment = commentRepository.findById(commentId).orElseThrow(EntityNotFoundException::new);
 
-            if (comment.getAuthorUserId() != userIdx) {
+            if (!comment.getAuthorUserId().equals(userIdx)) {
                 throw new AccessDeniedException("You don't have permission to delete");
             }
 
