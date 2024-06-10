@@ -1,12 +1,11 @@
 package com.valanse.valanse.service.QuizService;
 
-import com.valanse.valanse.dto.*;
+import com.valanse.valanse.dto.QuizDto;
+import com.valanse.valanse.dto.QuizRegisterDto;
+import com.valanse.valanse.dto.QuizStatsDto;
+import com.valanse.valanse.dto.UserAnswerDto;
 import com.valanse.valanse.entity.*;
-import com.valanse.valanse.repository.jpa.CategoryStatisticsRepository;
-import com.valanse.valanse.repository.jpa.QuizCategoryRepository;
-import com.valanse.valanse.repository.jpa.QuizRepository;
-import com.valanse.valanse.repository.jpa.RecommendQuizRepository;
-import com.valanse.valanse.repository.jpa.UserAnswerRepository;
+import com.valanse.valanse.repository.jpa.*;
 import com.valanse.valanse.security.util.JwtUtil;
 import com.valanse.valanse.service.ImageService.S3ImageService;
 import jakarta.persistence.EntityNotFoundException;
@@ -18,9 +17,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.IOException;
 import java.time.LocalDateTime;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
 import java.util.stream.Collectors;
 
 @Service
@@ -35,6 +35,7 @@ public class QuizServiceImpl implements QuizService {
     private final S3ImageService s3ImageService;
     private final JwtUtil jwtUtil;
     private final RecommendQuizRepository recommendQuizRepository;
+    private final UserCategoryPreferenceRepository userCategoryPreferenceRepository;
 
     // 올바르지 못한 리턴 예시
     @Override
@@ -98,7 +99,7 @@ public class QuizServiceImpl implements QuizService {
             List<RecommendQuiz> recommendQuizList = recommendQuizRepository.findByUserId(userIdx);
             if (recommendQuizList == null || recommendQuizList.isEmpty()) {
                 log.warn("No recommended quizzes found for user ID: {}", userIdx);
-                return Collections.emptyList();
+                throw new EntityNotFoundException("No recommended quizzes found for user ID: " + userIdx);
             }
 
             List<Integer> recommendQuizIds = recommendQuizList.stream()
@@ -106,8 +107,8 @@ public class QuizServiceImpl implements QuizService {
                     .collect(Collectors.toList());
 
             List<Quiz> recommendQuizzes = quizRepository.findAllByIdInAndNotAnswered(recommendQuizIds, userIdx);
-            log.info("Number of recommended quizzes found: {}", recommendQuizzes.size());
-            
+            log.info("recommended quizzes found, size is: {}", recommendQuizzes.size());
+
             return recommendQuizzes.stream()
                     .map(quiz -> QuizDto.builder()
                             .quizId(quiz.getQuizId())
@@ -128,7 +129,7 @@ public class QuizServiceImpl implements QuizService {
 
         } catch (Exception e) {
             log.error("Error occurred while getting recommended quizzes: ", e);
-            return Collections.emptyList();
+            throw new RuntimeException("Failed to get recommended quizzes", e); // Wrap and throw a generic exception
         }
     }
 
@@ -137,59 +138,68 @@ public class QuizServiceImpl implements QuizService {
     public void registerQuiz(HttpServletRequest httpServletRequest,
                              QuizRegisterDto quizRegisterDto,
                              MultipartFile image_A,
-                             MultipartFile image_B) throws IOException {
+                             MultipartFile image_B) {
+        try {
+            int userIdx = jwtUtil.getUserIdxFromRequest(httpServletRequest);
 
-        int userIdx = jwtUtil.getUserIdxFromRequest(httpServletRequest);
+            String path_A = null;
+            String path_B = null;
 
-        String path_A = null;
-        String path_B = null;
-
-        if (image_A != null && !image_A.isEmpty()) {
-            path_A = s3ImageService.uploadImage(image_A);
-        }
-
-        if (image_B != null && !image_B.isEmpty()) {
-            path_B = s3ImageService.uploadImage(image_B);
-        }
-
-        Quiz quiz = Quiz.builder()
-                .authorUserId(userIdx)
-                .content(quizRegisterDto.getContent())
-                .optionA(quizRegisterDto.getOptionA())
-                .optionB(quizRegisterDto.getOptionB())
-                .descriptionA(quizRegisterDto.getDescriptionA())
-                .descriptionB(quizRegisterDto.getDescriptionB())
-                .imageA(path_A)
-                .imageB(path_B)
-                .viewCount(0)
-                .preference(0)
-                .createdAt(LocalDateTime.now())
-                .build();
-
-        quizRepository.save(quiz); // 퀴즈 먼저 저장하여 ID를 생성
-
-        List<String> categories = quizRegisterDto.getCategory() != null ? quizRegisterDto.getCategory() : new ArrayList<>();
-
-        for (String category : categories) {
-
-            if (category == null || category.trim().isEmpty()) {
-                continue; // 무효한 카테고리는 건너뛴다
+            if (image_A != null && !image_A.isEmpty()) {
+                path_A = s3ImageService.uploadImage(image_A);
             }
 
-            QuizCategory quizCategory = QuizCategory.builder()
-                    .category(category)
-                    .quizId(quiz.getQuizId()) // 생성된 퀴즈 ID를 사용
+            if (image_B != null && !image_B.isEmpty()) {
+                path_B = s3ImageService.uploadImage(image_B);
+            }
+
+            Quiz quiz = Quiz.builder()
+                    .authorUserId(userIdx)
+                    .content(quizRegisterDto.getContent())
+                    .optionA(quizRegisterDto.getOptionA())
+                    .optionB(quizRegisterDto.getOptionB())
+                    .descriptionA(quizRegisterDto.getDescriptionA())
+                    .descriptionB(quizRegisterDto.getDescriptionB())
+                    .imageA(path_A)
+                    .imageB(path_B)
+                    .viewCount(0)
+                    .preference(0)
+                    .createdAt(LocalDateTime.now())
                     .build();
 
-            quizCategoryRepository.save(quizCategory); // 퀴즈 카테고리 저장
+            quizRepository.save(quiz); // 퀴즈 먼저 저장하여 ID를 생성
+
+            List<String> categories = quizRegisterDto.getCategory() != null ? quizRegisterDto.getCategory() : new ArrayList<>();
+
+            for (String category : categories) {
+                if (category == null || category.trim().isEmpty()) {
+                    continue; // 무효한 카테고리는 건너뛴다
+                }
+
+                QuizCategory quizCategory = QuizCategory.builder()
+                        .category(category)
+                        .quizId(quiz.getQuizId()) // 생성된 퀴즈 ID를 사용
+                        .build();
+
+                quizCategoryRepository.save(quizCategory); // 퀴즈 카테고리 저장
+            }
+
+            userCategoryPreferenceRepository.incrementRegistrationCounts(userIdx, categories);
+
+        } catch (Exception e) {
+            log.error("An unexpected error occurred during quiz registration", e);
+            throw e;
         }
-
-
     }
+
 
     @Override
     @Transactional
-    public void updateQuiz(HttpServletRequest httpServletRequest, Integer quizId, QuizRegisterDto quizRegisterDto, MultipartFile image_A, MultipartFile image_B) throws IOException {
+    public void updateQuiz(HttpServletRequest httpServletRequest,
+                           Integer quizId,
+                           QuizRegisterDto quizRegisterDto,
+                           MultipartFile image_A,
+                           MultipartFile image_B) {
         try {
             int userIdx = jwtUtil.getUserIdxFromRequest(httpServletRequest);
 
