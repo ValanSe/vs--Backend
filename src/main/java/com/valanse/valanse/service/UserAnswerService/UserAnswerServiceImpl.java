@@ -1,9 +1,6 @@
 package com.valanse.valanse.service.UserAnswerService;
 
-import com.valanse.valanse.entity.Quiz;
-import com.valanse.valanse.entity.UserAnswer;
-import com.valanse.valanse.entity.UserCategoryPreference;
-import com.valanse.valanse.entity.UserCategoryPreferenceId;
+import com.valanse.valanse.entity.*;
 import com.valanse.valanse.repository.jpa.QuizCategoryRepository;
 import com.valanse.valanse.repository.jpa.UserAnswerRepository;
 import com.valanse.valanse.repository.jpa.UserCategoryPreferenceRepository;
@@ -14,6 +11,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -34,16 +32,22 @@ public class UserAnswerServiceImpl implements UserAnswerService {
     public void updateUserCategoryPreference(UserAnswer userAnswer) {
         try {
             Integer userId = userAnswer.getUserId();
-            List<String> categoriesByQuizId = quizCategoryRepository.findByQuizId(userAnswer.getQuizId());
 
-            if (categoriesByQuizId == null || categoriesByQuizId.isEmpty()) {
+            List<QuizCategory> quizCategories = quizCategoryRepository.findByQuizId(userAnswer.getQuizId());
+            List<String> categories = quizCategories.stream()
+                    .map(QuizCategory::getCategory)
+                    .collect(Collectors.toList());
+
+            if (categories.isEmpty()) {
                 throw new EntityNotFoundException();
             }
 
-            initUserCategoryPreference(userId, categoriesByQuizId);
+            userCategoryPreferenceRepository.incrementCommentCounts(userId, categories);
+
+            initUserCategoryPreference(userId, categories);
             Integer preference = userAnswer.getPreference();
 
-            userCategoryPreferenceRepository.updatePreferences(userId, categoriesByQuizId, preference);
+            userCategoryPreferenceRepository.updatePreferences(userId, categories, preference);
 
             log.info("User category preferences updated for user ID: {}", userId);
         } catch (EntityNotFoundException e) {
