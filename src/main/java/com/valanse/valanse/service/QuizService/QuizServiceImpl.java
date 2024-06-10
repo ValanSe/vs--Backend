@@ -206,7 +206,7 @@ public class QuizServiceImpl implements QuizService {
 
             Quiz existingQuiz = quizRepository.findById(quizId).orElseThrow(EntityNotFoundException::new);
 
-            if (existingQuiz.getAuthorUserId() != userIdx) {
+            if (!existingQuiz.getAuthorUserId().equals(userIdx)) {
                 throw new AccessDeniedException("You don't have permission to update.");
             }
 
@@ -257,7 +257,7 @@ public class QuizServiceImpl implements QuizService {
 
             Quiz quiz = quizRepository.findById(quizId).orElseThrow(EntityNotFoundException::new);
 
-            if (quiz.getAuthorUserId() != userIdx) {
+            if (!quiz.getAuthorUserId().equals(userIdx)) {
                 throw new AccessDeniedException("You don't have permission to delete.");
             }
 
