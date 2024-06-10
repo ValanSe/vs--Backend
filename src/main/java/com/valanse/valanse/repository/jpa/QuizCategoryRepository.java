@@ -13,4 +13,6 @@ public interface QuizCategoryRepository extends JpaRepository<QuizCategory, Quiz
     List<QuizCategory> findByCategory(String category);
 
     List<QuizCategory> findByCategoryContaining(String keyword);
+
+    List<QuizCategory> findByQuizId(Integer quizId);
 }
