@@ -188,11 +188,9 @@ public class QuizController {
             @Parameter(description = "HTTP 요청 객체", hidden = true)
             HttpServletRequest httpServletRequest,
             @Parameter(description = "사용자의 답변", required = true, schema = @Schema(implementation = UserAnswerDto.class))
-            @RequestBody UserAnswerDto userAnswerDto,
-            @Parameter(description = "카테고리 통계를 저장할 카테고리")
-            @RequestParam List<String> categories
+            @RequestBody UserAnswerDto userAnswerDto
     ) {
-        quizService.saveUserAnswer(httpServletRequest, userAnswerDto, categories);
+        quizService.saveUserAnswer(httpServletRequest, userAnswerDto);
 
         return ResponseEntity.ok(StatusResponseDto.success("User answer and category statistics saved successfully"));
     }

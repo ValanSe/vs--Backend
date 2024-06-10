@@ -371,7 +371,7 @@ public class QuizServiceImpl implements QuizService {
     }
 
     @Override
-    public void saveUserAnswer(HttpServletRequest httpServletRequest, UserAnswerDto userAnswerDto, List<String> categories) {
+    public void saveUserAnswer(HttpServletRequest httpServletRequest, UserAnswerDto userAnswerDto) {
 
         UserAnswer userAnswer = null;
 
@@ -413,10 +413,12 @@ public class QuizServiceImpl implements QuizService {
 
         quizRepository.save(existingQuiz);
 
-        for (String category : categories) {
-            CategoryStatistics categoryStatistics = categoryStatisticsRepository.findById(category)
+        List<QuizCategory> quizCategories = quizCategoryRepository.findByQuizId(userAnswerDto.getQuizId());
+
+        for (QuizCategory quizCategory : quizCategories) {
+            CategoryStatistics categoryStatistics = categoryStatisticsRepository.findById(quizCategory.getCategory())
                     .orElse(CategoryStatistics.builder()
-                            .category(category)
+                            .category(quizCategory.getCategory())
                             .totalAnswers(0)
                             .totalScore(0)
                             .build());
@@ -432,6 +434,5 @@ public class QuizServiceImpl implements QuizService {
 
             categoryStatisticsRepository.save(categoryStatistics);
         }
-
     }
 }
