@@ -8,7 +8,7 @@ import lombok.*;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@IdClass(CommentQuiz.class)
+@IdClass(CommentQuizId.class)
 public class CommentQuiz {
     @Id
     private Integer quizId;
