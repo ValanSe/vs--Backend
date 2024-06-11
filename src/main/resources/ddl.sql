@@ -53,8 +53,6 @@ CREATE TABLE `quiz`
     `image_b`        TEXT COMMENT 'B 이미지',
     `view_count`     INT          NOT NULL COMMENT '조회수',
     `preference`     INT          NOT NULL COMMENT '선호도',
-    `like_count`     INT          NOT NULL COMMENT '좋아요 수',
-    `unlike_count`   INT          NOT NULL COMMENT '싫어요 수',
     `created_at`     DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '퀴즈 생성 시간',
     `updated_at`     DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '퀴즈 수정 시간',
     PRIMARY KEY (`quiz_id`),
