@@ -381,6 +381,7 @@ public class QuizServiceImpl implements QuizService {
     }
 
     @Override
+    @Transactional
     public void saveUserAnswer(HttpServletRequest httpServletRequest, UserAnswerDto userAnswerDto) {
 
         UserAnswer userAnswer = null;
