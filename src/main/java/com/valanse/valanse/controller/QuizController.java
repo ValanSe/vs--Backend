@@ -181,6 +181,7 @@ public class QuizController {
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "저장 성공", content = @Content(schema = @Schema(implementation = StatusResponseDto.class))),
             @ApiResponse(responseCode = "400", description = "잘못된 요청 형식"),
+            @ApiResponse(responseCode = "404", description = "해당 ID로 퀴즈를 찾을 수 없음"),
             @ApiResponse(responseCode = "409", description = "필수 항목 불입력")
     })
     @PostMapping("/save-user-answer")
