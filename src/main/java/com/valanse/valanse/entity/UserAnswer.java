@@ -1,8 +1,10 @@
 package com.valanse.valanse.entity;
 
-import com.valanse.valanse.service.UserAnswerService.UserAnswerListener;
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
 
@@ -12,7 +14,6 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @IdClass(UserAnswerId.class)
-@EntityListeners(UserAnswerListener.class)
 public class UserAnswer {
     @Id
     private Integer userId; // 답변한 사용자 식별자
