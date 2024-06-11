@@ -5,6 +5,7 @@ import com.valanse.valanse.dto.QuizRegisterDto;
 import com.valanse.valanse.dto.QuizStatsDto;
 import com.valanse.valanse.dto.UserAnswerDto;
 import com.valanse.valanse.entity.*;
+import com.valanse.valanse.event.UserAnswerEvent;
 import com.valanse.valanse.repository.jpa.*;
 import com.valanse.valanse.security.util.JwtUtil;
 import com.valanse.valanse.service.ImageService.S3ImageService;
@@ -12,6 +13,7 @@ import jakarta.persistence.EntityNotFoundException;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -36,6 +38,8 @@ public class QuizServiceImpl implements QuizService {
     private final JwtUtil jwtUtil;
     private final RecommendQuizRepository recommendQuizRepository;
     private final UserCategoryPreferenceRepository userCategoryPreferenceRepository;
+    private final ApplicationEventPublisher applicationEventPublisher;
+
 
     // 올바르지 못한 리턴 예시
     @Override
@@ -444,6 +448,10 @@ public class QuizServiceImpl implements QuizService {
                     .build();
 
             categoryStatisticsRepository.save(categoryStatistics);
+
         }
+
+        applicationEventPublisher.publishEvent(new UserAnswerEvent(userAnswer));
+
     }
 }

@@ -9,10 +9,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Service
 @Slf4j
@@ -51,9 +48,18 @@ public class RecommendServiceImpl implements RecommendService {
             Integer userId = Integer.valueOf(dataMap.get("userId"));
             String recommendQuizIds = dataMap.get("recommendQuizIds");
 
-            List<Integer> recommendQuizList = Arrays.stream(recommendQuizIds.split(","))
-                    .map(Integer::valueOf)
-                    .toList();
+            List<Integer> recommendQuizList = Optional.ofNullable(recommendQuizIds)
+                    .filter(ids -> !ids.isEmpty())
+                    .map(ids -> Arrays.stream(ids.split(","))
+                            .map(Integer::valueOf)
+                            .toList())
+                    .orElse(new ArrayList<>());
+
+            if (recommendQuizList.isEmpty()) {
+                log.warn("recommendQuizIds is null or empty, no recommendations will be updated for user ID: {}", userId);
+                // 추천 문제가 없는 경우의 처리 로직
+                return;
+            }
 
             List<RecommendQuiz> recommendQuizzes = recommendQuizList.stream()
                     .map(quizId -> RecommendQuiz.builder()

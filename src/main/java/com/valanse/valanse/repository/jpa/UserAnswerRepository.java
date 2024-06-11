@@ -6,8 +6,10 @@ import com.valanse.valanse.entity.UserAnswerId;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface UserAnswerRepository extends JpaRepository<UserAnswer, UserAnswerId> {
 
-    List<Quiz> findByUserIdAndPreferenceGreaterThanEqual(Integer userId, int preference);
+    Optional<UserAnswer> findByUserIdAndQuizId(Integer userId, Integer quizId);
+
 }
