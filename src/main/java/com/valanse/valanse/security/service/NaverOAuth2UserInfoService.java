@@ -68,14 +68,12 @@ public class NaverOAuth2UserInfoService implements OAuth2UserInfoService {
             String id = (String) response.get("id");
             String email = (String) response.get("email");
             String name = (String) response.get("name");
-            String birthyear = (String) response.get("birthyear");
 
             // 추출한 정보를 사용해 NaverUser 객체 생성 및 저장
             NaverUser naverUser = NaverUser.builder()
                     .id(id)
                     .email(email)
                     .name(name)
-                    .birthYear(birthyear)
                     .build();
 
             naverUserRepository.save(naverUser);

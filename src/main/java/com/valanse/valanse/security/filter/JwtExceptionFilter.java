@@ -27,7 +27,7 @@ public class JwtExceptionFilter extends OncePerRequestFilter {
             response.setStatus(401);
             response.setContentType(MediaType.APPLICATION_JSON_VALUE);
             response.setCharacterEncoding("UTF-8");
-            objectMapper.writeValue(response.getWriter(), StatusResponseDto.addStatus(401));
+            objectMapper.writeValue(response.getWriter(), StatusResponseDto.error(401, e.getMessage()));
         }
     }
 }

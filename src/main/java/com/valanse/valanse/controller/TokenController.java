@@ -16,6 +16,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -48,8 +49,7 @@ public class TokenController {
     @PostMapping("/get")
     public ResponseEntity<StatusResponseDto> getAccessToken(
             @RequestHeader("stateToken")
-            @Parameter(description = "OAuth 로그인 후 얻을 수 있는 상태 토큰", required = true, example = "bc5a447a-db14-4a48-4f0e-4471712c168f")
-            final String stateToken) {
+            @Parameter(description = "OAuth 로그인 후 얻을 수 있는 상태 토큰", required = true, example = "bc5a447a-db14-4a48-4f0e-4471712c168f") final String stateToken) {
         return ResponseEntity.ok(StatusResponseDto.success(jwtUtil.getAccessTokenByStateToken(stateToken)));
     }
 
@@ -61,8 +61,7 @@ public class TokenController {
     @PostMapping("/check/expiration")
     public ResponseEntity<StatusResponseDto> check1(
             @RequestHeader("Authorization")
-            @Parameter(description = "JWT 액세스 토큰", required = true, example = "eyJ...HAkYY4")
-            final String accessToken) {
+            @Parameter(description = "JWT 액세스 토큰", required = true, example = "eyJ...HAkYY4") final String accessToken) {
         long remainingExpirationTimeInMinutes = jwtUtil.getRemainingExpirationTimeInMinutes(accessToken);
         return ResponseEntity.ok(StatusResponseDto.success(remainingExpirationTimeInMinutes));
     }
@@ -75,8 +74,7 @@ public class TokenController {
     @PostMapping("/check/allClaimsFromToken")
     public ResponseEntity<StatusResponseDto> check2(
             @RequestHeader("Authorization")
-            @Parameter(description = "JWT 액세스 토큰", required = true, example = "eyJ...HAkYY4")
-            final String accessToken) {
+            @Parameter(description = "JWT 액세스 토큰", required = true, example = "eyJ...HAkYY4") final String accessToken) {
         Map<String, Object> allClaimsFromToken = jwtUtil.getAllClaimsFromToken(accessToken);
         return ResponseEntity.ok(StatusResponseDto.success(allClaimsFromToken));
     }
@@ -89,8 +87,7 @@ public class TokenController {
     @PostMapping("/logout")
     public ResponseEntity<StatusResponseDto> logout(
             @RequestHeader("Authorization")
-            @Parameter(description = "JWT 액세스 토큰", required = true, example = "eyJ...HAkYY4")
-            final String accessToken) {
+            @Parameter(description = "JWT 액세스 토큰", required = true, example = "eyJ...HAkYY4") final String accessToken) {
         tokenService.removeRefreshToken(accessToken);
         return ResponseEntity.ok(StatusResponseDto.success());
     }
@@ -98,21 +95,31 @@ public class TokenController {
     @Operation(summary = "Access Token 갱신", description = "Refresh Token을 사용하여 Access Token을 갱신합니다.")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "Access Token 갱신 성공", content = @Content(schema = @Schema(implementation = TokenResponseStatus.class))),
-            @ApiResponse(responseCode = "400", description = "잘못된 Refresh Token 또는 갱신 실패")
+            @ApiResponse(responseCode = "400", description = "잘못된 Refresh Token 또는 갱신 실패"),
+            @ApiResponse(responseCode = "404", description = "Refresh Token을 찾을 수 없음"),
+            @ApiResponse(responseCode = "401", description = "Refresh Token 만료")
     })
     @PostMapping("/refresh")
     public ResponseEntity<TokenResponseStatus> refresh(
             @RequestHeader("Authorization")
-            @Parameter(description = "JWT 액세스 토큰", required = true, example = "eyJ...HAkYY4")
-            final String accessToken) {
-        RefreshToken refreshToken = refreshTokenRepository.findByAccessToken(accessToken)
-                .orElseThrow(EntityNotFoundException::new);
-        if (jwtUtil.verifyToken(refreshToken.getRefreshToken())) {
+            @Parameter(description = "JWT 액세스 토큰", required = true, example = "eyJ...HAkYY4") final String accessToken) {
+        try {
+            RefreshToken refreshToken = refreshTokenRepository.findByAccessToken(accessToken)
+                    .orElseThrow(() -> new EntityNotFoundException("Refresh Token not found for provided Access Token"));
+
+            if (!jwtUtil.verifyToken(refreshToken.getRefreshToken())) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(TokenResponseStatus.addStatus(401, "Refresh Token has expired"));
+            }
+
             String newAccessToken = jwtUtil.generateAccessToken(refreshToken.getUserIdx(), jwtUtil.getUserRole(refreshToken.getRefreshToken()));
             refreshToken.updateAccessToken(newAccessToken);
             refreshTokenRepository.save(refreshToken);
             return ResponseEntity.ok(TokenResponseStatus.success(newAccessToken));
+
+        } catch (EntityNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(TokenResponseStatus.addStatus(404, "Refresh Token not found"));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(TokenResponseStatus.addStatus(400, "Invalid Refresh Token or failed to refresh"));
         }
-        return ResponseEntity.badRequest().body(TokenResponseStatus.addStatus(400, null));
     }
 }
