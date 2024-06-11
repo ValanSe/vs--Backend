@@ -28,5 +28,4 @@ public class UserCategoryPreference {
     private Integer totalPreference;
     private Integer commentCount;
     private Integer registrationCount;
-    private Integer recommendScore;
 }
