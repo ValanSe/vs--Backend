@@ -1,4 +1,4 @@
-package com.valanse.valanse.service.ImageService;
+package com.valanse.valanse.exception;
 
 public class S3Exception extends RuntimeException {
 

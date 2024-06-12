@@ -2,6 +2,7 @@ package com.valanse.valanse.service.QuizService;
 
 import com.valanse.valanse.dto.*;
 import com.valanse.valanse.entity.Quiz;
+import com.valanse.valanse.exception.InvalidOptionException;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -33,5 +34,7 @@ public interface QuizService {
 
     List<QuizDto> searchQuiz(String keyword); // 퀴즈 검색
 
-    void saveUserAnswer(HttpServletRequest httpServletRequest, UserAnswerDto userAnswerDto) throws InvalidOptionException; // 클라이언트의 답변을 데이터베이스에 저장
+    void saveUserAnswer(HttpServletRequest httpServletRequest, UserAnswerDto userAnswer) throws InvalidOptionException; // 클라이언트의 답변을 데이터베이스에 저장
+
+    Boolean checkUserAnswer(HttpServletRequest httpServletRequest, Integer quizId);
 }

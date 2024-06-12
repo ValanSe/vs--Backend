@@ -6,6 +6,7 @@ import com.valanse.valanse.dto.QuizStatsDto;
 import com.valanse.valanse.dto.UserAnswerDto;
 import com.valanse.valanse.entity.*;
 import com.valanse.valanse.event.UserAnswerEvent;
+import com.valanse.valanse.exception.InvalidOptionException;
 import com.valanse.valanse.repository.jpa.*;
 import com.valanse.valanse.security.util.JwtUtil;
 import com.valanse.valanse.service.ImageService.S3ImageService;
@@ -22,6 +23,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.Random;
 import java.util.stream.Collectors;
 
@@ -453,5 +455,14 @@ public class QuizServiceImpl implements QuizService {
 
         applicationEventPublisher.publishEvent(new UserAnswerEvent(userAnswer));
 
+    }
+
+    @Override
+    public Boolean checkUserAnswer(HttpServletRequest httpServletRequest, Integer quizId) {
+        // HTTP 요청에서 사용자 ID를 추출합니다.
+        int userId = jwtUtil.getUserIdxFromRequest(httpServletRequest);
+
+        // 조회된 결과가 존재하면 true, 존재하지 않으면 false를 반환합니다.
+        return userAnswerRepository.findByUserIdAndQuizId(userId, quizId).isPresent();
     }
 }
