@@ -210,4 +210,22 @@ public class QuizController {
 
         return ResponseEntity.ok(StatusResponseDto.success(quizService.getRecommendQuizzes(httpServletRequest)));
     }
+
+    @Operation(summary = "퀴즈 풀이 조회",
+            description = "해당 유저가 요청한 문제를 푼 기록을 확인 ")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "조회", content = @Content(schema = @Schema(implementation = StatusResponseDto.class))),
+            @ApiResponse(responseCode = "400", description = "잘못된 요청 형식"),
+    })
+    @GetMapping("/check-user-answer/{quizId}")
+    public ResponseEntity<StatusResponseDto> checkUserAnswer(
+            @PathVariable Integer quizId,
+            @Parameter(description = "HTTP 요청 객체", hidden = true)
+            HttpServletRequest httpServletRequest
+    ) {
+
+        Boolean hasAnswer = quizService.checkUserAnswer(httpServletRequest, quizId);
+
+        return ResponseEntity.ok(StatusResponseDto.success(hasAnswer ? "User has answered the quiz" : "User has not answered the quiz"));
+    }
 }
