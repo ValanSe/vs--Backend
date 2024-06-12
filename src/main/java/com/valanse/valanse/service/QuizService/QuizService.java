@@ -36,5 +36,7 @@ public interface QuizService {
 
     void saveUserAnswer(HttpServletRequest httpServletRequest, UserAnswerDto userAnswerDto) throws InvalidOptionException; // 클라이언트의 답변을 데이터베이스에 저장
 
+    void saveDummyUserAnswer(Integer userId, UserAnswerDto userAnswerDto) throws InvalidOptionException;
+
     Boolean checkUserAnswer(HttpServletRequest httpServletRequest, Integer quizId);
 }

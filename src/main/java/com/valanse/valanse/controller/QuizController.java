@@ -196,6 +196,26 @@ public class QuizController {
         return ResponseEntity.ok(StatusResponseDto.success("User answer and category statistics saved successfully"));
     }
 
+    @Operation(summary = "사용자의 답변과 카테고리 통계 저장",
+            description = "사용자의 답변과 카테고리 통계를 데이터베이스에 저장")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "저장 성공", content = @Content(schema = @Schema(implementation = StatusResponseDto.class))),
+            @ApiResponse(responseCode = "400", description = "잘못된 요청 형식"),
+            @ApiResponse(responseCode = "404", description = "해당 ID로 퀴즈를 찾을 수 없음"),
+            @ApiResponse(responseCode = "409", description = "필수 항목 불입력")
+    })
+    @PostMapping("/save-dummy-user-answer")
+    public ResponseEntity<StatusResponseDto> saveDummyUserAnswer(
+            @Parameter(description = "답변이 저장될 사용자")
+            @RequestParam Integer userId,
+            @Parameter(description = "사용자의 답변", required = true, schema = @Schema(implementation = UserAnswerDto.class))
+            @RequestBody UserAnswerDto userAnswerDto
+    ) {
+        quizService.saveDummyUserAnswer(userId, userAnswerDto);
+
+        return ResponseEntity.ok(StatusResponseDto.success("User answer and category statistics saved successfully"));
+    }
+
     @Operation(summary = "추천 퀴즈 조회",
             description = "여러 가중치를 기반으로 저장되어있던 추천도가 높은 문제를 제공")
     @ApiResponses({
