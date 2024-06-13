@@ -133,7 +133,7 @@ public class CommentServiceImpl implements CommentService {
 
             Comment existingComment = commentRepository.findById(commentId).orElseThrow(EntityNotFoundException::new);
 
-            if (!existingComment.getAuthorUserId().equals(userIdx)) {
+            if (!existingComment.getAuthorUserId().equals(Integer.valueOf(userIdx))) {
                 throw new AccessDeniedException("You don't have permission to update.");
             }
 
@@ -181,7 +181,7 @@ public class CommentServiceImpl implements CommentService {
 
             Comment comment = commentRepository.findById(commentId).orElseThrow(EntityNotFoundException::new);
 
-            if (!comment.getAuthorUserId().equals(userIdx)) {
+            if (!comment.getAuthorUserId().equals(Integer.valueOf(userIdx))) {
                 throw new AccessDeniedException("You don't have permission to delete");
             }
 
