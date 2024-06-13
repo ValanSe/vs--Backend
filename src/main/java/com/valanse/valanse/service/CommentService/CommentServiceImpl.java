@@ -19,6 +19,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 @Service
@@ -33,6 +36,9 @@ public class CommentServiceImpl implements CommentService {
     private final UserCategoryPreferenceRepository userCategoryPreferenceRepository;
     private final QuizCategoryRepository quizCategoryRepository;
 
+//    private static final Set<String> profanityWords = Set.of(
+//            "비속어 목록"
+//    );
 
     @Override
     @Transactional
@@ -45,18 +51,33 @@ public class CommentServiceImpl implements CommentService {
 
             String content = commentRegisterDto.getContent();
 
+//        for (String profanityWord : profanityWords) {
+//            String regex = "(?i)" + String.join("[^\\p{IsHangul}]*", profanityWord.split("")); // 비속어를 문자 단위로 분할하고 한글 이외의 문자가 있어도 대소문자 무시하고 매칭
+//            Pattern pattern = Pattern.compile(regex); // 생성된 정규식을 사용하여 Pattern 객체 생성
+//            Matcher matcher = pattern.matcher(content); // 주어진 댓글에 대해 정규식 매칭을 수행할 Matcher 객체 생성
+//            StringBuffer sb = new StringBuffer(); // 변경된 댓글을 저장할 StringBuffer 객체 생성
+//
+//            // 정규식 매칭을 통해 댓글에서 비속어를 찾고 해당 비속어를 *로 대체
+//            while (matcher.find()) {
+//                matcher.appendReplacement(sb, "*".repeat(profanityWord.length()));
+//            }
+//
+//            matcher.appendTail(sb); // 변경된 부분을 StringBuffer에 추가
+//            content = sb.toString(); // 변경된 댓글을 content에 저장
+//        }
+
             Comment comment = Comment.builder()
-                    .authorUserId(userIdx)
-                    .content(content)
-                    .createdAt(LocalDateTime.now())
-                    .build();
+                .authorUserId(userIdx)
+                .content(content)
+                .createdAt(LocalDateTime.now())
+                .build();
 
             commentRepository.save(comment);
 
             CommentQuiz commentQuiz = CommentQuiz.builder()
-                    .quizId(quiz.getQuizId())
-                    .commentId(comment.getCommentId())
-                    .build();
+                .quizId(quiz.getQuizId())
+                .commentId(comment.getCommentId())
+                .build();
 
             commentQuizRepository.save(commentQuiz);
 
@@ -112,9 +133,23 @@ public class CommentServiceImpl implements CommentService {
 
             Comment existingComment = commentRepository.findById(commentId).orElseThrow(EntityNotFoundException::new);
 
-            if (!existingComment.getAuthorUserId().equals(userIdx)) {
+            if (!existingComment.getAuthorUserId().equals(Integer.valueOf(userIdx))) {
                 throw new AccessDeniedException("You don't have permission to update.");
             }
+
+//            for (String profanityWord : profanityWords) {
+//                String regex = "(?i)" + String.join("[^\\p{IsHangul}]*", profanityWord.split(""));
+//                Pattern pattern = Pattern.compile(regex);
+//                Matcher matcher = pattern.matcher(content);
+//                StringBuffer sb = new StringBuffer();
+//
+//                while (matcher.find()) {
+//                    matcher.appendReplacement(sb, "*".repeat(profanityWord.length()));
+//                }
+//
+//                matcher.appendTail(sb);
+//                content = sb.toString();
+//            }
 
             existingComment = Comment.builder()
                     .commentId(existingComment.getCommentId())
@@ -146,14 +181,14 @@ public class CommentServiceImpl implements CommentService {
 
             Comment comment = commentRepository.findById(commentId).orElseThrow(EntityNotFoundException::new);
 
-            if (comment.getAuthorUserId() != userIdx) {
+            if (!comment.getAuthorUserId().equals(Integer.valueOf(userIdx))) {
                 throw new AccessDeniedException("You don't have permission to delete");
             }
 
             commentRepository.delete(comment);
 
         } catch (AccessDeniedException e) {
-            log.error("You don't have permission to delete");
+            log.error("Forbidden to delete comment with id {}", commentId, e);
             throw e;
         }
     }

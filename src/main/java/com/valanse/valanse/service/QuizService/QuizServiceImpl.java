@@ -222,7 +222,7 @@ public class QuizServiceImpl implements QuizService {
 
             Quiz existingQuiz = quizRepository.findById(quizId).orElseThrow(EntityNotFoundException::new);
 
-            if (existingQuiz.getAuthorUserId() != userIdx) {
+            if (!existingQuiz.getAuthorUserId().equals(Integer.valueOf(userIdx))) {
                 throw new AccessDeniedException("You don't have permission to update.");
             }
 
@@ -273,7 +273,7 @@ public class QuizServiceImpl implements QuizService {
 
             Quiz quiz = quizRepository.findById(quizId).orElseThrow(EntityNotFoundException::new);
 
-            if (quiz.getAuthorUserId() != userIdx) {
+            if (!quiz.getAuthorUserId().equals(Integer.valueOf(userIdx))) {
                 throw new AccessDeniedException("You don't have permission to delete.");
             }
 
@@ -455,6 +455,74 @@ public class QuizServiceImpl implements QuizService {
 
         applicationEventPublisher.publishEvent(new UserAnswerEvent(userAnswer));
 
+    }
+
+    @Override
+    @Transactional
+    public void saveDummyUserAnswer(Integer userId, UserAnswerDto userAnswerDto) throws InvalidOptionException {
+
+        UserAnswer userAnswer = null;
+
+        try {
+            userAnswer = UserAnswer.builder()
+                    .userId(userId)
+                    .quizId(userAnswerDto.getQuizId())
+                    .selectedOption(OptionAB.valueOf(userAnswerDto.getSelectedOption().toUpperCase())) // 입력 값이 대소문자에 관계없이 처리되도록 변환
+                    .answeredAt(LocalDateTime.now())
+                    .preference(userAnswerDto.getPreference())
+                    .build();
+        } catch (IllegalArgumentException e) {
+            // 유효하지 않은 옵션 값에 대한 상세한 예외 메시지
+            throw new InvalidOptionException("Invalid option value: " + userAnswerDto.getSelectedOption() +
+                    ". Please select either 'A' or 'B'.", e);
+        }
+
+        userAnswerRepository.save(userAnswer);
+
+        Quiz existingQuiz = quizRepository.findById(userAnswerDto.getQuizId()).orElseThrow(EntityNotFoundException::new);
+
+        existingQuiz = Quiz.builder()
+                .quizId(existingQuiz.getQuizId())
+                .authorUserId(existingQuiz.getAuthorUserId())
+                .content(existingQuiz.getContent())
+                .optionA(existingQuiz.getOptionA())
+                .optionB(existingQuiz.getOptionB())
+                .descriptionA(existingQuiz.getDescriptionA())
+                .descriptionB(existingQuiz.getDescriptionB())
+                .imageA(existingQuiz.getImageA())
+                .imageB(existingQuiz.getImageB())
+                .viewCount(existingQuiz.getViewCount())
+                .preference(existingQuiz.getPreference() + userAnswerDto.getPreference())
+                .createdAt(existingQuiz.getCreatedAt())
+                .updatedAt(LocalDateTime.now())
+                .build();
+
+        quizRepository.save(existingQuiz);
+
+        List<QuizCategory> quizCategories = quizCategoryRepository.findByQuizId(userAnswerDto.getQuizId());
+
+        for (QuizCategory quizCategory : quizCategories) {
+            CategoryStatistics categoryStatistics = categoryStatisticsRepository.findById(quizCategory.getCategory())
+                    .orElse(CategoryStatistics.builder()
+                            .category(quizCategory.getCategory())
+                            .totalAnswers(0)
+                            .totalScore(0)
+                            .build());
+
+            int totalAnswers = categoryStatistics.getTotalAnswers() + 1;
+            int totalScore = categoryStatistics.getTotalScore() + userAnswerDto.getPreference();
+
+            categoryStatistics = CategoryStatistics.builder()
+                    .category(categoryStatistics.getCategory())
+                    .totalAnswers(totalAnswers)
+                    .totalScore(totalScore)
+                    .build();
+
+            categoryStatisticsRepository.save(categoryStatistics);
+
+        }
+
+        applicationEventPublisher.publishEvent(new UserAnswerEvent(userAnswer));
     }
 
     @Override
