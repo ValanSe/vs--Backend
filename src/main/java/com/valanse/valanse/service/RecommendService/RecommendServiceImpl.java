@@ -48,6 +48,8 @@ public class RecommendServiceImpl implements RecommendService {
             Integer userId = Integer.valueOf(dataMap.get("userId"));
             String recommendQuizIds = dataMap.get("recommendQuizIds");
 
+            log.info("check {}", recommendQuizIds);
+
             List<Integer> recommendQuizList = Optional.ofNullable(recommendQuizIds)
                     .filter(ids -> !ids.isEmpty())
                     .map(ids -> Arrays.stream(ids.split(","))
