@@ -43,12 +43,24 @@ public class RecommendServiceImpl implements RecommendService {
     @Override
     public void updateRecommendQuiz(String data) {
         try {
-            Map<String, String> dataMap = DataParseUtil.parseCommaSeparatedKeyValuePairs(data);
+            Map<String, String> dataMap = new HashMap<>();
 
+            // userId와 recommendedQuizIds를 정확히 분리
+            String[] keyValuePairs = data.split(",(?=[a-zA-Z])"); // 알파벳 앞에서만 ,로 분리
+
+            for (String pair : keyValuePairs) {
+                String[] keyValue = pair.split(":");
+                String key = keyValue[0].trim();
+                String value = keyValue[1].trim();
+                dataMap.put(key, value);
+            }
+
+            // userId와 recommendQuizIds 추출
             Integer userId = Integer.valueOf(dataMap.get("userId"));
             String recommendQuizIds = dataMap.get("recommendQuizIds");
 
-            log.info("check {}", recommendQuizIds);
+            log.info("User ID: {}", userId);
+            log.info("Recommended Quiz IDs: {}", recommendQuizIds);
 
             List<Integer> recommendQuizList = Optional.ofNullable(recommendQuizIds)
                     .filter(ids -> !ids.isEmpty())
