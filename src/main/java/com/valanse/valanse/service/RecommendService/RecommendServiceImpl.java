@@ -45,10 +45,11 @@ public class RecommendServiceImpl implements RecommendService {
         try {
             Map<String, String> dataMap = new HashMap<>();
 
-            // userId와 recommendedQuizIds를 정확히 분리
+            // 콜론(:)을 기준으로 나누고, 키와 값을 분리
             String[] keyValuePairs = data.split(",(?=[a-zA-Z])"); // 알파벳 앞에서만 ,로 분리
 
             for (String pair : keyValuePairs) {
+                log.info("Pair: {}", pair); // 각 keyValuePair 확인
                 String[] keyValue = pair.split(":");
                 String key = keyValue[0].trim();
                 String value = keyValue[1].trim();
@@ -57,7 +58,7 @@ public class RecommendServiceImpl implements RecommendService {
 
             // userId와 recommendQuizIds 추출
             Integer userId = Integer.valueOf(dataMap.get("userId"));
-            String recommendQuizIds = dataMap.get("recommendQuizIds");
+            String recommendQuizIds = dataMap.get("recommendedQuizIds");
 
             log.info("User ID: {}", userId);
             log.info("Recommended Quiz IDs: {}", recommendQuizIds);
@@ -84,6 +85,8 @@ public class RecommendServiceImpl implements RecommendService {
 
             recommendQuizRepository.saveAll(recommendQuizzes);
 
+        } catch (NumberFormatException e) {
+            log.error("Error parsing integer values: ", e);
         } catch (Exception e) {
             log.error("Error occurred while updating recommended quizzes: ", e);
         }
